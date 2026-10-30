@@ -14,7 +14,7 @@
 | دوربین رو به پایین زنده | ✅ | JPEG 256×256، ۵fps |
 | waypoint + geofence نرم‌افزاری + پرواز/فرود | ✅ | ۴ نقطه، ۳۰m |
 | GPS-denied با EV از Gazebo truth | ✅ | arm → takeoff → waypoint → land |
-| GPS-denied با EV از map-match | ⚠️ | ابتدا درست، وسط مسیر قطع می‌شود |
+| GPS-denied با EV از map-match | ⚠️ | localizer آفلاین: ۹۸.۹٪ match، p95=۱.۸m؛ کنترل/ارتفاع وسط مسیر باقی است |
 | HITL / SIH | ⬜ | فاز بعد |
 | سرویس داخلی 4090 | ⬜ | قرارداد API آماده است |
 | Excel BOM | ✅ | `outputs/navlab/hardware_bom.xlsx` |
@@ -22,15 +22,17 @@
 ## کارهای باقی‌مانده
 
 ### A) Localization / Mapping (اولویت ۱)
-- [ ] جستجوی localizer بر اساس **ترتیب keyframe** (پنجرهٔ ±N حول آخرین kf) نه فقط radius.
-- [ ] prior متحرک + پیش‌بینی سرعت + آستانهٔ adaptive.
+- [x] جستجوی localizer بر اساس **ترتیب keyframe** (پنجرهٔ ±N حول آخرین kf).
+- [x] prior متحرک + hold-last-EV + آستانهٔ coverage.
+- [ ] پیش‌بینی سرعت + آستانهٔ adaptive.
 - [ ] نقشه با چند ارتفاع / keyframe بیشتر / فیلتر کیفیت.
 - [ ] UI ضبط نقشه (start/stop + تعداد فریم + نقشهٔ پوشش).
+- [x] ارزیابی آفلاین localizer: ۹۸.۹٪ match، mean≈۰.۶m، p95≈۱.۸m، latency≈۱۷ms.
 - [ ] نمایش «تخمینی vs واقعی» و معیار خطا در UI.
 - [ ] سناریوی از دست دادن GPS در میانهٔ پرواز + بازیابی.
 
 ### B) Control / Failsafe (اولویت ۱)
-- [ ] جایگزینی `goto_location` با **offboard local NED** برای GPS-denied.
+- [ ] offboard local NED پیاده شد ولی به‌خاطر fly-away در SITL **گیت شده** (`use_offboard=False`) تا bench-test.
 - [ ] نگه‌داشتن آخرین EV هنگام نبود match (جلوگیری از blind land).
 - [ ] failsafe/RTL/land دقیق + geofence واقعی PX4.
 - [ ] تست پرواز مسیر با باد/نویز/قطع EV.
@@ -72,8 +74,8 @@
 
 ## ۶ قدم بعدی (پیشنهاد اجرا)
 
-1. **Offboard local NED** + hold-last-EV → حذف blind land.
-2. **Localizer با ترتیب keyframe** + prior متحرک → پایداری mid-route.
+1. **کنترل/ارتفاع mid-route**: فعال‌سازی map EV در ۳۰m با prior اولیه از INS، بدون offboard.
+2. **Bench-test offboard** (setpoint ثابت، بدون پرواز) قبل از فعال‌سازی.
 3. **UI ثبت نقشه** + نقشهٔ چندارتفاعی.
 4. **Fusion** (EKF/UKF) + covariance.
 5. **HITL/SIH** + سخت‌افزار.

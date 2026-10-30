@@ -332,3 +332,14 @@ GPS-denied با تزریق EV، و HITL.
 - قبل از فعال‌سازی مجدد: تست bench با setpoint ثابت، بررسی فریم NED و `position_velocity_ned`،
   و محدودکردن حداکثر فاصله/سرعت.
 - localizer حالا پنجرهٔ keyframe و hold-last-EV دارد؛ ولی offboard تا اعتبارسنجی فعال نمی‌شود.
+
+### ۱۳.۶ — اعتبارسنجی آفلاین localizer (نتیجهٔ مهم)
+
+- نقشه: ۳۶۰ keyframe؛ برای جلوگیری از self-match، فریم‌های فرد به‌عنوان map و زوج‌ها به‌عنوان live.
+- نتیجه با radius 10–35m:
+  - match rate: **۹۸.۳–۹۸.۹٪**
+  - mean error: **~۰.۵–۰.۶m**، median ~۰.۰۱m، p95 **۱.۵–۱.۸m**
+  - latency: **~۱۷ms**
+- یعنی **map matching خودش خوب است**؛ قطع‌شدن وسط پرواز از کنترل/ارتفاع/failsafe بود، نه الگوریتم تطبیق.
+- offboard فعلاً گیت شده؛ مسیر کنترل اثبات‌شده `goto_location` + EV است. قدم بعد: map EV را در ارتفاع ۳۰m
+  با prior اولیه از INS فعال کن و ارتفاع را ثابت نگه دار.
