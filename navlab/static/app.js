@@ -140,6 +140,14 @@ function pollSim() {
           : "هنوز فریمی از دوربین نرسیده است.";
       }
 
+      const map = data.map || {};
+      const mapStatus = document.getElementById("map-status");
+      const mapFrames = document.getElementById("map-frames");
+      const mapDir = document.getElementById("map-dir");
+      if (mapStatus) mapStatus.textContent = map.running ? `در حال ثبت (${map.elapsed_s || 0}s)` : "متوقف";
+      if (mapFrames) mapFrames.textContent = map.frames ?? 0;
+      if (mapDir) mapDir.textContent = map.out_dir || "—";
+
       const log = document.getElementById("sim-log");
       if (log && data.log) log.textContent = data.log.join("\n");
       const badge = document.getElementById("sim-log-badge");
@@ -178,6 +186,29 @@ async function startSim() {
 async function stopSim() {
   await fetch("/api/sim/stop", { method: "POST" });
   setTimeout(() => window.location.reload(), 500);
+}
+
+async function startMapRecord() {
+  const select = document.getElementById("sim-mission");
+  if (!select) return;
+  const body = new FormData();
+  body.append("mission_id", select.value);
+  body.append("altitude", document.getElementById("map-altitude")?.value || "30");
+  body.append("duration", document.getElementById("map-duration")?.value || "120");
+  const response = await fetch("/api/sim/map/start", { method: "POST", body });
+  const data = await response.json();
+  alert(data.message || "شروع ثبت نقشه");
+}
+
+async function stopMapRecord() {
+  await fetch("/api/sim/map/stop", { method: "POST" });
+  alert("ثبت نقشه متوقف شد");
+}
+
+async function benchOffboard() {
+  const response = await fetch("/api/sim/offboard/bench", { method: "POST" });
+  const data = await response.json();
+  alert(data.message || "bench offboard");
 }
 
 async function disableGps() {

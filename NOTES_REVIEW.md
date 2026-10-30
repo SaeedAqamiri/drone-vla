@@ -181,3 +181,20 @@ map-EV, and failures/fixes (sections 12.x and 13.x).
 10. `scripts/make_hardware_xlsx.py → navlab/templates/hardware.html` — `main()` writes the BOM;
     the template links it at `/media/hardware_bom.xlsx`.
 11. `navlab/ROADMAP.md → NOTES.md` — status/roadmap mirrors sections 12.x/13.x of the engineering log.
+
+---
+
+## Update 2026-10-30 — items 1–4
+
+- `navlab/sim.py`: `_settle()` holds 2 s before landing; the latest GPS flight reached the endpoint
+  within ~2 m with near-zero final roll and no overshoot/failsafe. `bench_offboard()` sends a static
+  `PositionNedYaw` setpoint and `offboard.start` was accepted while disarmed; flight offboard remains
+  gated by `use_offboard=False`.
+- `navlab/fusion.py`: `Fusion2D` constant-velocity KF with Mahalanobis gating; integrated into the map
+  EV branch, with prediction/hold when no match; 3 unit tests.
+- `navlab/mapping.py`: `MapRecorder` start/stop/status plus `/api/sim/map/*`; recorded 23 frames in 5 s
+  into `outputs/navlab/maps/mission3_alt30`; altitude is stored in the manifest and the UI shows
+  frames/path/status and `truth_error_m`.
+- `navlab/hardware.py`: serial-device scan and HITL readiness checklist rendered on `/hardware`;
+  actual HITL still needs a Pixhawk and Gazebo Classic/SIH.
+- Tests: 19/19.

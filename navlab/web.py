@@ -15,6 +15,7 @@ from .camera import LATEST as CAMERA_LATEST
 from .config import MISSIONS_DIR, OUTPUTS, QUICK_DIR, ROOT
 from .db import engine, get_session, init_db
 from .generation import BACKENDS, VIEWS, backend_status
+from .hardware import hitl_status
 from .geo import mission_route_points, route_summary_multi
 from .imagery import inspect_image, make_preview, save_bytes
 from .jobs import enqueue, start_worker
@@ -454,6 +455,26 @@ def sim_gps_disable():
     return JSONResponse(SIM.disable_gps())
 
 
+def sim_map_start(
+    mission_id: int = Form(...),
+    altitude: float = Form(30.0),
+    duration: float = Form(120.0),
+):
+    return JSONResponse(SIM.recorder.start(mission_id, altitude, duration))
+
+
+def sim_map_stop():
+    return JSONResponse(SIM.recorder.stop())
+
+
+def sim_map_status():
+    return JSONResponse(SIM.recorder.status())
+
+
+def sim_offboard_bench():
+    return JSONResponse(SIM.bench_offboard())
+
+
 def sim_param(name: str = Form(...), value: str = Form(...), value_type: str = Form("int")):
     return JSONResponse(SIM.set_param(name, value, value_type))
 
@@ -489,7 +510,11 @@ def sim_camera_meta():
 
 
 def hardware_page(request: Request):
-    return templates.TemplateResponse(request=request, name="hardware.html", context={})
+    return templates.TemplateResponse(
+        request=request,
+        name="hardware.html",
+        context={"hitl": hitl_status()},
+    )
 
 
 def settings_page(request: Request):
@@ -529,6 +554,10 @@ app.add_api_route("/api/sim/ev/start", sim_ev_start, methods=["POST"])
 app.add_api_route("/api/sim/ev/stop", sim_ev_stop, methods=["POST"])
 app.add_api_route("/api/sim/gps/disable", sim_gps_disable, methods=["POST"])
 app.add_api_route("/api/sim/param", sim_param, methods=["POST"])
+app.add_api_route("/api/sim/map/start", sim_map_start, methods=["POST"])
+app.add_api_route("/api/sim/map/stop", sim_map_stop, methods=["POST"])
+app.add_api_route("/api/sim/map/status", sim_map_status, methods=["GET"])
+app.add_api_route("/api/sim/offboard/bench", sim_offboard_bench, methods=["POST"])
 app.add_api_route("/api/sim/status", sim_status, methods=["GET"])
 app.add_api_route("/api/sim/fly", sim_fly, methods=["POST"])
 app.add_api_route("/api/sim/camera.jpg", sim_camera, methods=["GET"])

@@ -18,12 +18,13 @@ def main() -> int:
     parser.add_argument("--duration", type=float, default=60.0)
     parser.add_argument("--hz", type=float, default=10.0)
     parser.add_argument("--stop-file", default=None)
+    parser.add_argument("--altitude", type=float, default=0.0)
     args = parser.parse_args()
 
     out = Path(args.out)
     frames_dir = out / "frames"
     frames_dir.mkdir(parents=True, exist_ok=True)
-    manifest = {"z0": None, "frames": []}
+    manifest = {"z0": None, "altitude": args.altitude, "frames": []}
     last_mtime = 0.0
     started = time.time()
     period = 1.0 / max(args.hz, 1.0)

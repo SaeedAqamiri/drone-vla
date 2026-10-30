@@ -42,6 +42,7 @@
       <button class="btn secondary" onclick="stopSim()">توقف</button>
       <button class="btn secondary" onclick="flySim()">پرواز تا نقطهٔ پایان</button>
       <button class="btn secondary" onclick="disableGps()">قطع GPS</button>
+      <button class="btn secondary" onclick="benchOffboard()">Bench offboard</button>
     </div>
     <p class="muted small">
       شروع SITL ممکن است ۳۰–۹۰ ثانیه طول بکشد. HITL در فاز بعد اضافه می‌شود
@@ -82,6 +83,28 @@
   <p class="muted small" id="sim-camera-note">
     فریم‌ها از تاپیک دوربین Gazebo در حافظه گرفته می‌شوند و به‌صورت JPEG سرو می‌شوند.
   </p>
+</section>
+
+<section class="card">
+  <h2>ثبت نقشهٔ بصری</h2>
+  <div class="grid grid-3">
+    <label>ارتفاع (m)
+      <input id="map-altitude" type="number" value="30">
+    </label>
+    <label>مدت (s)
+      <input id="map-duration" type="number" value="120">
+    </label>
+  </div>
+  <div class="button-row">
+    <button class="btn" onclick="startMapRecord()">شروع ثبت</button>
+    <button class="btn secondary" onclick="stopMapRecord()">توقف ثبت</button>
+  </div>
+  <div class="kv">
+    <div><span>وضعیت</span><b id="map-status">—</b></div>
+    <div><span>فریم‌ها</span><b id="map-frames">0</b></div>
+    <div><span>مسیر نقشه</span><b id="map-dir" class="mono">—</b></div>
+  </div>
+  <p class="muted small">برای نقشهٔ چندارتفاعی، هر ارتفاع را جدا ثبت کن (پوشهٔ mission&lt;id&gt;_alt&lt;alt&gt;).</p>
 </section>
 
 <section class="card">

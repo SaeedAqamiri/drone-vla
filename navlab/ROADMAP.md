@@ -99,3 +99,17 @@
 - geofence و failsafe فعال.
 - HITL با Pixhawk و دوربین واقعی.
 - گزارش تکرارپذیر با seed/مسیر/مدل.
+
+## به‌روزرسانی 2026-10-30 — موارد ۱ تا ۴
+
+- **کنترل/فرود:** `_settle` قبل از land (hold 2s)؛ آخرین پرواز GPS endpoint را در ~۲m گرفت
+  و فرود بدون overshoot/attitude بد انجام شد.
+- **Bench offboard:** `POST /api/sim/offboard/bench` با setpoint ثابت در حالت disarmed
+  `offboard.start` را پذیرفت؛ پرواز offboard همچنان گیت‌شده است.
+- **Fusion:** `navlab/fusion.py` (`Fusion2D`: KF سرعت ثابت + Mahalanobis gate) به map-EV وصل شد؛
+  ۳ تست واحد پاس. پرواز با fusion هنوز تست نشده.
+- **Map UI / multi-altitude:** `MapRecorder` + `/api/sim/map/*` + کارت UI؛ تست: ۲۳ فریم در ۵s در
+  `outputs/navlab/maps/mission3_alt30`؛ `truth_error_m` در UI.
+- **HITL scaffold:** `navlab/hardware.py` + بخش «آمادگی HITL» در `/hardware` (تشخیص سریال و چک‌لیست)؛
+  بدون Pixhawk واقعی قابل تست نیست.
+- تست‌ها: **۱۹/۱۹**.

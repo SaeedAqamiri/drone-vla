@@ -16,6 +16,34 @@
 </section>
 
 <section class="card">
+  <h2>آمادگی HITL / SIH</h2>
+  <table class="table">
+    <thead><tr><th>بررسی</th><th>وضعیت</th><th>توضیح</th></tr></thead>
+    <tbody>
+      {% for check in hitl.checks %}
+      <tr>
+        <td>{{ check.name }}</td>
+        <td><span class="badge {{ 'ok' if check.ok else 'bad' }}">{{ 'آماده' if check.ok else 'ناقص' }}</span></td>
+        <td class="small">{{ check.detail }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <p class="muted small">{{ hitl.note }}</p>
+  <div class="kv">
+    <div><span>سریال‌های شناسایی‌شده</span><b class="mono">{{ hitl.serial|length }}</b></div>
+    <div><span>HITL ready</span><b>{{ 'بله' if hitl.ready else 'خیر' }}</b></div>
+  </div>
+  {% if hitl.serial %}
+  <ul class="file-list">
+    {% for device in hitl.serial %}
+    <li><span class="mono">{{ device.path }}</span><span class="muted small">{{ device.by_id or '—' }}</span></li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+</section>
+
+<section class="card">
   <h2>پیکربندی پیشنهادی</h2>
   <p class="muted">
     سناریو: پرواز ۲۰۰ متر، دوربین تقریباً رو به پایین، ناوبری بدون GPS با تطبیق تصویری.

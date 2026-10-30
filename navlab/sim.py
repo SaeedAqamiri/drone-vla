@@ -16,7 +16,9 @@ from typing import Any
 from .camera import LATEST as CAMERA_LATEST, CameraStream
 from .config import CAMERA_MODEL, PX4_DIR
 from .localizer import MapLocalizer
+from .mapping import MapRecorder
 from .truth import TruthBridge
+from .fusion import Fusion2D
 from .geo import GEOD, distance_to_polyline_m, local_ned, mission_route_points
 
 
@@ -34,6 +36,7 @@ class SimManager:
         self._reader_thread: threading.Thread | None = None
         self.camera = CameraStream()
         self.truth = TruthBridge()
+        self.recorder = MapRecorder()
         self._camera_retry_at = 0.0
         self._truth_retry_at = 0.0
         self._drone: Any = None
@@ -48,6 +51,7 @@ class SimManager:
         self.ev_source = "truth"
         self.use_offboard = False
         self.localizer: MapLocalizer | None = None
+        self.fusion: Fusion2D | None = None
         self._map_prior: tuple[float, float] = (0.0, 0.0)
         self._map_last: dict[str, float] | None = None
         self._map_kf = -1
@@ -69,6 +73,7 @@ class SimManager:
             pass
 
     def start(self, mission: Any, timeout: float = 120.0) -> dict:
+        self._home = (float(mission.start_lat), float(mission.start_lon))
         with self._lock:
             if self.process and self.process.poll() is None:
                 return {"ok": True, "message": "already running", "pid": self.process.pid}
@@ -155,6 +160,7 @@ class SimManager:
                         pass
             self.camera.stop()
             self.truth.stop()
+            self.recorder.stop()
             subprocess.run(
                 ["pkill", "-f", "mavsdk_server.*udpin://0.0.0.0:14540"],
                 check=False,
@@ -186,8 +192,10 @@ class SimManager:
             "mission_status": self.mission_status,
             "telemetry": self.telemetry,
             "local_ned": self.local_ned,
+            "fusion": self.fusion.status() if self.fusion is not None else None,
             "camera": camera,
             "truth": truth,
+            "map": self.recorder.status(),
             "health": self.health,
             "ev": {
                 "active": self._ev_active,
@@ -281,6 +289,7 @@ class SimManager:
                 if not map_dir:
                     return {"ok": False, "message": "map_dir is required"}
                 self.localizer = MapLocalizer(map_dir)
+                self.fusion = Fusion2D()
                 self.ev_source = "map"
                 if init_prior and self.local_ned:
                     self._map_prior = (
@@ -302,6 +311,7 @@ class SimManager:
             else:
                 self.ev_source = "truth"
                 self.localizer = None
+                self.fusion = None
             self._run(self._enable_gps_denied(mission, disable_gps))
             stage = "GPS off" if disable_gps else "GPS on (validation)"
             return {"ok": True, "message": f"EV starting ({source}, {stage})"}
@@ -461,12 +471,38 @@ class SimManager:
                         self._map_kf,
                     )
                     if located is not None:
-                        east = located["east"]
-                        north = located["north"]
+                        raw_east = located["east"]
+                        raw_north = located["north"]
                         z_down = -located["z"]
                         yaw = float(located.get("yaw", 0.0))
-                        self._map_prior = (east, north)
+                        self._map_prior = (raw_east, raw_north)
                         self._map_kf = int(located["keyframe"])
+                        sigma = max(
+                            0.75,
+                            min(3.0, 6.0 / math.sqrt(max(located["inliers"], 1))),
+                        )
+                        fused = (
+                            self.fusion.update(
+                                raw_north, raw_east, time.time(), sigma
+                            )
+                            if self.fusion is not None
+                            else None
+                        )
+                        if fused is not None:
+                            east, north = fused["east"], fused["north"]
+                            meta["fusion"] = {
+                                "accepted": fused["accepted"],
+                                "std_north": round(fused["std_north"], 2),
+                                "std_east": round(fused["std_east"], 2),
+                                "d2": round(fused["d2"], 2),
+                            }
+                        else:
+                            east, north = raw_east, raw_north
+                        self._map_last = {
+                            "east": east,
+                            "north": north,
+                            "z_down": z_down,
+                        }
                         truth = self.truth.read()
                         if truth:
                             meta["truth_error_m"] = round(
@@ -476,7 +512,6 @@ class SimManager:
                                 ),
                                 2,
                             )
-                        self._map_last = {"east": east, "north": north, "z_down": z_down}
                         meta.update(
                             {
                                 "matched": True,
@@ -487,10 +522,26 @@ class SimManager:
                             }
                         )
                     elif self._map_last is not None:
-                        east = self._map_last["east"]
-                        north = self._map_last["north"]
                         z_down = self._map_last["z_down"]
-                        meta.update({"matched": False, "hold": True})
+                        predicted = (
+                            self.fusion.predict_only(time.time())
+                            if self.fusion is not None
+                            else None
+                        )
+                        if predicted is not None:
+                            east, north = predicted["east"], predicted["north"]
+                            meta.update(
+                                {
+                                    "matched": False,
+                                    "predicted": True,
+                                    "std_north": round(predicted["std_north"], 2),
+                                    "std_east": round(predicted["std_east"], 2),
+                                }
+                            )
+                        else:
+                            east = self._map_last["east"]
+                            north = self._map_last["north"]
+                            meta.update({"matched": False, "hold": True})
                     else:
                         east, north, z_down = 0.0, 0.0, 0.0
                         meta.update({"matched": False, "hold": True})
@@ -534,6 +585,59 @@ class SimManager:
             except Exception as error:
                 self._ev_error = str(error)
             await asyncio.sleep(0.2)
+
+    async def _settle(self, drone: Any) -> None:
+        try:
+            await drone.action.hold()
+            await asyncio.sleep(2.0)
+        except Exception:
+            pass
+
+    def bench_offboard(self) -> dict:
+        try:
+            future = self._run(self._bench_offboard())
+            return future.result(timeout=12)
+        except Exception as error:
+            return {"ok": False, "message": str(error)}
+
+    async def _bench_offboard(self) -> dict:
+        from mavsdk.offboard import PositionNedYaw
+
+        drone = self._drone
+        if drone is None:
+            raise RuntimeError("MAVSDK is not connected")
+        north = float(self.local_ned.get("north", 0.0))
+        east = float(self.local_ned.get("east", 0.0))
+        down = float(self.local_ned.get("down", 0.0))
+        if not self.local_ned and self._home and self.telemetry.get("lat") is not None:
+            north, east = local_ned(
+                self._home[0],
+                self._home[1],
+                float(self.telemetry["lat"]),
+                float(self.telemetry["lon"]),
+            )
+            down = 0.0
+        await drone.offboard.set_position_ned(
+            PositionNedYaw(north, east, down, 0.0)
+        )
+        started = False
+        error = ""
+        try:
+            await drone.offboard.start()
+            started = True
+        except Exception as exc:
+            error = str(exc)
+        try:
+            await drone.offboard.stop()
+        except Exception:
+            pass
+        return {
+            "ok": started,
+            "message": "offboard start accepted" if started else f"setpoint sent; start rejected: {error}",
+            "north": round(north, 2),
+            "east": round(east, 2),
+            "down": round(down, 2),
+        }
 
     async def _fly_offboard(
         self,
@@ -586,6 +690,7 @@ class SimManager:
                             break
                     await asyncio.sleep(0.1)
             await drone.offboard.stop()
+            await self._settle(drone)
             await drone.action.land()
             await asyncio.sleep(8)
         finally:
@@ -695,6 +800,7 @@ class SimManager:
                         if remaining < 20.0:
                             break
                     await asyncio.sleep(1.0)
+            await self._settle(drone)
             await drone.action.land()
             await asyncio.sleep(8)
         finally:

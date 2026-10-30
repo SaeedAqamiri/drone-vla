@@ -364,3 +364,16 @@ GPS-denied با تزریق EV، و HITL.
   `truth_error_m` حدود **۰.۲–۲.۹m**؛ فرود/landing نرمال (بدون blind land).
 - نقص باقی‌مانده: overshoot افقی/attitude هنگام فرود (`roll` نهایی عجیب) و کنترل offboard گیت‌شده.
 - `position_velocity_ned` rate=10Hz اضافه شد؛ prior اگر خالی باشد از telemetry lat/lon محاسبه می‌شود.
+
+### ۱۳.۹ — موارد ۱–۴ (2026-10-30)
+
+- **Landing:** `_settle` (`action.hold()` 2s) قبل از land؛ پرواز GPS endpoint را در ~۲m گرفت،
+  roll نهایی ~۰ و بدون overshoot/failsafe.
+- **Bench offboard:** `bench_offboard` setpoint ثابت را روی حالت disarmed می‌فرستد و `offboard.start`
+  را پذیرفت (`ok:true`). پرواز offboard همچنان `use_offboard=False`.
+- **Fusion:** `Fusion2D` (KF سرعت ثابت، process/measurement noise، gate=9.21) در `_ev_loop` map
+  استفاده می‌شود؛ `fusion.update/predict_only` + status؛ ۳ تست.
+- **Map UI:** `MapRecorder` (`navlab/mapping.py`) + APIهای `/api/sim/map/start|stop|status`؛
+  تست ۲۳ فریم/۵s در `maps/mission3_alt30`؛ altitude در manifest؛ UI فریم/مسیر/وضعیت.
+- **HITL:** `navlab/hardware.py` سریال‌ها را detect و چک‌لیست HITL را در `/hardware` نشان می‌دهد.
+- تست‌ها: **۱۹/۱۹**.
