@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+import math
 import os
 import re
 import signal
@@ -41,6 +42,7 @@ class SimManager:
         self._ev_active = False
         self._ev_z0: float | None = None
         self._ev_last: dict[str, Any] = {}
+        self.local_ned: dict[str, float] = {}
         self._ev_error = ""
         self._model_name = CAMERA_MODEL
         self.ev_source = "truth"
@@ -183,6 +185,7 @@ class SimManager:
             "connected": self.connected,
             "mission_status": self.mission_status,
             "telemetry": self.telemetry,
+            "local_ned": self.local_ned,
             "camera": camera,
             "truth": truth,
             "health": self.health,
@@ -219,6 +222,7 @@ class SimManager:
 
         try:
             await drone.telemetry.set_rate_health(1.0)
+            await drone.telemetry.set_rate_position_velocity_ned(10.0)
         except Exception:
             pass
 
@@ -264,21 +268,43 @@ class SimManager:
             raise RuntimeError("MAVSDK is not connected")
         return asyncio.run_coroutine_threadsafe(coro, self._loop)
 
-    def enable_gps_denied(self, mission: Any, source: str = "truth", map_dir: str | None = None) -> dict:
+    def enable_gps_denied(
+        self,
+        mission: Any,
+        source: str = "truth",
+        map_dir: str | None = None,
+        disable_gps: bool = True,
+        init_prior: bool = False,
+    ) -> dict:
         try:
             if source == "map":
                 if not map_dir:
                     return {"ok": False, "message": "map_dir is required"}
                 self.localizer = MapLocalizer(map_dir)
                 self.ev_source = "map"
-                self._map_prior = (0.0, 0.0)
+                if init_prior and self.local_ned:
+                    self._map_prior = (
+                        float(self.local_ned.get("east", 0.0)),
+                        float(self.local_ned.get("north", 0.0)),
+                    )
+                elif init_prior and self.telemetry.get("lat") is not None:
+                    north, east = local_ned(
+                        mission.start_lat,
+                        mission.start_lon,
+                        float(self.telemetry["lat"]),
+                        float(self.telemetry["lon"]),
+                    )
+                    self._map_prior = (east, north)
+                else:
+                    self._map_prior = (0.0, 0.0)
                 self._map_last = None
                 self._map_kf = -1
             else:
                 self.ev_source = "truth"
                 self.localizer = None
-            self._run(self._enable_gps_denied(mission))
-            return {"ok": True, "message": f"GPS-denied mode starting ({source})"}
+            self._run(self._enable_gps_denied(mission, disable_gps))
+            stage = "GPS off" if disable_gps else "GPS on (validation)"
+            return {"ok": True, "message": f"EV starting ({source}, {stage})"}
         except Exception as error:
             return {"ok": False, "message": str(error)}
 
@@ -300,7 +326,7 @@ class SimManager:
         except Exception as error:
             return {"ok": False, "message": str(error)}
 
-    async def _enable_gps_denied(self, mission: Any) -> None:
+    async def _enable_gps_denied(self, mission: Any, disable_gps: bool = True) -> None:
         drone = self._drone
         if drone is None:
             raise RuntimeError("MAVSDK is not connected")
@@ -310,13 +336,22 @@ class SimManager:
         if self._ev_task is None or self._ev_task.done():
             self._ev_task = asyncio.create_task(self._ev_loop())
         await asyncio.sleep(1.0)
-        for name, value in [
-            ("EKF2_EV_NOISE_MD", 1),
-            ("EKF2_EV_CTRL", 11),
-            ("EKF2_HGT_REF", 3),
-            ("EKF2_GPS_CTRL", 0),
-            ("COM_ARM_WO_GPS", 1),
-        ]:
+        overrides = (
+            {
+                "EKF2_EV_CTRL": 11,
+                "EKF2_HGT_REF": 3,
+                "EKF2_GPS_CTRL": 0,
+                "COM_ARM_WO_GPS": 1,
+            }
+            if disable_gps
+            else {
+                "EKF2_EV_CTRL": 1,
+                "EKF2_HGT_REF": 1,
+                "EKF2_GPS_CTRL": 7,
+                "COM_ARM_WO_GPS": 0,
+            }
+        )
+        for name, value in [("EKF2_EV_NOISE_MD", 1), *overrides.items()]:
             try:
                 await drone.param.set_param_int(name, value)
             except Exception as error:
@@ -334,6 +369,28 @@ class SimManager:
             )
         except Exception as error:
             self._ev_error = f"origin: {error}"
+
+    def disable_gps(self) -> dict:
+        try:
+            self._run(self._disable_gps())
+            return {"ok": True, "message": "GPS disabled"}
+        except Exception as error:
+            return {"ok": False, "message": str(error)}
+
+    async def _disable_gps(self) -> None:
+        drone = self._drone
+        if drone is None:
+            return
+        for name, value in [
+            ("EKF2_EV_CTRL", 11),
+            ("EKF2_HGT_REF", 3),
+            ("EKF2_GPS_CTRL", 0),
+            ("COM_ARM_WO_GPS", 1),
+        ]:
+            try:
+                await drone.param.set_param_int(name, value)
+            except Exception:
+                pass
 
     async def _restore_gps(self) -> None:
         drone = self._drone
@@ -394,6 +451,15 @@ class SimManager:
                         yaw = float(located.get("yaw", 0.0))
                         self._map_prior = (east, north)
                         self._map_kf = int(located["keyframe"])
+                        truth = self.truth.read()
+                        if truth:
+                            meta["truth_error_m"] = round(
+                                math.hypot(
+                                    east - float(truth["x"]),
+                                    north - float(truth["y"]),
+                                ),
+                                2,
+                            )
                         self._map_last = {"east": east, "north": north, "z_down": z_down}
                         meta.update(
                             {

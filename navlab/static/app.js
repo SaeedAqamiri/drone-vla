@@ -99,6 +99,13 @@ function pollSim() {
           ? `${last.source || ""} · inliers ${last.inliers ?? "—"} · kf ${last.keyframe ?? "—"}`
           : (last.source === "map" ? "no match" : "—");
       }
+      const truthError = document.getElementById("sim-truth-error");
+      if (truthError) {
+        const last = ev.last || {};
+        truthError.textContent = last.truth_error_m !== undefined
+          ? `${last.truth_error_m} m`
+          : "—";
+      }
 
       const telemetry = data.telemetry || {};
       const lat = document.getElementById("sim-lat");
@@ -155,8 +162,12 @@ async function startSim() {
     body.append("gps_denied", "1");
     const source = document.getElementById("sim-ev-source");
     const mapDir = document.getElementById("sim-map-dir");
+    const gpsDisable = document.getElementById("sim-gps-disable");
+    const initPrior = document.getElementById("sim-init-prior");
     if (source) body.append("source", source.value);
     if (mapDir) body.append("map_dir", mapDir.value);
+    body.append("disable_gps", gpsDisable && gpsDisable.checked ? "1" : "0");
+    body.append("init_prior", initPrior && initPrior.checked ? "1" : "0");
   }
   const response = await fetch("/api/sim/start", { method: "POST", body });
   const data = await response.json();
@@ -167,6 +178,12 @@ async function startSim() {
 async function stopSim() {
   await fetch("/api/sim/stop", { method: "POST" });
   setTimeout(() => window.location.reload(), 500);
+}
+
+async function disableGps() {
+  const response = await fetch("/api/sim/gps/disable", { method: "POST" });
+  const data = await response.json();
+  alert(data.message || "دستور قطع GPS ارسال شد");
 }
 
 async function flySim() {

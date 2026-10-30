@@ -402,6 +402,8 @@ async def sim_start(
     gps_denied: int = Form(0),
     source: str = Form("truth"),
     map_dir: str | None = Form(None),
+    disable_gps: int = Form(1),
+    init_prior: int = Form(0),
 ):
     with Session(engine) as session:
         mission = session.get(Mission, mission_id)
@@ -410,7 +412,13 @@ async def sim_start(
     result = await run_in_threadpool(SIM.start, mission)
     if result.get("ok"):
         if gps_denied:
-            result["ev"] = SIM.enable_gps_denied(mission, source, map_dir)
+            result["ev"] = SIM.enable_gps_denied(
+                mission,
+                source,
+                map_dir,
+                disable_gps=bool(disable_gps),
+                init_prior=bool(init_prior),
+            )
         else:
             result["gps_restored"] = SIM.restore_gps_async()
     return JSONResponse(result)
@@ -424,12 +432,26 @@ def sim_ev_start(
     mission_id: int = Form(...),
     source: str = Form("truth"),
     map_dir: str | None = Form(None),
+    disable_gps: int = Form(1),
+    init_prior: int = Form(0),
 ):
     with Session(engine) as session:
         mission = session.get(Mission, mission_id)
         if mission is None:
             raise HTTPException(status_code=404, detail="Mission not found")
-    return JSONResponse(SIM.enable_gps_denied(mission, source, map_dir))
+    return JSONResponse(
+        SIM.enable_gps_denied(
+            mission,
+            source,
+            map_dir,
+            disable_gps=bool(disable_gps),
+            init_prior=bool(init_prior),
+        )
+    )
+
+
+def sim_gps_disable():
+    return JSONResponse(SIM.disable_gps())
 
 
 def sim_ev_stop():
@@ -501,6 +523,7 @@ app.add_api_route("/api/sim/start", sim_start, methods=["POST"])
 app.add_api_route("/api/sim/stop", sim_stop, methods=["POST"])
 app.add_api_route("/api/sim/ev/start", sim_ev_start, methods=["POST"])
 app.add_api_route("/api/sim/ev/stop", sim_ev_stop, methods=["POST"])
+app.add_api_route("/api/sim/gps/disable", sim_gps_disable, methods=["POST"])
 app.add_api_route("/api/sim/status", sim_status, methods=["GET"])
 app.add_api_route("/api/sim/fly", sim_fly, methods=["POST"])
 app.add_api_route("/api/sim/camera.jpg", sim_camera, methods=["GET"])

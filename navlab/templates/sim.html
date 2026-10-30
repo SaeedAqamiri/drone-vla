@@ -18,6 +18,14 @@
       <input type="checkbox" id="sim-gps-denied">
       GPS-denied (EV)
     </label>
+    <label class="check-row">
+      <input type="checkbox" id="sim-gps-disable" checked>
+      قطع GPS پس از فعال‌سازی EV
+    </label>
+    <label class="check-row">
+      <input type="checkbox" id="sim-init-prior">
+      prior اولیه از INS (برای map)
+    </label>
     <div class="grid grid-2">
       <label>منبع EV
         <select id="sim-ev-source">
@@ -33,6 +41,7 @@
       <button class="btn" onclick="startSim()">شروع SITL</button>
       <button class="btn secondary" onclick="stopSim()">توقف</button>
       <button class="btn secondary" onclick="flySim()">پرواز تا نقطهٔ پایان</button>
+      <button class="btn secondary" onclick="disableGps()">قطع GPS</button>
     </div>
     <p class="muted small">
       شروع SITL ممکن است ۳۰–۹۰ ثانیه طول بکشد. HITL در فاز بعد اضافه می‌شود
@@ -45,6 +54,7 @@
       <div><span>Mission state</span><b id="sim-mission-state">—</b></div>
       <div><span>GPS-denied / EV</span><b id="sim-ev-state">—</b></div>
       <div><span>EV match</span><b id="sim-ev-match" class="mono">—</b></div>
+      <div><span>خطای EV نسبت به truth</span><b id="sim-truth-error" class="mono">—</b></div>
       <div><span>EV error</span><b id="sim-ev-error" class="mono">—</b></div>
     </div>
   </div>

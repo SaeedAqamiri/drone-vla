@@ -343,3 +343,15 @@ GPS-denied با تزریق EV، و HITL.
 - یعنی **map matching خودش خوب است**؛ قطع‌شدن وسط پرواز از کنترل/ارتفاع/failsafe بود، نه الگوریتم تطبیق.
 - offboard فعلاً گیت شده؛ مسیر کنترل اثبات‌شده `goto_location` + EV است. قدم بعد: map EV را در ارتفاع ۳۰m
   با prior اولیه از INS فعال کن و ارتفاع را ثابت نگه دار.
+
+### ۱۳.۷ — Staged map EV (GPS روشن) — نتیجهٔ خیلی خوب
+
+- مسیر: GPS روشن، پرواز تا ۳۰m، سپس map EV با `disable_gps=0` و `init_prior=1`.
+- نتیجه: localizer در کل مسیر match کرد؛ `truth_error_m` بین **۰.۲۸ تا ۱.۵۶m**، ارتفاع ۳۰m ثابت.
+  یعنی map EV به‌عنوان منبع موقعیت افقی دقیق است.
+- بعد از `gps/disable`: دو نمونه اول match/دقیق، بعد ارتفاع افت کرد و PX4 `Landing at current position` /
+  `invalid setpoints` / `blind land` داد.
+- علت اصلی: `EKF2_HGT_REF` **reboot-required** است؛ با خاموش‌کردن GPS، مرجع ارتفاع (که روی GPS مانده)
+  نامعتبر می‌شود. راه‌حل: قبل از بوت `EKF2_HGT_REF=0` (baro) یا `3` (vision) را ست و SITL را ری‌استارت کن،
+  یا از baro به‌عنوان height استفاده کن. سپس EV افقی (`EKF2_EV_CTRL=1`) کافی است.
+- گیت offboard همچنان فعال است؛ کنترل با `goto_location` انجام شد.

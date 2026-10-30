@@ -14,7 +14,7 @@
 | دوربین رو به پایین زنده | ✅ | JPEG 256×256، ۵fps |
 | waypoint + geofence نرم‌افزاری + پرواز/فرود | ✅ | ۴ نقطه، ۳۰m |
 | GPS-denied با EV از Gazebo truth | ✅ | arm → takeoff → waypoint → land |
-| GPS-denied با EV از map-match | ⚠️ | localizer آفلاین: ۹۸.۹٪ match، p95=۱.۸m؛ کنترل/ارتفاع وسط مسیر باقی است |
+| GPS-denied با EV از map-match | ⚠️ | GPS روشن: error ۰.۳–۱.۶m؛ بعد از خاموش‌کردن GPS ارتفاع/EKF می‌افتد (HGT_REF نیاز به reboot) |
 | HITL / SIH | ⬜ | فاز بعد |
 | سرویس داخلی 4090 | ⬜ | قرارداد API آماده است |
 | Excel BOM | ✅ | `outputs/navlab/hardware_bom.xlsx` |
@@ -28,12 +28,14 @@
 - [ ] نقشه با چند ارتفاع / keyframe بیشتر / فیلتر کیفیت.
 - [ ] UI ضبط نقشه (start/stop + تعداد فریم + نقشهٔ پوشش).
 - [x] ارزیابی آفلاین localizer: ۹۸.۹٪ match، mean≈۰.۶m، p95≈۱.۸m، latency≈۱۷ms.
+- [x] نمایش خطای EV نسبت به truth (`truth_error_m`) و تست staged با GPS روشن.
 - [ ] نمایش «تخمینی vs واقعی» و معیار خطا در UI.
 - [ ] سناریوی از دست دادن GPS در میانهٔ پرواز + بازیابی.
 
 ### B) Control / Failsafe (اولویت ۱)
 - [ ] offboard local NED پیاده شد ولی به‌خاطر fly-away در SITL **گیت شده** (`use_offboard=False`) تا bench-test.
 - [ ] نگه‌داشتن آخرین EV هنگام نبود match (جلوگیری از blind land).
+- [ ] **EKF2_HGT_REF/baro**: ست‌کردن قبل از بوت (reboot-required) یا استفاده از baro؛ الان بعد از GPS off ارتفاع می‌افتد.
 - [ ] failsafe/RTL/land دقیق + geofence واقعی PX4.
 - [ ] تست پرواز مسیر با باد/نویز/قطع EV.
 
