@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block title %}Run {{ run.id }} · NavLab{% endblock %}
+{% block page_title %}نتیجهٔ تطبیق #{{ run.id }}{% endblock %}
+{% block page_subtitle %}{{ run.name }} · {{ run.algorithm }}{% endblock %}
+{% block content %}
+
+<section class="grid grid-4">
+  <div class="stat">
+    <span>فریم‌ها</span>
+    <strong>{{ metrics.frames or 1 }}</strong>
+  </div>
+  <div class="stat">
+    <span>success rate</span>
+    <strong>{{ "%.2f"|format(metrics.success_rate or 0) }}</strong>
+  </div>
+  <div class="stat">
+    <span>میانگین inliers</span>
+    <strong>{{ "%.1f"|format(metrics.mean_inliers or 0) }}</strong>
+  </div>
+  <div class="stat">
+    <span>میانگین coverage</span>
+    <strong>{{ "%.2f"|format(metrics.mean_coverage or 0) }}</strong>
+  </div>
+</section>
+
+{% if run.result.generated %}
+<section class="card">
+  <h2>آزمایش سریع</h2>
+  <div class="grid grid-2">
+    <div>
+      <h3>تصویر تولیدشده</h3>
+      <img class="result-image" src="{{ media_url(run.result.montage) }}" alt="montage">
+    </div>
+    <div>
+      <h3>تطبیق</h3>
+      <img class="result-image" src="{{ media_url(run.result.overlay) }}" alt="overlay">
+    </div>
+  </div>
+  <table class="table">
+    <thead><tr><th>—</th><th>success</th><th>inliers</th><th>ratio</th><th>coverage</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>generated → aerial</td>
+        <td>{{ run.metrics.generated.success }}</td>
+        <td>{{ run.metrics.generated.match.inliers }}</td>
+        <td>{{ "%.2f"|format(run.metrics.generated.match.inlier_ratio) }}</td>
+        <td>{{ "%.2f"|format(run.metrics.generated.match.coverage) }}</td>
+      </tr>
+      <tr>
+        <td>satellite → aerial</td>
+        <td>{{ run.metrics.baseline.success }}</td>
+        <td>{{ run.metrics.baseline.match.inliers }}</td>
+        <td>{{ "%.2f"|format(run.metrics.baseline.match.inlier_ratio) }}</td>
+        <td>{{ "%.2f"|format(run.metrics.baseline.match.coverage) }}</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+{% elif frames %}
+<section class="card">
+  <h2>فریم‌ها</h2>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>فریم</th>
+        <th>generated success</th>
+        <th>generated inliers</th>
+        <th>baseline inliers</th>
+        <th>coverage</th>
+        <th>overlay</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for frame in frames %}
+      {% set gen = frame.generated if frame.generated is defined else frame %}
+      <tr>
+        <td>{{ frame.aerial_name or frame.aerial }}</td>
+        <td>{{ gen.success }}</td>
+        <td>{{ gen.match.inliers }}</td>
+        <td>{% if frame.baseline %}{{ frame.baseline.match.inliers }}{% else %}—{% endif %}</td>
+        <td>{{ "%.2f"|format(gen.match.coverage) }}</td>
+        <td>
+          {% if gen.overlay %}
+          <a class="btn small" href="{{ media_url(gen.overlay) }}" target="_blank">overlay</a>
+          {% else %}—{% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% else %}
+<section class="card"><p class="muted">نتیجه‌ای ثبت نشده است.</p></section>
+{% endif %}
+
+<section class="card">
+  <h2>جزئیات خام</h2>
+  <pre class="log">{{ run.result | tojson(indent=2) }}</pre>
+</section>
+
+{% endblock %}

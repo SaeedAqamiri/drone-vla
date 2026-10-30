@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}آزمایش سریع · NavLab{% endblock %}
+{% block page_title %}آزمایش سریع{% endblock %}
+{% block page_subtitle %}یک تایل ماهواره + یک فریم هوایی واقعی → تولید و تطبیق{% endblock %}
+{% block content %}
+
+<section class="grid grid-2">
+  <div class="card">
+    <h2>ورودی‌ها</h2>
+    <form method="post" action="/quick" enctype="multipart/form-data" class="form">
+      <label>تایل ماهواره‌ای
+        <input type="file" name="satellite" accept=".tif,.tiff,.png,.jpg,.jpeg" required>
+      </label>
+      <label>فریم هوایی واقعی
+        <input type="file" name="aerial" accept=".png,.jpg,.jpeg,.tif,.tiff" required>
+      </label>
+      <div class="grid grid-2">
+        <label>بک‌اند
+          <select name="backend">
+            {% for item in backends %}
+            <option value="{{ item }}">{{ item }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <label>نما
+          <select name="view">
+            {% for item in views %}
+            <option value="nadir">nadir</option>
+            <option value="oblique15">oblique15</option>
+            <option value="oblique30">oblique30</option>
+            <option value="oblique45">oblique45</option>
+            {% endfor %}
+          </select>
+        </label>
+        <label>Seed
+          <input name="seed" type="number" value="0">
+        </label>
+        <label>خروجی
+          <select name="size">
+            <option value="768x768">768×768</option>
+            <option value="512x512">512×512</option>
+            <option value="1024x1024">1024×1024</option>
+          </select>
+        </label>
+      </div>
+      <button class="btn" type="submit">تولید و تطبیق</button>
+    </form>
+  </div>
+
+  <div class="card">
+    <h2>راهنما</h2>
+    <p>
+      این صفحه همان منطق <code>sat2aerial</code> را اجرا می‌کند: از تایل ماهواره یک تصویر هوایی
+      می‌سازد، سپس آن را با فریم واقعی تطبیق می‌دهد و با baseline ماهواره مقایسه می‌کند.
+    </p>
+    <div class="status-row">
+      <span>ComfyUI</span>
+      <span class="badge {% if backend.comfy_available %}ok{% else %}bad{% endif %}">
+        {% if backend.comfy_available %}آماده{% else %}خاموش{% endif %}
+      </span>
+    </div>
+    <div class="status-row">
+      <span>BFL API</span>
+      <span class="badge {% if backend.bfl_key %}ok{% else %}warn{% endif %}">
+        {% if backend.bfl_key %}کلید دارد{% else %}کلید ندارد{% endif %}
+      </span>
+    </div>
+    <p class="muted small">
+      اگر ComfyUI خاموش است، <code>dummy</code> را انتخاب کن تا فقط مسیر داده و متریک‌ها تست شود.
+    </p>
+  </div>
+</section>
+
+{% endblock %}

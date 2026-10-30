@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}تنظیمات · NavLab{% endblock %}
+{% block page_title %}تنظیمات{% endblock %}
+{% block page_subtitle %}سرویس تولید، مسیرها و قرارداد API{% endblock %}
+{% block content %}
+
+<section class="grid grid-2">
+  <div class="card">
+    <h2>سرویس تولید تصویر</h2>
+    <div class="status-row">
+      <span>ComfyUI URL</span>
+      <span class="mono">{{ backend.comfy_url }}</span>
+    </div>
+    <div class="status-row">
+      <span>وضعیت ComfyUI</span>
+      <span class="badge {% if backend.comfy_available %}ok{% else %}bad{% endif %}">
+        {% if backend.comfy_available %}آماده{% else %}خاموش{% endif %}
+      </span>
+    </div>
+    <div class="status-row">
+      <span>BFL API Key</span>
+      <span class="badge {% if backend.bfl_key %}ok{% else %}warn{% endif %}">
+        {% if backend.bfl_key %}تنظیم شده{% else %}تنظیم نشده{% endif %}
+      </span>
+    </div>
+    <p class="muted small">
+      برای روشن کردن ComfyUI:
+    </p>
+    <pre class="log">cd ~/drone-vla/ComfyUI
+../env_comfy/bin/python main.py --lowvram --disable-auto-launch \
+  --listen 127.0.0.1 --port 8188 --preview-method none</pre>
+  </div>
+
+  <div class="card">
+    <h2>مسیرها</h2>
+    <div class="kv">
+      <div><span>خروجی‌ها</span><b class="mono">{{ outputs }}</b></div>
+      <div><span>پایگاه داده</span><b class="mono">{{ outputs }}/navlab.db</b></div>
+    </div>
+    <p class="muted small">
+      هر مأموریت زیر <code>outputs/navlab/missions/&lt;id&gt;</code> ذخیره می‌شود.
+    </p>
+  </div>
+</section>
+
+<section class="card">
+  <h2>قرارداد سرویس تولید (برای 4090 بعدی)</h2>
+  <p>
+    UI با یک interface ثابت کار می‌کند؛ سرویس داخلی 4090 فقط باید همان قرارداد را پیاده کند:
+  </p>
+  <pre class="log">POST /v1/generate
+  { image, prompt, size, seed, style_refs[] }
+→ { job_id }
+
+GET /v1/jobs/{id}
+→ { status, image_url, seconds, cost }
+
+GET /v1/health</pre>
+  <p class="muted small">
+    الان بک‌اند <code>bfl</code> و <code>comfy</code> فعال‌اند. بعداً <code>internal</code>
+    با آدرس سرویس 4090 اضافه می‌شود.
+  </p>
+</section>
+
+{% endblock %}

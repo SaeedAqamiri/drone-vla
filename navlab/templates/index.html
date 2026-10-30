@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+{% block title %}داشبورد · NavLab{% endblock %}
+{% block page_title %}داشبورد{% endblock %}
+{% block page_subtitle %}شروع یک مأموریت جدید یا ادامهٔ آزمایش‌های قبلی{% endblock %}
+{% block content %}
+
+<section class="grid grid-4">
+  <div class="stat">
+    <span>مأموریت‌ها</span>
+    <strong>{{ counts.missions }}</strong>
+  </div>
+  <div class="stat">
+    <span>تایل‌های تولیدشده</span>
+    <strong>{{ counts.tiles }}</strong>
+  </div>
+  <div class="stat">
+    <span>اجراهای تطبیق</span>
+    <strong>{{ counts.runs }}</strong>
+  </div>
+  <div class="stat">
+    <span>وضعیت SITL</span>
+    <strong class="{% if sim.running %}ok{% else %}muted{% endif %}">
+      {% if sim.running %}روشن{% else %}خاموش{% endif %}
+    </strong>
+  </div>
+</section>
+
+<section class="grid grid-2">
+  <div class="card">
+    <h2>مأموریت جدید</h2>
+    <form method="post" action="/missions" class="form">
+      <label>نام مأموریت
+        <input name="name" required value="مأموریت نمونه">
+      </label>
+      <div class="grid grid-2">
+        <label>Lat شروع
+          <input name="start_lat" type="number" step="0.000001" required value="35.689200">
+        </label>
+        <label>Lon شروع
+          <input name="start_lon" type="number" step="0.000001" required value="51.389000">
+        </label>
+        <label>Lat پایان
+          <input name="end_lat" type="number" step="0.000001" required value="35.700000">
+        </label>
+        <label>Lon پایان
+          <input name="end_lon" type="number" step="0.000001" required value="51.420000">
+        </label>
+      </div>
+      <div class="grid grid-3">
+        <label>ارتفاع (m)
+          <input name="altitude_m" type="number" step="1" value="200">
+        </label>
+        <label>سرعت (km/h)
+          <input name="speed_kmh" type="number" step="1" value="180">
+        </label>
+        <label>عرض کوریدور (km)
+          <input name="corridor_km" type="number" step="0.1" value="2">
+        </label>
+      </div>
+      <label>FOV دوربین (deg)
+        <input name="camera_fov" type="number" step="1" value="73">
+      </label>
+      <label>نقاط میانی مسیر (هر خط: lat,lon — اختیاری)
+        <textarea name="waypoints" rows="3" placeholder="35.6900,51.3950&#10;35.6950,51.4050"></textarea>
+      </label>
+      <button class="btn" type="submit">ساخت مأموریت</button>
+    </form>
+  </div>
+
+  <div class="card">
+    <h2>وضعیت سرویس‌ها</h2>
+    <div class="status-row">
+      <span>ComfyUI (local)</span>
+      <span class="badge {% if backend.comfy_available %}ok{% else %}bad{% endif %}">
+        {% if backend.comfy_available %}آماده{% else %}خاموش{% endif %}
+      </span>
+    </div>
+    <div class="status-row">
+      <span>BFL API</span>
+      <span class="badge {% if backend.bfl_key %}ok{% else %}warn{% endif %}">
+        {% if backend.bfl_key %}کلید دارد{% else %}کلید ندارد{% endif %}
+      </span>
+    </div>
+    <div class="status-row">
+      <span>PX4 SITL</span>
+      <span class="badge {% if sim.running %}ok{% else %}bad{% endif %}">
+        {% if sim.running %}در حال اجرا{% else %}متوقف{% endif %}
+      </span>
+    </div>
+    <p class="muted small">
+      برای تولید بدون GPU از بک‌اند <code>dummy</code> استفاده کن. برای FLUX واقعی، ComfyUI را روشن کن
+      یا بعداً سرویس 4090 را وصل کن.
+    </p>
+    <a class="btn secondary" href="/settings">تنظیمات</a>
+  </div>
+</section>
+
+<section class="card">
+  <h2>مأموریت‌ها</h2>
+  {% if missions %}
+  <table class="table">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>نام</th>
+        <th>شروع</th>
+        <th>پایان</th>
+        <th>ارتفاع</th>
+        <th>وضعیت</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for mission in missions %}
+      <tr>
+        <td>{{ mission.id }}</td>
+        <td>{{ mission.name }}</td>
+        <td class="mono">{{ "%.5f"|format(mission.start_lat) }}, {{ "%.5f"|format(mission.start_lon) }}</td>
+        <td class="mono">{{ "%.5f"|format(mission.end_lat) }}, {{ "%.5f"|format(mission.end_lon) }}</td>
+        <td>{{ mission.altitude_m }} m</td>
+        <td><span class="badge">فاز ۱</span></td>
+        <td><a class="btn small" href="/missions/{{ mission.id }}">باز کردن</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="muted">هنوز مأموریتی ساخته نشده است.</p>
+  {% endif %}
+</section>
+
+{% endblock %}

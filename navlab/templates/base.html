@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}NavLab{% endblock %}</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">N</div>
+      <div>
+        <strong>NavLab</strong>
+        <small>ناوبری بدون GPS</small>
+      </div>
+    </div>
+    <nav>
+      <a href="/">داشبورد</a>
+      <a href="/quick">آزمایش سریع</a>
+      <a href="/sim">شبیه‌سازی SITL</a>
+      <a href="/hardware">سخت‌افزار</a>
+      <a href="/settings">تنظیمات</a>
+    </nav>
+    <div class="sidebar-note">
+      فاز ۱: SITL<br>
+      فاز بعد: HITL / SIH
+    </div>
+  </aside>
+  <main class="main">
+    <header class="topbar">
+      <div>
+        <h1>{% block page_title %}داشبورد{% endblock %}</h1>
+        <p class="muted">{% block page_subtitle %}پلتفرم آزمایش ناوبری بدون GPS{% endblock %}</p>
+      </div>
+      <div class="topbar-badges">
+        <span class="badge">RTX 4060 · 8GB</span>
+        <span class="badge">SITL Gazebo</span>
+      </div>
+    </header>
+    {% block content %}{% endblock %}
+  </main>
+</div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="/static/app.js"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,32 @@
+# Python environments and caches
+env_*/
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Large external trees (separate repos / downloads)
+ComfyUI/
+models/
+PX4-Autopilot/
+IsaacLab-2.1/
+flux-action/
+data/
+outputs/
+logs/
+
+# Model / log artifacts
+*.safetensors
+*.ckpt
+*.pt
+*.pth
+*.onnx
+*.npz
+*.ulg
+*.bag
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
+*.swp

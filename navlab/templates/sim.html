@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block title %}شبیه‌سازی SITL · NavLab{% endblock %}
+{% block page_title %}شبیه‌سازی SITL{% endblock %}
+{% block page_subtitle %}PX4 + Gazebo Harmonic · فاز اول{% endblock %}
+{% block content %}
+
+<section class="grid grid-2">
+  <div class="card">
+    <h2>کنترل</h2>
+    <label>مأموریت
+      <select id="sim-mission">
+        {% for mission in missions %}
+        <option value="{{ mission.id }}">{{ mission.name }} (#{{ mission.id }})</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label class="check-row">
+      <input type="checkbox" id="sim-gps-denied">
+      GPS-denied (EV)
+    </label>
+    <div class="grid grid-2">
+      <label>منبع EV
+        <select id="sim-ev-source">
+          <option value="truth">Gazebo truth (مرحلهٔ ۱)</option>
+          <option value="map">نقشهٔ بصری (map-match)</option>
+        </select>
+      </label>
+      <label>پوشهٔ نقشه
+        <input id="sim-map-dir" value="outputs/navlab/maps/3">
+      </label>
+    </div>
+    <div class="button-row">
+      <button class="btn" onclick="startSim()">شروع SITL</button>
+      <button class="btn secondary" onclick="stopSim()">توقف</button>
+      <button class="btn secondary" onclick="flySim()">پرواز تا نقطهٔ پایان</button>
+    </div>
+    <p class="muted small">
+      شروع SITL ممکن است ۳۰–۹۰ ثانیه طول بکشد. HITL در فاز بعد اضافه می‌شود
+      (Gazebo Classic یا SIH).
+    </p>
+    <div class="kv">
+      <div><span>وضعیت</span><b id="sim-status">—</b></div>
+      <div><span>اتصال MAVLink</span><b id="sim-connected">—</b></div>
+      <div><span>PID</span><b id="sim-pid" class="mono">—</b></div>
+      <div><span>Mission state</span><b id="sim-mission-state">—</b></div>
+      <div><span>GPS-denied / EV</span><b id="sim-ev-state">—</b></div>
+      <div><span>EV match</span><b id="sim-ev-match" class="mono">—</b></div>
+      <div><span>EV error</span><b id="sim-ev-error" class="mono">—</b></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>تله‌متری</h2>
+    <div class="grid grid-2">
+      <div class="stat"><span>Lat</span><strong id="sim-lat" class="mono">—</strong></div>
+      <div class="stat"><span>Lon</span><strong id="sim-lon" class="mono">—</strong></div>
+      <div class="stat"><span>Alt (rel)</span><strong id="sim-alt">—</strong></div>
+      <div class="stat"><span>Yaw</span><strong id="sim-yaw">—</strong></div>
+    </div>
+    <p class="muted small">تله‌متری از MAVSDK روی پورت 14540 خوانده می‌شود.</p>
+  </div>
+</section>
+
+<section class="card">
+  <div class="card-head">
+    <h2>دوربین Gazebo</h2>
+    <span class="badge" id="sim-camera-badge">—</span>
+  </div>
+  <div class="camera-wrap">
+    <img id="sim-camera" alt="Gazebo camera" onerror="this.style.visibility='hidden'">
+  </div>
+  <p class="muted small" id="sim-camera-note">
+    فریم‌ها از تاپیک دوربین Gazebo در حافظه گرفته می‌شوند و به‌صورت JPEG سرو می‌شوند.
+  </p>
+</section>
+
+<section class="card">
+  <h2>نقشه</h2>
+  <div id="sim-map" class="map"></div>
+</section>
+
+<section class="card">
+  <div class="card-head">
+    <h2>لاگ PX4</h2>
+    <span class="badge" id="sim-log-badge">—</span>
+  </div>
+  <pre class="log" id="sim-log">—</pre>
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+initSimMap("sim-map");
+pollSim();
+</script>
+{% endblock %}

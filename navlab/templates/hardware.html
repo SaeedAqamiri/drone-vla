@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}سخت‌افزار · NavLab{% endblock %}
+{% block page_title %}سخت‌افزار پیشنهادی{% endblock %}
+{% block page_subtitle %}بدون بدنهٔ پهپاد — قابل تهیه در بازار ایران{% endblock %}
+{% block content %}
+
+<section class="card">
+  <div class="card-head">
+    <h2>فایل اکسل BOM</h2>
+    <a class="btn" href="/media/hardware_bom.xlsx" download>دانلود Excel</a>
+  </div>
+  <p class="muted small">
+    شامل شیت‌های Summary، Drone_BOM، GPU_Station، Available و Notes.
+    قیمت‌ها دلاری و قابل ویرایش‌اند؛ نرخ ارز را در <code>Summary!B10</code> وارد کن تا ستون‌های تومان خودکار حساب شوند.
+  </p>
+</section>
+
+<section class="card">
+  <h2>پیکربندی پیشنهادی</h2>
+  <p class="muted">
+    سناریو: پرواز ۲۰۰ متر، دوربین تقریباً رو به پایین، ناوبری بدون GPS با تطبیق تصویری.
+    تصویربرداری/Matching روی Raspberry Pi؛ تولید تصویر روی GPU جدا.
+  </p>
+  <table class="table">
+    <thead>
+      <tr><th>قطعه</th><th>پیشنهاد</th><th>قیمت تقریبی</th><th>موجودی ایران</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Flight controller</td><td>Pixhawk 6C یا CUAV V5+</td><td>$150–220</td><td>خوب</td></tr>
+      <tr><td>Companion</td><td>Raspberry Pi 5 8GB یا Pi 4B 8GB</td><td>$75–110</td><td>متوسط / خوب</td></tr>
+      <tr><td>حافظه</td><td>NVMe + HAT (برای Pi 5) یا SD صنعتی</td><td>$30–50</td><td>متوسط</td></tr>
+      <tr><td>دوربین اصلی</td><td>Arducam OV9281 global mono + لنز ۶mm</td><td>$30–50</td><td>متوسط</td></tr>
+      <tr><td>دوربین رنگ</td><td>Arducam IMX477 HQ</td><td>$50–70</td><td>خوب</td></tr>
+      <tr><td>GPS (ground truth)</td><td>u-blox M9N</td><td>$25–45</td><td>خوب</td></tr>
+      <tr><td>تله‌متری</td><td>SiK 433MHz (جفت)</td><td>$30–60</td><td>خوب</td></tr>
+      <tr><td>Power</td><td>PM02 + BEC 5V/5A</td><td>$30–45</td><td>خوب</td></tr>
+      <tr><td>Rangefinder</td><td>TFmini-S</td><td>$40–60</td><td>متوسط</td></tr>
+      <tr><td>Optical flow</td><td>PMW3901</td><td>$20–30</td><td>متوسط</td></tr>
+      <tr><td>متفرقه</td><td>vibration mount، enclosure، fan، کابل، SD</td><td>$30–60</td><td>خوب</td></tr>
+      <tr class="total"><td colspan="2">جمع تقریبی پهپاد</td><td>$420–720</td><td>—</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="card">
+  <h2>ایستگاه 4090 (سرویس داخلی تولید تصویر)</h2>
+  <table class="table">
+    <thead><tr><th>قطعه</th><th>قیمت تقریبی جهانی</th><th>نکته</th></tr></thead>
+    <tbody>
+      <tr><td>RTX 4090 24GB</td><td>$1,600–2,500</td><td>BF16 بدون کوانتیزاسیون؛ 1024px تنگ است</td></tr>
+      <tr><td>Host (64GB RAM، 2TB NVMe، PSU 1000W)</td><td>$1,000–1,500</td><td>برای offload شدن text encoder ضروری است</td></tr>
+      <tr class="total"><td>جمع</td><td>$2,600–4,000</td><td>در ایران معمولاً ۱.۵–۲ برابر</td></tr>
+    </tbody>
+  </table>
+  <p class="muted small">
+    برای یک مأموریت ۵۰۰۰km، API ارزان‌تر از خرید 4090 است (~$343 برای ۳۸k تصویر).
+    خرید 4090 وقتی منطقی است که تولید تکراری/سرویس داخلی بخواهی.
+  </p>
+</section>
+
+<section class="card">
+  <h2>HITL</h2>
+  <p>
+    برای HITL، همان Pixhawk + Raspberry Pi + دوربین کافی است. داکیومنت PX4 فعلاً HITL را با
+    Gazebo Classic / jMAVSim پشتیبانی می‌کند؛ Gazebo Harmonic پشتیبانی رسمی ندارد.
+    گزینهٔ ساده‌تر: SIH روی Pixhawk.
+  </p>
+</section>
+
+{% endblock %}

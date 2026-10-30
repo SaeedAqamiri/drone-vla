@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Job {{ job.id }} · NavLab{% endblock %}
+{% block page_title %}Job #{{ job.id }}{% endblock %}
+{% block page_subtitle %}{{ job.kind }} · {{ job.backend }}{% endblock %}
+{% block content %}
+
+<section class="card" id="job-card" data-job-id="{{ job.id }}">
+  <div class="card-head">
+    <h2>وضعیت</h2>
+    <span class="badge" id="job-status">{{ job.status }}</span>
+  </div>
+  {% set pct = (job.progress / job.total * 100) if job.total else 0 %}
+  <div class="progress"><div class="progress-fill" id="job-progress" style="width: {{ pct }}%"></div></div>
+  <p class="muted" id="job-message">{{ job.message }}</p>
+  <p class="small mono" id="job-count">{{ job.progress }} / {{ job.total }}</p>
+
+  <div class="kv">
+    <div><span>نوع</span><b>{{ job.kind }}</b></div>
+    <div><span>بک‌اند</span><b>{{ job.backend }}</b></div>
+    <div><span>مأموریت</span><b>{{ job.mission_id or "—" }}</b></div>
+  </div>
+</section>
+
+<section class="card" id="job-result">
+  <h2>نتیجه</h2>
+  {% if job.status == "error" %}
+  <p class="error">{{ job.message }}</p>
+  {% elif job.status == "done" %}
+    {% if result.run_id %}
+    <p>اجرای تطبیق آماده است.</p>
+    <a class="btn" href="/runs/{{ result.run_id }}">مشاهدهٔ نتایج</a>
+    {% elif result.tile_ids %}
+    <p>{{ result.tile_ids|length }} تایل تولید شد.</p>
+    <a class="btn" href="/missions/{{ job.mission_id }}">بازگشت به مأموریت</a>
+    {% else %}
+    <pre class="log">{{ result | tojson(indent=2) }}</pre>
+    {% endif %}
+  {% else %}
+  <p class="muted">در حال اجرا… این صفحه خودکار به‌روز می‌شود.</p>
+  {% endif %}
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+pollJob(document.getElementById("job-card").dataset.jobId);
+</script>
+{% endblock %}

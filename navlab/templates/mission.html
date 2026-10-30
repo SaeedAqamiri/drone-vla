@@ -1,0 +1,234 @@
+{% extends "base.html" %}
+{% block title %}{{ mission.name }} · NavLab{% endblock %}
+{% block page_title %}{{ mission.name }}{% endblock %}
+{% block page_subtitle %}مأموریت #{{ mission.id }} — مسیر و منابع تصویری{% endblock %}
+{% block content %}
+
+<section class="grid grid-4">
+  <div class="stat">
+    <span>طول مسیر</span>
+    <strong>{{ "%.1f"|format(summary.length_km) }} km</strong>
+  </div>
+  <div class="stat">
+    <span>مساحت کوریدور</span>
+    <strong>{{ "%.1f"|format(summary.area_km2) }} km²</strong>
+  </div>
+  <div class="stat">
+    <span>تایل‌های تقریبی</span>
+    <strong>{{ summary.tile_count_estimate }}</strong>
+  </div>
+  <div class="stat">
+    <span>ارتفاع / سرعت</span>
+    <strong>{{ mission.altitude_m }}m · {{ mission.speed_kmh }}km/h</strong>
+  </div>
+</section>
+
+<section class="card">
+  <div class="card-head">
+    <h2>نقشهٔ مسیر</h2>
+    <span class="muted small">
+      کوریدور {{ mission.corridor_km }}km · FOV {{ mission.camera_fov }}°
+      {% if mission.meta and mission.meta.waypoints %}· {{ mission.meta.waypoints|length }} waypoint{% endif %}
+    </span>
+  </div>
+  <div id="mission-map" class="map"></div>
+  <div class="coords">
+    <span>شروع: <b class="mono">{{ "%.6f"|format(mission.start_lat) }}, {{ "%.6f"|format(mission.start_lon) }}</b></span>
+    <span>پایان: <b class="mono">{{ "%.6f"|format(mission.end_lat) }}, {{ "%.6f"|format(mission.end_lon) }}</b></span>
+  </div>
+</section>
+
+<section class="grid grid-2">
+  <div class="card">
+    <h2>آپلود نقشهٔ ماهواره‌ای</h2>
+    <form method="post" action="/missions/{{ mission.id }}/upload" enctype="multipart/form-data" class="form">
+      <input type="hidden" name="kind" value="satellite">
+      <label>فایل GeoTIFF یا تصویر
+        <input type="file" name="file" accept=".tif,.tiff,.png,.jpg,.jpeg" required>
+      </label>
+      <button class="btn" type="submit">آپلود ماهواره</button>
+    </form>
+    {% if satellite %}
+    <div class="kv">
+      <div><span>فایل</span><b>{{ satellite.filename }}</b></div>
+      <div><span>ابعاد</span><b>{{ satellite.width }} × {{ satellite.height }}</b></div>
+      <div><span>GSD</span><b>{{ "%.2f"|format(satellite.gsd_m or 0) }} m</b></div>
+      <div><span>CRS</span><b class="mono">{{ satellite.crs or "—" }}</b></div>
+    </div>
+    {% else %}
+    <p class="muted small">برای محاسبهٔ کوریدور و کراپ تایل، GeoTIFF با CRS لازم است.</p>
+    {% endif %}
+  </div>
+
+  <div class="card">
+    <h2>آپلود فریم هوایی واقعی</h2>
+    <form method="post" action="/missions/{{ mission.id }}/upload" enctype="multipart/form-data" class="form">
+      <input type="hidden" name="kind" value="aerial">
+      <label>فریم drone (برای ارزیابی تطبیق)
+        <input type="file" name="file" accept=".png,.jpg,.jpeg,.tif,.tiff" required>
+      </label>
+      <button class="btn secondary" type="submit">آپلود فریم</button>
+    </form>
+    {% if aerials %}
+    <ul class="file-list">
+      {% for frame in aerials %}
+      <li>
+        <span>{{ frame.filename }}</span>
+        <a class="muted small" href="{{ media_url(frame.preview_path) }}" target="_blank">پیش‌نمایش</a>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p class="muted small">بدون فریم واقعی، فقط consistency بین ماهواره و تصویر تولیدشده سنجیده می‌شود.</p>
+    {% endif %}
+  </div>
+</section>
+
+<section class="grid grid-2">
+  <div class="card">
+    <h2>تولید تصویر هوایی</h2>
+    <form method="post" action="/missions/{{ mission.id }}/generate" class="form">
+      <div class="grid grid-2">
+        <label>بک‌اند
+          <select name="backend">
+            {% for item in backends %}
+            <option value="{{ item }}">{{ item }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <label>نما
+          <select name="view">
+            {% for item in views %}
+            <option value="{{ item }}">{{ item }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <label>Seed
+          <input name="seed" type="number" value="0">
+        </label>
+        <label>تعداد تایل
+          <input name="limit" type="number" min="1" max="32" value="2">
+        </label>
+        <label>اندازهٔ تایل (px)
+          <input name="tile_px" type="number" value="1024">
+        </label>
+        <label>خروجی
+          <select name="size">
+            <option value="768x768">768×768</option>
+            <option value="512x512">512×512</option>
+            <option value="1024x1024">1024×1024</option>
+          </select>
+        </label>
+      </div>
+      <button class="btn" type="submit">شروع تولید</button>
+    </form>
+    <p class="muted small">
+      <code>dummy</code> آفلاین است؛ <code>comfy</code> به سرور محلی ComfyUI نیاز دارد؛ <code>bfl</code> کلید API.
+    </p>
+  </div>
+
+  <div class="card">
+    <h2>اجرای تطبیق</h2>
+    <form method="post" action="/missions/{{ mission.id }}/match" class="form">
+      <label>فریم واقعی
+        <select name="aerial_id">
+          <option value="">— بدون فریم (consistency) —</option>
+          {% for frame in aerials %}
+          <option value="{{ frame.id }}">{{ frame.filename }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>حالت تطبیق
+        <select name="mode">
+          <option value="edges">edges</option>
+          <option value="gray">gray</option>
+        </select>
+      </label>
+      <button class="btn secondary" type="submit" {% if not generated %}disabled{% endif %}>اجرای تطبیق</button>
+    </form>
+    <p class="muted small">آستانه: inliers ≥ 15، ratio ≥ 0.15، coverage ≥ 0.03</p>
+  </div>
+</section>
+
+<section class="card">
+  <div class="card-head">
+    <h2>تایل‌های تولیدشده</h2>
+    <span class="badge">{{ generated|length }}</span>
+  </div>
+  {% if generated %}
+  <div class="thumbs">
+    {% for tile in generated %}
+    <figure class="thumb">
+      <img src="{{ media_url(tile.generated_path) }}" alt="generated {{ tile.id }}">
+      <figcaption>
+        #{{ tile.id }} · {{ tile.variant }} · seed {{ tile.seed }}
+        <a href="{{ media_url(tile.source_path) }}" target="_blank">منبع</a>
+      </figcaption>
+    </figure>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p class="muted">هنوز تایلی تولید نشده است.</p>
+  {% endif %}
+</section>
+
+<section class="grid grid-2">
+  <div class="card">
+    <h2>Jobها</h2>
+    {% if jobs %}
+    <table class="table">
+      <thead><tr><th>#</th><th>نوع</th><th>وضعیت</th><th>پیشرفت</th><th></th></tr></thead>
+      <tbody>
+        {% for job in jobs %}
+        <tr>
+          <td>{{ job.id }}</td>
+          <td>{{ job.kind }}</td>
+          <td><span class="badge {{ 'ok' if job.status == 'done' else ('bad' if job.status == 'error' else 'warn') }}">{{ job.status }}</span></td>
+          <td>{{ job.progress }}/{{ job.total }}</td>
+          <td><a class="btn small" href="/jobs/{{ job.id }}">جزئیات</a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p class="muted">Jobی ثبت نشده است.</p>
+    {% endif %}
+  </div>
+
+  <div class="card">
+    <h2>نتایج تطبیق</h2>
+    {% if runs %}
+    <table class="table">
+      <thead><tr><th>#</th><th>نام</th><th>success</th><th>inliers</th><th></th></tr></thead>
+      <tbody>
+        {% for run in runs %}
+        <tr>
+          <td>{{ run.id }}</td>
+          <td>{{ run.name }}</td>
+          <td>{{ "%.2f"|format(run.metrics.get("success_rate", 0)) }}</td>
+          <td>{{ "%.1f"|format(run.metrics.get("mean_inliers", 0) or 0) }}</td>
+          <td><a class="btn small" href="/runs/{{ run.id }}">نتایج</a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p class="muted">هنوز runی ثبت نشده است.</p>
+    {% endif %}
+  </div>
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+window.NAVLAB_MISSION = {
+  start: [{{ mission.start_lat }}, {{ mission.start_lon }}],
+  end: [{{ mission.end_lat }}, {{ mission.end_lon }}],
+  points: {{ summary.points | default([]) | tojson }},
+  polygon: {{ summary.polygon | default([]) | tojson }},
+  overlay: {{ overlay | tojson }}
+};
+initMissionMap("mission-map", window.NAVLAB_MISSION);
+</script>
+{% endblock %}
