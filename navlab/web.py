@@ -454,6 +454,10 @@ def sim_gps_disable():
     return JSONResponse(SIM.disable_gps())
 
 
+def sim_param(name: str = Form(...), value: str = Form(...), value_type: str = Form("int")):
+    return JSONResponse(SIM.set_param(name, value, value_type))
+
+
 def sim_ev_stop():
     return JSONResponse(SIM.disable_gps_denied())
 
@@ -524,6 +528,7 @@ app.add_api_route("/api/sim/stop", sim_stop, methods=["POST"])
 app.add_api_route("/api/sim/ev/start", sim_ev_start, methods=["POST"])
 app.add_api_route("/api/sim/ev/stop", sim_ev_stop, methods=["POST"])
 app.add_api_route("/api/sim/gps/disable", sim_gps_disable, methods=["POST"])
+app.add_api_route("/api/sim/param", sim_param, methods=["POST"])
 app.add_api_route("/api/sim/status", sim_status, methods=["GET"])
 app.add_api_route("/api/sim/fly", sim_fly, methods=["POST"])
 app.add_api_route("/api/sim/camera.jpg", sim_camera, methods=["GET"])

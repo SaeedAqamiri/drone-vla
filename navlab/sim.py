@@ -346,7 +346,7 @@ class SimManager:
             if disable_gps
             else {
                 "EKF2_EV_CTRL": 1,
-                "EKF2_HGT_REF": 1,
+                "EKF2_HGT_REF": 0,
                 "EKF2_GPS_CTRL": 7,
                 "COM_ARM_WO_GPS": 0,
             }
@@ -370,6 +370,22 @@ class SimManager:
         except Exception as error:
             self._ev_error = f"origin: {error}"
 
+    def set_param(self, name: str, value: str, value_type: str = "int") -> dict:
+        try:
+            self._run(self._set_param(name, value, value_type))
+            return {"ok": True, "message": f"set {name}={value}"}
+        except Exception as error:
+            return {"ok": False, "message": str(error)}
+
+    async def _set_param(self, name: str, value: str, value_type: str) -> None:
+        drone = self._drone
+        if drone is None:
+            raise RuntimeError("MAVSDK is not connected")
+        if value_type == "float":
+            await drone.param.set_param_float(name, float(value))
+        else:
+            await drone.param.set_param_int(name, int(value))
+
     def disable_gps(self) -> dict:
         try:
             self._run(self._disable_gps())
@@ -382,8 +398,8 @@ class SimManager:
         if drone is None:
             return
         for name, value in [
-            ("EKF2_EV_CTRL", 11),
-            ("EKF2_HGT_REF", 3),
+            ("EKF2_EV_CTRL", 1),
+            ("EKF2_HGT_REF", 0),
             ("EKF2_GPS_CTRL", 0),
             ("COM_ARM_WO_GPS", 1),
         ]:

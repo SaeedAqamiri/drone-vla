@@ -355,3 +355,12 @@ GPS-denied با تزریق EV، و HITL.
   نامعتبر می‌شود. راه‌حل: قبل از بوت `EKF2_HGT_REF=0` (baro) یا `3` (vision) را ست و SITL را ری‌استارت کن،
   یا از baro به‌عنوان height استفاده کن. سپس EV افقی (`EKF2_EV_CTRL=1`) کافی است.
 - گیت offboard همچنان فعال است؛ کنترل با `goto_location` انجام شد.
+
+### ۱۳.۸ — GPS-denied با map-EV + baro height (موفق)
+
+- `EKF2_HGT_REF=0` (baro) قبل از بوت ست شد و SITL ری‌استارت شد (چون reboot-required).
+- پرواز: GPS روشن → map EV با `EKF2_EV_CTRL=1` (افقی) + prior از INS → `gps/disable`.
+- نتیجه: ارتفاع ۳۰m تا نزدیک end حفظ شد؛ map match تا kf≈۲۶۵ ادامه داشت؛
+  `truth_error_m` حدود **۰.۲–۲.۹m**؛ فرود/landing نرمال (بدون blind land).
+- نقص باقی‌مانده: overshoot افقی/attitude هنگام فرود (`roll` نهایی عجیب) و کنترل offboard گیت‌شده.
+- `position_velocity_ned` rate=10Hz اضافه شد؛ prior اگر خالی باشد از telemetry lat/lon محاسبه می‌شود.

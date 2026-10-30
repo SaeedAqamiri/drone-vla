@@ -14,7 +14,7 @@
 | دوربین رو به پایین زنده | ✅ | JPEG 256×256، ۵fps |
 | waypoint + geofence نرم‌افزاری + پرواز/فرود | ✅ | ۴ نقطه، ۳۰m |
 | GPS-denied با EV از Gazebo truth | ✅ | arm → takeoff → waypoint → land |
-| GPS-denied با EV از map-match | ⚠️ | GPS روشن: error ۰.۳–۱.۶m؛ بعد از خاموش‌کردن GPS ارتفاع/EKF می‌افتد (HGT_REF نیاز به reboot) |
+| GPS-denied با EV از map-match | ✅ | با baro height (HGT_REF=0 + reboot): کل مسیر، error ۰.۲–۲.۹m؛ فرود/overshoot کنترل باقی است |
 | HITL / SIH | ⬜ | فاز بعد |
 | سرویس داخلی 4090 | ⬜ | قرارداد API آماده است |
 | Excel BOM | ✅ | `outputs/navlab/hardware_bom.xlsx` |
@@ -35,8 +35,8 @@
 ### B) Control / Failsafe (اولویت ۱)
 - [ ] offboard local NED پیاده شد ولی به‌خاطر fly-away در SITL **گیت شده** (`use_offboard=False`) تا bench-test.
 - [ ] نگه‌داشتن آخرین EV هنگام نبود match (جلوگیری از blind land).
-- [ ] **EKF2_HGT_REF/baro**: ست‌کردن قبل از بوت (reboot-required) یا استفاده از baro؛ الان بعد از GPS off ارتفاع می‌افتد.
-- [ ] failsafe/RTL/land دقیق + geofence واقعی PX4.
+- [x] **EKF2_HGT_REF/baro**: `HGT_REF=0` قبل از بوت + restart؛ EV افقی؛ GPS off تا پایان مسیر تست شد.
+- [ ] failsafe/RTL/land دقیق + geofence واقعی PX4؛ overshoot/attitude هنگام فرود.
 - [ ] تست پرواز مسیر با باد/نویز/قطع EV.
 
 ### C) Fusion (اولویت ۲)
@@ -76,7 +76,7 @@
 
 ## ۶ قدم بعدی (پیشنهاد اجرا)
 
-1. **کنترل/ارتفاع mid-route**: فعال‌سازی map EV در ۳۰m با prior اولیه از INS، بدون offboard.
+1. **کنترل/فرود**: رفع overshoot و attitude هنگام land (bench offboard / velocity control).
 2. **Bench-test offboard** (setpoint ثابت، بدون پرواز) قبل از فعال‌سازی.
 3. **UI ثبت نقشه** + نقشهٔ چندارتفاعی.
 4. **Fusion** (EKF/UKF) + covariance.
