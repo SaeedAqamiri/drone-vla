@@ -23,6 +23,16 @@
         {% if backend.bfl_key %}تنظیم شده{% else %}تنظیم نشده{% endif %}
       </span>
     </div>
+    <div class="status-row">
+      <span>SGLang URL</span>
+      <span class="mono">{{ backend.sglang_url }}</span>
+    </div>
+    <div class="status-row">
+      <span>وضعیت SGLang</span>
+      <span class="badge {% if backend.sglang_available %}ok{% else %}bad{% endif %}">
+        {% if backend.sglang_available %}آماده{% else %}خاموش{% endif %}
+      </span>
+    </div>
     <p class="muted small">
       برای روشن کردن ComfyUI:
     </p>
@@ -57,8 +67,7 @@ GET /v1/jobs/{id}
 
 GET /v1/health</pre>
   <p class="muted small">
-    الان بک‌اند <code>bfl</code> و <code>comfy</code> فعال‌اند. بعداً <code>internal</code>
-    با آدرس سرویس 4090 اضافه می‌شود.
+    الان بک‌اندهای <code>sglang</code> (FLUX.3 روی H100)، <code>comfy</code> و <code>bfl</code> در دسترس‌اند. SGLang با API سازگار OpenAI روی پورت <code>30010</code> سرویس می‌دهد.
   </p>
 </section>
 

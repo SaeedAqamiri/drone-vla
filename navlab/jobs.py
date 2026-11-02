@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import queue
 import threading
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from typing import Any
 
@@ -116,6 +117,10 @@ def _run_generation(job_id: int) -> None:
         seed = int(config.get("seed", 0))
         altitude = mission.altitude_m
         points = mission_route_points(mission)
+        concurrency = int(config.get("concurrency") or 0)
+        if concurrency <= 0:
+            concurrency = 2 if backend == "sglang" else 1
+        concurrency = max(1, min(concurrency, 4))
 
     tiles: list[dict[str, Any]]
     if bounds:
@@ -124,60 +129,132 @@ def _run_generation(job_id: int) -> None:
     else:
         tiles = [{"index": 0, "center": None, "bounds": None}]
 
-    update_job(job_id, total=len(tiles), progress=0, message="tiles prepared")
-    created: list[int] = []
-    for position, tile in enumerate(tiles, start=1):
+    # Crop source tiles up front; rasterio reads stay single-threaded.
+    prepared: list[dict[str, Any]] = []
+    for tile in tiles:
         source_png = mission_dir / "tiles" / f"source_{tile['index']:03d}.png"
         if tile.get("bounds"):
             cropped = crop_bounds(map_path, tile["bounds"], source_png, tile_px=tile_px)
         else:
             cropped = whole_image_png(map_path, source_png, size=tile_px)
         if cropped is None:
-            update_job(
-                job_id,
-                progress=position,
-                message=f"tile {tile['index']} outside map; skipped",
-            )
             continue
-        generated_path = mission_dir / "generated" / f"gen_{tile['index']:03d}.png"
+        prepared.append(
+            {
+                "tile": tile,
+                "source": source_png,
+                "generated": mission_dir / "generated" / f"gen_{tile['index']:03d}.png",
+            }
+        )
+
+    update_job(
+        job_id,
+        total=len(prepared),
+        progress=0,
+        message=f"tiles prepared ({len(prepared)}, concurrency={concurrency})",
+    )
+
+    def _generate(item: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any]]:
+        tile = item["tile"]
         meta = generate_reference(
-            satellite=source_png,
-            out_path=generated_path,
+            satellite=item["source"],
+            out_path=item["generated"],
             backend=backend,
             view=view,
-            seed=seed + tile["index"],
+            seed=seed + int(tile["index"]),
             size=size,
             altitude_m=altitude,
         )
+        return item, meta
+
+    def _record(item: dict[str, Any], meta: dict[str, Any]) -> int:
         with Session(engine) as session:
             record = GeneratedTile(
                 job_id=job_id,
                 mission_id=mission_id,
-                source_path=str(source_png),
-                generated_path=str(generated_path),
-                bounds=tile.get("bounds"),
+                source_path=str(item["source"]),
+                generated_path=str(item["generated"]),
+                bounds=item["tile"].get("bounds"),
                 prompt=str(meta.get("prompt", "")),
-                seed=seed + tile["index"],
+                seed=seed + int(item["tile"]["index"]),
                 variant=view,
                 meta={k: v for k, v in meta.items() if k not in {"prompt"}},
             )
             session.add(record)
             session.commit()
             session.refresh(record)
-            created.append(record.id)
+            return int(record.id)
+
+    created: list[int] = []
+    errors: list[dict[str, Any]] = []
+    done = 0
+
+    def _handle(item: dict[str, Any], meta: dict[str, Any] | None = None, error: Exception | None = None) -> None:
+        nonlocal done
+        done += 1
+        index = item["tile"]["index"]
+        if error is not None:
+            errors.append({"index": index, "error": str(error)[:1000]})
+            update_job(
+                job_id,
+                progress=done,
+                message=f"tile {index} failed ({done}/{len(prepared)})",
+            )
+            return
+        created.append(_record(item, meta or {}))
         update_job(
             job_id,
-            progress=position,
-            message=f"generated tile {tile['index']} ({position}/{len(tiles)})",
+            progress=done,
+            message=f"generated tile {index} ({done}/{len(prepared)})",
         )
 
-    update_job(
-        job_id,
-        status="done",
-        progress=len(tiles),
-        message="generation finished",
-        result={"tile_ids": created, "backend": backend, "view": view},
-    )
+    if concurrency <= 1 or len(prepared) <= 1:
+        for item in prepared:
+            try:
+                item, meta = _generate(item)
+            except Exception as error:
+                _handle(item, error=error)
+            else:
+                _handle(item, meta=meta)
+    else:
+        with ThreadPoolExecutor(max_workers=concurrency) as pool:
+            futures = {pool.submit(_generate, item): item for item in prepared}
+            for future in as_completed(futures):
+                item = futures[future]
+                try:
+                    item, meta = future.result()
+                except Exception as error:
+                    _handle(item, error=error)
+                else:
+                    _handle(item, meta=meta)
+
+    if created:
+        update_job(
+            job_id,
+            status="done",
+            progress=len(prepared),
+            message="generation finished",
+            result={
+                "tile_ids": created,
+                "backend": backend,
+                "view": view,
+                "concurrency": concurrency,
+                "errors": errors[:20],
+            },
+        )
+    else:
+        update_job(
+            job_id,
+            status="error",
+            progress=done,
+            message="generation failed for every tile",
+            result={
+                "backend": backend,
+                "view": view,
+                "concurrency": concurrency,
+                "errors": errors[:20],
+            },
+        )
 
 
 def _aerial_sources(session: Session, mission_id: int, aerial_id: int | None) -> list[MapSource]:

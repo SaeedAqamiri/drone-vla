@@ -82,14 +82,19 @@
       </span>
     </div>
     <div class="status-row">
+      <span>SGLang · FLUX.3 (H100)</span>
+      <span class="badge {% if backend.sglang_available %}ok{% else %}bad{% endif %}">
+        {% if backend.sglang_available %}آماده{% else %}خاموش{% endif %}
+      </span>
+    </div>
+    <div class="status-row">
       <span>PX4 SITL</span>
       <span class="badge {% if sim.running %}ok{% else %}bad{% endif %}">
         {% if sim.running %}در حال اجرا{% else %}متوقف{% endif %}
       </span>
     </div>
     <p class="muted small">
-      برای تولید بدون GPU از بک‌اند <code>dummy</code> استفاده کن. برای FLUX واقعی، ComfyUI را روشن کن
-      یا بعداً سرویس 4090 را وصل کن.
+      برای تولید بدون GPU از بک‌اند <code>dummy</code> استفاده کن. برای FLUX واقعی، بک‌اند <code>sglang</code> (روی H100) یا <code>comfy</code> را انتخاب کن.
     </p>
     <a class="btn secondary" href="/settings">تنظیمات</a>
   </div>

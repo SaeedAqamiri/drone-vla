@@ -257,6 +257,7 @@ def start_generation(
     limit: int = Form(4),
     tile_px: int = Form(1024),
     size: str = Form("768x768"),
+    concurrency: int = Form(0),
 ):
     mission = _mission_or_404(session, mission_id)
     if backend not in BACKENDS:
@@ -274,6 +275,7 @@ def start_generation(
             "limit": limit,
             "tile_px": tile_px,
             "size": size,
+            "concurrency": concurrency,
         },
         message="queued",
     )

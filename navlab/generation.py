@@ -7,9 +7,9 @@ from typing import Sequence
 from sat2aerial.backends import make_backend
 from sat2aerial.prompts import build_prompt
 
-from .config import BFL_API_KEY, COMFY_INPUT, COMFY_URL
+from .config import BFL_API_KEY, COMFY_INPUT, COMFY_URL, SGLANG_URL
 
-BACKENDS = ["dummy", "comfy", "bfl"]
+BACKENDS = ["dummy", "comfy", "bfl", "sglang"]
 VIEWS = ["nadir", "oblique15", "oblique30", "oblique45"]
 
 
@@ -30,10 +30,20 @@ def comfy_available(url: str = COMFY_URL, timeout: float = 2.0) -> bool:
         return False
 
 
+def sglang_available(url: str = SGLANG_URL, timeout: float = 2.0) -> bool:
+    try:
+        with urllib.request.urlopen(f"{url.rstrip('/')}/health", timeout=timeout):
+            return True
+    except Exception:
+        return False
+
+
 def backend_status() -> dict:
     return {
         "comfy_url": COMFY_URL,
         "comfy_available": comfy_available(),
+        "sglang_url": SGLANG_URL,
+        "sglang_available": sglang_available(),
         "bfl_key": bool(BFL_API_KEY),
         "backends": BACKENDS,
     }
@@ -53,6 +63,8 @@ def get_backend(name: str, seed: int = 0):
         if not BFL_API_KEY:
             raise RuntimeError("BFL_API_KEY is not set; use dummy or start ComfyUI")
         return make_backend("bfl", seed=seed, api_key=BFL_API_KEY)
+    if name == "sglang":
+        return make_backend("sglang", seed=seed, server=SGLANG_URL)
     raise ValueError(f"Unknown backend {name!r}")
 
 

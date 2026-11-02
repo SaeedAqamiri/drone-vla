@@ -119,11 +119,14 @@
             <option value="1024x1024">1024×1024</option>
           </select>
         </label>
+        <label>هم‌زمانی SGLang (۰=خودکار)
+          <input name="concurrency" type="number" min="0" max="4" value="0">
+        </label>
       </div>
       <button class="btn" type="submit">شروع تولید</button>
     </form>
     <p class="muted small">
-      <code>dummy</code> آفلاین است؛ <code>comfy</code> به سرور محلی ComfyUI نیاز دارد؛ <code>bfl</code> کلید API.
+      <code>dummy</code> آفلاین است؛ <code>sglang</code> روی H100 (FLUX.3 FP8R) اجرا می‌شود؛ <code>comfy</code> به سرور محلی ComfyUI نیاز دارد؛ <code>bfl</code> کلید API.
     </p>
   </div>
 

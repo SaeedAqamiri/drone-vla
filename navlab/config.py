@@ -12,6 +12,7 @@ DB_PATH = OUTPUTS / "navlab.db"
 PX4_DIR = ROOT / "PX4-Autopilot"
 COMFY_INPUT = ROOT / "ComfyUI" / "input"
 COMFY_URL = os.environ.get("NAVLAB_COMFY_URL", "http://127.0.0.1:8188")
+SGLANG_URL = os.environ.get("NAVLAB_SGLANG_URL", "http://172.16.20.117:30010")
 CAMERA_DIR = OUTPUTS / "camera"
 CAMERA_TOPIC = os.environ.get("NAVLAB_CAMERA_TOPIC", "auto")
 CAMERA_MODEL = os.environ.get("NAVLAB_CAMERA_MODEL", "x500_mono_cam_down_0")

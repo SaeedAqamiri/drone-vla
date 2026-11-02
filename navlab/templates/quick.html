@@ -65,8 +65,14 @@
         {% if backend.bfl_key %}کلید دارد{% else %}کلید ندارد{% endif %}
       </span>
     </div>
+    <div class="status-row">
+      <span>SGLang · FLUX.3</span>
+      <span class="badge {% if backend.sglang_available %}ok{% else %}bad{% endif %}">
+        {% if backend.sglang_available %}آماده{% else %}خاموش{% endif %}
+      </span>
+    </div>
     <p class="muted small">
-      اگر ComfyUI خاموش است، <code>dummy</code> را انتخاب کن تا فقط مسیر داده و متریک‌ها تست شود.
+      برای FLUX واقعی <code>sglang</code> (H100) را انتخاب کن؛ <code>dummy</code> فقط مسیر داده و متریک‌ها را تست می‌کند.
     </p>
   </div>
 </section>

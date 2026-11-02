@@ -20,8 +20,12 @@ def make_backend(name: str, **kwargs) -> Backend:
         from .comfy import ComfyBackend
 
         return ComfyBackend(**kwargs)
+    if key in {"sglang", "sgl"}:
+        from .sglang import SGLangBackend
+
+        return SGLangBackend(**kwargs)
     raise ValueError(
-        f"Unknown backend {name!r}; use dummy, comfy, bfl, or flux3"
+        f"Unknown backend {name!r}; use dummy, comfy, bfl, sglang, or flux3"
     )
 
 
