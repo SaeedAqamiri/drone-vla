@@ -11,7 +11,7 @@ from PIL import Image
 from pyproj import Transformer
 from rasterio.windows import Window, from_bounds
 
-IMAGE_EXTS = {".png", ".jpg", ".jpeg", ".tif", ".tiff", ".webp", ".bmp"}
+IMAGE_EXTS = {".png", ".jpg", ".jpeg", ".tif", ".tiff", ".jp2", ".j2k", ".webp", ".bmp"}
 
 
 def save_bytes(data: bytes, dest: Path) -> Path:

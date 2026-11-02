@@ -5,7 +5,7 @@ from pathlib import Path
 
 from .types import Pair
 
-IMAGE_EXTS = {".png", ".jpg", ".jpeg", ".tif", ".tiff", ".webp", ".bmp"}
+IMAGE_EXTS = {".png", ".jpg", ".jpeg", ".tif", ".tiff", ".jp2", ".j2k", ".webp", ".bmp"}
 SAT_KEYS = ("satellite", "sat", "map", "reference", "ref")
 AERIAL_KEYS = ("aerial", "drone", "uav", "query", "frame", "camera")
 
