@@ -30,3 +30,7 @@ logs/
 .idea/
 .vscode/
 *.swp
+
+# Large satellite test data
+*.jp2
+navlab/final_Request points/
