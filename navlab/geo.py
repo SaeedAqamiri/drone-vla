@@ -23,11 +23,15 @@ def route_points(
     return coords, distance, azimuth, count
 
 
-def _aeqd(lat: float, lon: float) -> str:
+def local_crs(lat: float, lon: float) -> str:
     return (
         f"+proj=aeqd +lat_0={lat} +lon_0={lon} +datum=WGS84 "
         "+units=m +no_defs +type=crs"
     )
+
+
+def _aeqd(lat: float, lon: float) -> str:
+    return local_crs(lat, lon)
 
 
 def corridor_geometry(

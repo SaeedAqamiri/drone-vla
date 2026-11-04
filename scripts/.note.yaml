@@ -1,0 +1,43 @@
+version: 1
+updated: '2026-11-04T18:27:03.976Z'
+summary: >-
+  Operational scripts for PX4/Gazebo and visual-localization tooling: `scripts/record_map.py`
+  records keyframe maps from the live camera plus truth; `scripts/eval_localizer.py` runs holdout
+  evaluation; `scripts/uav_visloc_pairs.py` crops UAV-VisLoc satellite/aerial pairs;
+  `scripts/gz_truth_bridge.py` and `scripts/gz_latest_frame.py` bridge Gazebo pose/camera;
+  `scripts/flight_log.py`/`gz_flight_logger.py` log flights. The UAV-VisLoc pair script is now
+  legacy: navlab/lab/tiles.py rebuilds metric north-up tiles and supersedes its manual offsets.
+based_on:
+  - scripts/record_map.py@2649-1793397359673
+  - scripts/eval_localizer.py@3235-1793374620459
+  - scripts/uav_visloc_pairs.py@5843-1792585763849
+  - scripts/gz_truth_bridge.py@2966-1793370464925
+  - scripts/gz_latest_frame.py@3503-1793198357140
+  - scripts/flight_log.py@4755-1790268381713
+entries:
+  uav_visloc_pairs.py:
+    summary: >-
+      Extracts satellite/aerial pairs from a UAV-VisLoc satellite TIF and drone CSV.
+      `latlon_to_pixel` uses `dataset.index(lon, lat)`; `pixel_size_m` uses `dataset.res` with
+      latitude-scaled degrees; `crop_satellite` computes footprint from altitude/FOV/aspect/margin,
+      applies `--offset-east`/`--offset-north`, reads a `rasterio.windows.Window`, resizes to
+      `--width`/`--height`, and returns crop/GSD metadata. `main` reads
+      `filename,lat,lon,height,Phi1` and writes `manifest.csv` + `meta.json`. Useful reference, but
+      manual offsets and unguarded edge windows make it unsuitable as the final geo pipeline.
+    confidence: verified
+    based_on:
+      - scripts/uav_visloc_pairs.py@5843-1792585763849
+      - data/pairs/uav03_hires/meta.json@4393-1792587315517
+  eval_localizer.py:
+    summary: >-
+      Offline holdout evaluator for `MapLocalizer`. `make_holdout` splits recorded frames by index
+      parity (`--every`), writes a reduced `manifest.json`, and returns live frames. `main` sweeps
+      `--radius`, calls `MapLocalizer.locate(item['frame'], prior_e, prior_n, radius, last_kf)`,
+      updates the prior from each accepted fix, and reports `match_rate`, `mean_error_m`,
+      `median_error_m`, `p95_error_m`, and `mean_latency_ms`. Good metric template, but only for
+      recorded keyframe maps.
+    confidence: verified
+    based_on:
+      - scripts/eval_localizer.py@3235-1793374620459
+      - navlab/localizer.py@4841-1793369480609
+      - outputs/navlab/maps/3_eval_report.json@599-1793374664319

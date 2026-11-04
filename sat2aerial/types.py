@@ -28,12 +28,14 @@ class MatchResult:
     rotation_deg: float | None
     coverage: float
     success: bool
+    detector: str = "sift"
 
     def as_dict(self) -> dict[str, Any]:
         return {
             "ref": self.ref,
             "target": self.target,
             "mode": self.mode,
+            "detector": self.detector,
             "keypoints_ref": self.keypoints_ref,
             "keypoints_target": self.keypoints_target,
             "good_matches": self.good_matches,

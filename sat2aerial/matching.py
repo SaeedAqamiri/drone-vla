@@ -39,13 +39,24 @@ def _prepare(image: np.ndarray, mode: str) -> np.ndarray:
     return gray
 
 
-def _detector():
-    if hasattr(cv2, "SIFT_create"):
-        return cv2.SIFT_create(nfeatures=5000, contrastThreshold=0.005, edgeThreshold=15)
-    return cv2.ORB_create(nfeatures=5000)
+def _detector(name: str = "sift"):
+    key = name.lower().strip()
+    if key == "sift":
+        if hasattr(cv2, "SIFT_create"):
+            return cv2.SIFT_create(
+                nfeatures=5000, contrastThreshold=0.005, edgeThreshold=15
+            )
+        return cv2.ORB_create(nfeatures=5000)
+    if key == "orb":
+        return cv2.ORB_create(nfeatures=5000)
+    if key == "akaze":
+        return cv2.AKAZE_create()
+    raise ValueError(f"Unknown detector {name!r}")
 
 
-def _matcher():
+def _matcher(name: str = "sift"):
+    if name.lower().strip() in {"orb", "akaze"}:
+        return cv2.BFMatcher(cv2.NORM_HAMMING)
     index_params = dict(algorithm=FLANN_INDEX_KDTREE, trees=5)
     search_params = dict(checks=64)
     return cv2.FlannBasedMatcher(index_params, search_params)
@@ -69,6 +80,7 @@ def match_images(
     min_inliers: int = 15,
     min_ratio: float = 0.15,
     min_coverage: float = 0.03,
+    detector: str = "sift",
 ) -> tuple[MatchResult, np.ndarray | None]:
     ref_image = _read(ref_path, max_dim)
     target_image = _read(target_path, max_dim)
@@ -86,21 +98,22 @@ def match_images(
         rotation_deg=None,
         coverage=0.0,
         success=False,
+        detector=detector,
     )
     if ref_image is None or target_image is None:
         return empty, None
 
     ref_gray = _prepare(ref_image, mode)
     target_gray = _prepare(target_image, mode)
-    detector = _detector()
-    kp_ref, des_ref = detector.detectAndCompute(ref_gray, None)
-    kp_target, des_target = detector.detectAndCompute(target_gray, None)
+    extractor = _detector(detector)
+    kp_ref, des_ref = extractor.detectAndCompute(ref_gray, None)
+    kp_target, des_target = extractor.detectAndCompute(target_gray, None)
     if des_ref is None or des_target is None or len(kp_ref) < 4 or len(kp_target) < 4:
         empty.keypoints_ref = len(kp_ref)
         empty.keypoints_target = len(kp_target)
         return empty, None
 
-    knn = _matcher().knnMatch(des_ref, des_target, k=2)
+    knn = _matcher(detector).knnMatch(des_ref, des_target, k=2)
     good = [pair[0] for pair in knn if len(pair) == 2 and pair[0].distance < ratio * pair[1].distance]
     if len(good) < 4:
         empty.keypoints_ref = len(kp_ref)
@@ -155,6 +168,7 @@ def match_images(
         rotation_deg=rotation,
         coverage=coverage,
         success=inliers >= min_inliers and inlier_ratio >= min_ratio and coverage >= min_coverage,
+        detector=detector,
     )
     return result, homography
 

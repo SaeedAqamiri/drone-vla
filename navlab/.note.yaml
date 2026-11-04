@@ -1,0 +1,189 @@
+version: 1
+updated: '2026-11-04T18:27:03.976Z'
+summary: >-
+  FastAPI/SQLite RTL platform for GPS-denied UAV navigation, now with a reproducible
+  visual-localization lab. The original modules remain: web.py routes, models.py schema,
+  generation.py backend dispatch, matching.py SIFT wrapper, geo.py route/tile helpers, localizer.py
+  keyframe EV, fusion.py KF, and sim.py PX4 SITL/MAVSDK/Gazebo bridges. The new navlab/lab package
+  adds metric north-up tile stores, UAV-VisLoc/video/synthetic sequences, classical+deep matcher
+  registry, prior-based candidate selection, temporal/scale/jump gating, and CSV/Markdown
+  benchmarks. Imagery GSD/rotation handling was fixed, so jobs.py and generation now receive correct
+  tile scale and orientation.
+based_on:
+  - navlab/web.py@18291-1793640261472
+  - navlab/jobs.py@15933-1793640245089
+  - navlab/localizer.py@4841-1793369480609
+  - navlab/fusion.py@4158-1793397229376
+  - navlab/sim.py@31256-1793397436243
+  - navlab/README.md@4209-1793204204120
+  - navlab/ROADMAP.md@6758-1793398071714
+  - navlab/README.md@7952-1793816544969
+  - navlab/imagery.py@8970-1793811073821
+  - navlab/lab/tiles.py@14385-1793814721164
+  - navlab/lab/runner.py@14677-1793814385675
+entries:
+  imagery.py:
+    summary: >-
+      Geospatial image I/O. `_ground_resolution(dataset)` computes true per-axis ground sampling
+      from the affine vectors and latitude, so rotated/anisotropic JP2 report the real axes (e.g.
+      0.500x0.384m instead of a misleading 0.44m average). `inspect_image` now returns `gsd_xy_m`
+      and `rotated`, and `crop_bounds` reprojects the requested bounds into `navlab.geo.local_crs`
+      with `rasterio.warp.reproject`/`Resampling.average`, producing a north-up metric crop instead
+      of a rotated raw window. `_read_rgb`/`_stretch` handle uint16 and 1-band sources;
+      `whole_image_png`/`save_bytes` remain.
+    confidence: verified
+    based_on:
+      - navlab/imagery.py@6291-1793622078515
+      - navlab/imagery.py@8970-1793811073821
+      - navlab/geo.py@10805-1793811038210
+  final_Request points:
+    summary: >-
+      Nine JP2 scenes. `20250526_1.jp2`, `20250529_1.jp2`, `20260505_1.jp2`, and `20260527_1.jp2`
+      are 4-band uint16 RGBA (not RGBN) with rotated geotransforms and ~0.50m columns / 0.35-0.39m
+      rows. `20260507_1.jp2`, `20260526_1.jp2`, `20260526_2.jp2`, `20260527_2.jp2`, and
+      `20260527_3.jp2` are 1-band panchromatic north-up at ~0.55m (uint16/uint8 variants) or ~0.91m.
+      `navlab.imagery.inspect_image` now reports correct per-axis GSD/rotated flags and
+      `crop_bounds` produces north-up crops for both storage conventions.
+    confidence: inferred
+    based_on:
+      - navlab/final_Request points/20250526_1.jp2@42501572-1780204958000
+      - navlab/final_Request points/20260526_1.jp2@342329618-1779809450000
+      - navlab/final_Request points/20260507_1.jp2@227481470-1778149848000
+      - navlab/final_Request points/20260527_1.jp2@53103825-1780204864000
+      - navlab/imagery.py@6291-1793622078515
+      - navlab/imagery.py@8970-1793811073821
+  localizer.py:
+    summary: >-
+      `MapLocalizer.__init__` loads `manifest.json`, precomputes a normalized 32x32 thumbnail matrix
+      plus SIFT keypoints/descriptors, and keeps `self.east`/`self.north` per frame.
+      `MapLocalizer.locate(frame_path, prior_east, prior_north, radius, last_keyframe)` restricts
+      candidates by `last_keyframe` +/- offset and prior radius, ranks by 32x32 distance, runs
+      `cv2.BFMatcher` + `cv2.findHomography`, and rejects `inliers < 12` or `coverage < 0.02`.
+      `scripts/eval_localizer.py` reported 98.9% match, mean ~0.6m, p95 ~1.8m, ~17ms on held-out
+      recorded keyframes.
+    confidence: verified
+    based_on:
+      - navlab/localizer.py@4841-1793369480609
+      - navlab/ROADMAP.md@6758-1793398071714
+      - scripts/eval_localizer.py@3235-1793374620459
+  jobs.py:
+    summary: >-
+      Background worker queue for generate/match/quick jobs. `_run_generation` reads the corrected
+      `MapSource.gsd_m`, computes `tile_ground_m = gsd * tile_px`, calls
+      `navlab.geo.tile_bounds_multi`, crops with the now north-up `navlab.imagery.crop_bounds`, and
+      dispatches `navlab.generation.generate_reference`. `_run_matching` calls
+      `navlab.matching.best_match` against generated and raw-satellite references and stores Run
+      metrics/overlays. The earlier rotated-source GSD/orientation bug no longer propagates here.
+    confidence: verified
+    based_on:
+      - navlab/jobs.py@15933-1793640245089
+      - navlab/imagery.py@6291-1793622078515
+      - navlab/matching.py@2438-1793181676267
+      - navlab/generation.py@2842-1793639776984
+      - navlab/geo.py@10726-1793197285354
+      - navlab/imagery.py@8970-1793811073821
+      - navlab/geo.py@10805-1793811038210
+  geo.py:
+    summary: >-
+      Route/corridor helpers plus the shared local metric frame. `local_crs(lat, lon)` returns an
+      AEQD proj string used by imagery.crop_bounds and lab.tiles; `_aeqd` now delegates to it. The
+      module still provides `route_points_multi`, `corridor_geometry_multi`, `tile_bounds_multi`,
+      `distance_to_polyline_m`, `local_ned`, and `mission_route_points` for mission tiling and
+      geofencing.
+    confidence: verified
+    based_on:
+      - navlab/geo.py@10805-1793811038210
+  README.md:
+    summary: >-
+      NavLab usage guide, now including the `navlab.lab` workflow: sequence export, metric tile
+      store, SGLang/dummy generation, run/bench/combine, video input with telemetry, deep matcher
+      notes, and the SGLang service start command. It documents the 26-test suite, the GSD/north-up
+      fix, and the benchmark finding that SGLang-generated references equal raw satellite on the
+      synthetic scene while UAV-VisLoc remains a hard dataset.
+    confidence: verified
+    based_on:
+      - navlab/README.md@7952-1793816544969
+relations:
+  - from: imagery.py
+    to: jobs.py
+    description: >-
+      After the fix, `navlab.jobs._run_generation` still computes `tile_ground_m = MapSource.gsd_m *
+      tile_px` and calls `navlab.imagery.crop_bounds`, but `inspect_image` now supplies correct
+      per-axis GSD and `crop_bounds` returns north-up metric crops, so the earlier rotated-source
+      scale/orientation bug no longer propagates.
+    confidence: verified
+    based_on:
+      - navlab/imagery.py@6291-1793622078515
+      - navlab/jobs.py@15933-1793640245089
+      - navlab/imagery.py@8970-1793811073821
+  - from: jobs.py
+    to: matching.py
+    description: >-
+      `navlab.jobs._run_matching` calls `navlab.matching.best_match`, which wraps
+      `sat2aerial.matching.match_images` and `sat2aerial.metrics.evaluate_pair` for
+      generated-vs-satellite and aerial-vs-reference scoring.
+    confidence: verified
+    based_on:
+      - navlab/jobs.py@15933-1793640245089
+      - navlab/matching.py@2438-1793181676267
+      - sat2aerial/matching.py@7284-1792588473577
+  - from: final_Request points
+    to: imagery.py
+    description: >-
+      The nine JP2 scenes are consumed by `navlab.imagery.inspect_image`/`crop_bounds`; the four
+      rotated 4-band scenes now report correct `gsd_xy_m`/`rotated` and are reprojected to north-up
+      local CRS instead of being cropped as rotated raw windows.
+    confidence: verified
+    based_on:
+      - navlab/final_Request points/20250526_1.jp2@42501572-1780204958000
+      - navlab/imagery.py@6291-1793622078515
+      - navlab/imagery.py@8970-1793811073821
+  - from: geo.py
+    to: jobs.py
+    description: >-
+      `navlab.jobs._run_generation` calls `navlab.geo.mission_route_points` and
+      `navlab.geo.tile_bounds_multi` after computing `tile_ground_m = gsd * tile_px`;
+      `navlab.geo.local_ned` is also used by sim/geofence for local frame conversion.
+    confidence: verified
+    based_on:
+      - navlab/geo.py@10726-1793197285354
+      - navlab/jobs.py@15933-1793640245089
+  - from: lab/tiles.py
+    to: imagery.py
+    description: >-
+      `navlab.lab.tiles` imports `_ground_resolution` from `navlab.imagery` to compute native
+      per-axis GSD before choosing the target tile GSD; both rely on `navlab.geo.local_crs` for the
+      local metric frame.
+    confidence: verified
+    based_on:
+      - navlab/lab/tiles.py@14385-1793814721164
+      - navlab/imagery.py@8970-1793811073821
+      - navlab/geo.py@10805-1793811038210
+  - from: lab/tiles.py
+    to: geo.py
+    description: >-
+      `build_tiles_along_route`, `build_tiles_in_bbox`, and `_build_from_centers` call
+      `navlab.geo.local_crs(lat, lon)` and use pyproj Transformers to convert route lon/lat into
+      tile east/north centers.
+    confidence: verified
+    based_on:
+      - navlab/lab/tiles.py@14385-1793814721164
+      - navlab/geo.py@10805-1793811038210
+  - from: lab/generate.py
+    to: generation.py
+    description: >-
+      `navlab.lab.generate.generate_references` calls `navlab.generation.generate_reference` for
+      each tile/seed; that function builds the prompt and dispatches the selected backend.
+    confidence: verified
+    based_on:
+      - navlab/lab/generate.py@3588-1793813162556
+      - navlab/generation.py@2842-1793639776984
+  - from: README.md
+    to: lab/cli.py
+    description: >-
+      The README documents the `tile-store`/`sequence`/`video`/`generate`/`combine`/`run`/`bench`
+      commands implemented by `navlab.lab.cli`, including the SGLang and deep-matcher options.
+    confidence: verified
+    based_on:
+      - navlab/README.md@7952-1793816544969
+      - navlab/lab/cli.py@11731-1793814874236

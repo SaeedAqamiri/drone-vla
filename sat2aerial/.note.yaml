@@ -1,0 +1,42 @@
+version: 1
+updated: '2026-11-04T18:27:03.976Z'
+summary: >-
+  Satellite-to-aerial reference synthesis and map-matching bake-off.
+  `sat2aerial.backends.make_backend` dispatches dummy/ComfyUI/BFL/SGLang/flux3;
+  `sat2aerial.matching.match_images` now takes `detector` (sift/orb/akaze) and returns
+  `MatchResult.detector`; `sat2aerial.metrics.evaluate_pair` adds edge IoU/SSIM/color;
+  `sat2aerial.dataset.load_pairs` accepts subdirectory/flat/manifest layouts. Findings: 2D
+  translation preserves top-down layout but not oblique viewpoint; style references help near nadir;
+  coverage prevents collinear false positives. Deep matchers now live in navlab/lab/deep.py rather
+  than sat2aerial.
+based_on:
+  - sat2aerial/README.md@6968-1792590070440
+  - sat2aerial/matching.py@7284-1792588473577
+  - sat2aerial/metrics.py@4088-1792566229608
+  - sat2aerial/dataset.py@5118-1793622078515
+  - sat2aerial/backends/__init__.py@897-1793639770674
+  - sat2aerial/matching.py@7787-1793811114222
+  - sat2aerial/types.py@1487-1793811083236
+entries:
+  matching.py:
+    summary: >-
+      Pairwise matcher with selectable detector. `match_images(..., detector='sift')` preprocesses
+      with `_prepare` (CLAHE + optional Canny), detects with `_detector(name)` (SIFT/ORB/AKAZE),
+      matches with `_matcher(name)` (FLANN kNN for SIFT, BFMatcher Hamming for ORB/AKAZE), estimates
+      a RANSAC homography, and computes `_coverage` from the inlier convex hull. Success still
+      requires inliers>=15, ratio>=0.15, coverage>=0.03. `MatchResult.detector` records the
+      detector. Deep matchers are not in this module; they live in navlab/lab/deep.py.
+    confidence: verified
+    based_on:
+      - sat2aerial/matching.py@7284-1792588473577
+      - sat2aerial/types.py@1421-1792566188164
+      - sat2aerial/matching.py@7787-1793811114222
+      - sat2aerial/types.py@1487-1793811083236
+  types.py:
+    summary: >-
+      `Pair` and `MatchResult` dataclasses. `MatchResult` gained a `detector` field (default 'sift')
+      after `success`, and `as_dict()` now includes it; existing named-argument construction remains
+      compatible. `Pair` remains the dataset site/satellite/aerials/meta container.
+    confidence: verified
+    based_on:
+      - sat2aerial/types.py@1487-1793811083236

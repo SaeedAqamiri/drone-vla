@@ -9,7 +9,12 @@ import numpy as np
 import rasterio
 from PIL import Image
 from pyproj import Transformer
+from rasterio.enums import Resampling
+from rasterio.transform import from_bounds as transform_from_bounds
+from rasterio.warp import reproject
 from rasterio.windows import Window, from_bounds
+
+from .geo import local_crs
 
 IMAGE_EXTS = {".png", ".jpg", ".jpeg", ".tif", ".tiff", ".jp2", ".j2k", ".webp", ".bmp"}
 
@@ -51,6 +56,20 @@ def _read_rgb(path: Path) -> np.ndarray | None:
         return None
 
 
+def _ground_resolution(dataset) -> tuple[float, float]:
+    transform = dataset.transform
+    if dataset.crs and dataset.crs.is_geographic:
+        center_lat = (dataset.bounds.bottom + dataset.bounds.top) / 2.0
+        m_per_deg_lat = 111_320.0
+        m_per_deg_lon = 111_320.0 * math.cos(math.radians(center_lat))
+        col_m = math.hypot(transform.a * m_per_deg_lon, transform.b * m_per_deg_lat)
+        row_m = math.hypot(transform.d * m_per_deg_lon, transform.e * m_per_deg_lat)
+    else:
+        col_m = math.hypot(transform.a, transform.d)
+        row_m = math.hypot(transform.b, transform.e)
+    return float(col_m), float(row_m)
+
+
 def inspect_image(path: Path) -> dict[str, Any]:
     info: dict[str, Any] = {
         "width": None,
@@ -78,16 +97,12 @@ def inspect_image(path: Path) -> dict[str, Any]:
                     "max_lon": max(left, right),
                     "max_lat": max(bottom, top),
                 }
-                res_x, res_y = dataset.res
-                if dataset.crs.is_geographic:
-                    center_lat = (info["bounds"]["min_lat"] + info["bounds"]["max_lat"]) / 2.0
-                    m_per_deg_lat = 111_320.0
-                    m_per_deg_lon = 111_320.0 * math.cos(math.radians(center_lat))
-                    info["gsd_m"] = float(
-                        (abs(res_x) * m_per_deg_lon + abs(res_y) * m_per_deg_lat) / 2.0
-                    )
-                else:
-                    info["gsd_m"] = float((abs(res_x) + abs(res_y)) / 2.0)
+                col_m, row_m = _ground_resolution(dataset)
+                info["gsd_m"] = (col_m + row_m) / 2.0
+                info["gsd_xy_m"] = [col_m, row_m]
+                info["rotated"] = bool(
+                    abs(dataset.transform.b) > 1e-15 or abs(dataset.transform.d) > 1e-15
+                )
                 return info
     except Exception:
         pass
@@ -131,32 +146,89 @@ def crop_bounds(
         with rasterio.open(path) as dataset:
             if not dataset.crs:
                 return None
-            left = bounds["min_lon"]
-            right = bounds["max_lon"]
-            bottom = bounds["min_lat"]
-            top = bounds["max_lat"]
-            if dataset.crs.to_epsg() != 4326:
-                transformer = Transformer.from_crs(
-                    "EPSG:4326", dataset.crs, always_xy=True
+            min_lon = bounds["min_lon"]
+            max_lon = bounds["max_lon"]
+            min_lat = bounds["min_lat"]
+            max_lat = bounds["max_lat"]
+            center_lat = (min_lat + max_lat) / 2.0
+            center_lon = (min_lon + max_lon) / 2.0
+            crs = local_crs(center_lat, center_lon)
+            to_local = Transformer.from_crs("EPSG:4326", crs, always_xy=True)
+            corners = [
+                to_local.transform(lon, lat)
+                for lon, lat in (
+                    (min_lon, min_lat),
+                    (max_lon, min_lat),
+                    (max_lon, max_lat),
+                    (min_lon, max_lat),
                 )
-                left, bottom = transformer.transform(left, bottom)
-                right, top = transformer.transform(right, top)
-            window = from_bounds(left, bottom, right, top, dataset.transform)
+            ]
+            xs = [point[0] for point in corners]
+            ys = [point[1] for point in corners]
+            side = max(max(xs) - min(xs), max(ys) - min(ys), 1.0)
+            center_x = (max(xs) + min(xs)) / 2.0
+            center_y = (max(ys) + min(ys)) / 2.0
+            min_x = center_x - side / 2.0
+            max_x = center_x + side / 2.0
+            min_y = center_y - side / 2.0
+            max_y = center_y + side / 2.0
+            dst_transform = transform_from_bounds(
+                min_x, min_y, max_x, max_y, tile_px, tile_px
+            )
+
+            to_source = Transformer.from_crs(crs, dataset.crs, always_xy=True)
+            source_corners = [
+                to_source.transform(x, y)
+                for x, y in (
+                    (min_x, min_y),
+                    (max_x, min_y),
+                    (max_x, max_y),
+                    (min_x, max_y),
+                )
+            ]
+            source_xs = [point[0] for point in source_corners]
+            source_ys = [point[1] for point in source_corners]
+            window = from_bounds(
+                min(source_xs),
+                min(source_ys),
+                max(source_xs),
+                max(source_ys),
+                dataset.transform,
+            )
             window = window.round_offsets().round_lengths()
+            pad = 4
+            window = Window(
+                window.col_off - pad,
+                window.row_off - pad,
+                window.width + 2 * pad,
+                window.height + 2 * pad,
+            )
             if window.width < 2 or window.height < 2:
                 return None
-            data = dataset.read(
-                indexes=[1, 2, 3] if dataset.count >= 3 else [1],
+            bands = min(3, dataset.count)
+            source = dataset.read(
+                indexes=list(range(1, bands + 1)),
                 window=window,
                 boundless=True,
                 fill_value=0,
             )
-            rgb = np.transpose(data, (1, 2, 0))
+            source_transform = dataset.window_transform(window)
+            destination = np.zeros((bands, tile_px, tile_px), dtype=source.dtype)
+            for band in range(bands):
+                reproject(
+                    source=source[band],
+                    destination=destination[band],
+                    src_transform=source_transform,
+                    src_crs=dataset.crs,
+                    dst_transform=dst_transform,
+                    dst_crs=crs,
+                    resampling=Resampling.average,
+                )
+            rgb = np.transpose(destination, (1, 2, 0))
             if rgb.shape[2] == 1:
                 rgb = np.repeat(rgb, 3, axis=2)
             rgb = _stretch(rgb)
             image = cv2.cvtColor(rgb, cv2.COLOR_RGB2BGR)
-            image = cv2.resize(image, (tile_px, tile_px), interpolation=cv2.INTER_AREA)
             cv2.imwrite(str(dest), image)
             return dest
     except Exception:

@@ -1,5 +1,7 @@
 # drone-vla — راهنمای کامل وضعیت و راه‌اندازی
 
+> **آزمایشگاه مکانیابی تصویری:** راهنمای کامل اجرا روی سرور جدید (tile store، SGLang، deep matcherها، ویدیو و benchmark) در [`LAB_README.md`](LAB_README.md).
+
 > آخرین به‌روزرسانی: 2026-09-30 | سخت‌افزار: RTX 4060 Laptop 8GB / 15GB RAM / i7-12700H / Ubuntu 22.04
 > درایور فعلی: **NVIDIA 580.178.04** (دان‌گرید از 595 — برای رندر Isaac لازم بود)
 Isaac Lab 2.1.0 نصب شد روی `env_isaac45` (پوشهٔ `IsaacLab-2.1/`) — لاگر rotor فوتورئال تست شد ✓

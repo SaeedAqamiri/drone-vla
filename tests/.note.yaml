@@ -1,0 +1,16 @@
+version: 1
+updated: '2026-11-04T18:27:03.976Z'
+summary: >-
+  Unittest suite covering sat2aerial dataset/prompts/matching/metrics/sizing, navlab
+  geo/corridor/tiles/fusion, and the new lab: test_lab_tiles (rotated GSD + tile store),
+  test_lab_sequences (UAV-VisLoc filter/sort/pose), test_lab_runner (synthetic localization
+  end-to-end), test_lab_metrics (fix/precision/false-fix), and test_lab_video (telemetry and
+  no-truth video). The full suite is 26 tests and passes.
+based_on:
+  - tests/test_lab_tiles.py@2513-1793812732846
+  - tests/test_lab_sequences.py@2557-1793812774234
+  - tests/test_lab_runner.py@1718-1793812836749
+  - tests/test_lab_metrics.py@1649-1793812897081
+  - tests/test_lab_video.py@2585-1793814432596
+  - tests/test_matching.py@1790-1792566337832
+  - tests/test_navlab_geo.py@1523-1793199934454
