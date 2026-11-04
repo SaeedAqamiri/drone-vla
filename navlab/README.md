@@ -125,6 +125,7 @@ env_flight/bin/python -m navlab.lab bench \
   curl -s http://172.16.20.117:30010/v1/models
   ```
   اگر سرویس پایین بود، همین اسکریپت را روی سرور اجرا کن. آدرس در `NAVLAB_SGLANG_URL` قابل override است.
+  اتصال مستقیم: `curl http://172.16.20.117:30010/v1/models` و `POST /v1/images/edits`؛ نمونهٔ کامل curl/Python در [`LAB_README.md`](../LAB_README.md#sglang--flux3-klein-توصیهشده).
 - نتیجهٔ benchmark روی صحنهٔ مصنوعی (۱۰ فریم، reference تولیدشده با SGLang):
   `sift/orb/akaze/loftr/lightglue` در mode `gray` همگی **۱۰/۱۰ fix** با `precision=1.0` و `p95 ≈ ۹.۶–۹.۹m`؛
   `edges` برای تصاویر تولیدشده ضعیف است. یعنی در این صحنه، رفرنس تولیدشده هم‌ارز ماهوارهٔ خام است.

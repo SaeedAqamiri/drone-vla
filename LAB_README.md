@@ -142,6 +142,78 @@ curl -s "http://$SGLANG_HOST:$SGLANG_PORT/v1/models"
 سرویس با `--model-variant fp8r --batching-max-size 2 --dit-cpu-offload=false` بالا می‌آید.
 روی H100 80GB تست شد: ~۳.۵s برای یک تصویر 768px و ~۱۳s برای چهار تصویر.
 
+#### اتصال مستقیم از یک سرور/کلاینت دیگر به FLUX.3 روی ۱۱۷
+
+```bash
+export NAVLAB_SGLANG_URL=http://172.16.20.117:30010
+
+# سلامت سرویس
+curl -s "$NAVLAB_SGLANG_URL/health"
+# مدل و وضعیت
+curl -s "$NAVLAB_SGLANG_URL/v1/models"
+```
+
+نمونهٔ Python برای تولید یک تصویر از tile ماهواره:
+
+```python
+import base64
+import os
+import requests
+
+url = os.environ.get("NAVLAB_SGLANG_URL", "http://172.16.20.117:30010")
+with open("tile.png", "rb") as handle:
+    response = requests.post(
+        f"{url}/v1/images/edits",
+        data={
+            "prompt": "top-down aerial view of the same area, nadir, realistic",
+            "size": "768x768",
+            "num_inference_steps": "16",
+            "seed": "0",
+            "response_format": "b64_json",
+            "output_format": "png",
+        },
+        files={"image": ("tile.png", handle, "image/png")},
+        timeout=1800,
+    )
+response.raise_for_status()
+image_b64 = response.json()["data"][0]["b64_json"]
+with open("generated.png", "wb") as handle:
+    handle.write(base64.b64decode(image_b64))
+```
+
+استفاده از wrapper آماده (همان API، بدون نوشتن requests):
+
+```python
+from pathlib import Path
+
+from sat2aerial.backends import make_backend
+
+backend = make_backend("sglang", server="http://172.16.20.117:30010", seed=0)
+meta = backend.generate(
+    satellite=Path("tile.png"),
+    prompt="top-down aerial view, nadir",
+    out_path=Path("generated.png"),
+    size=(768, 768),
+    seed=0,
+)
+```
+
+یا از CLI خود آزمایشگاه:
+
+```bash
+export NAVLAB_SGLANG_URL=http://172.16.20.117:30010
+env_flight/bin/python -m navlab.lab generate \
+  --store outputs/navlab/lab/uav03_tiles \
+  --out outputs/navlab/lab/uav03_tiles/generated_sglang \
+  --backend sglang --view nadir --size 768x768 --altitude 466
+```
+
+نکته‌ها:
+- `NAVLAB_SGLANG_URL` را در `env_flight`/shell خود ست کن؛ `navlab.config.SGLANG_URL` و `navlab.generation.get_backend("sglang")` از همین استفاده می‌کنند.
+- سرویس فعلاً **بدون authentication** است؛ فقط از شبکهٔ مطمئن/LAN استفاده کن و پورت `30010` را عمومی باز نکن.
+- اگر از سرور دیگری وصل می‌شوی، مطمئن شو firewall اجازهٔ TCP به `172.16.20.117:30010` را می‌دهد.
+- اگر `Connection refused` گرفتی یعنی سرویس پایین است؛ با `api/sglang_start.sh` روی همان سرور بالا بیاور.
+
 ### ComfyUI (جایگزین لوکال)
 
 | مورد | مقدار پیش‌فرض |
