@@ -12,6 +12,7 @@ diagnostics corresponding to the reports in
   adaptive crops and the closed-loop visual-anchor gate.
 - `decision_examples/`: measured footprints and retrospective landmark support.
 - `ortholoc/`: selection and paired results for the OrthoLoC out-of-place test.
+- `label_alignment/`: oracle-only diagnostics of label/image consistency; future labels are used in the nearest-neighbor analysis, so this is not navigation.
 
 The numerical outputs preserve the settings and paths recorded at the time;
 those paths describe the original local environment, not portable locations.

@@ -1,0 +1,53 @@
+{
+  "note": "Strict retrospective image-frame proxy; not simulated or measured destination-arrival probability. Short correlated, selected trajectories; not independent missions.",
+  "threshold_m": 30,
+  "segments": [
+    {
+      "source": "outputs/navlab/level_holdout/01/gim_dkm_c2_cov10_768/frames.csv",
+      "frames": 10,
+      "duration_s": 30.0,
+      "within_threshold": 1,
+      "accepted_over_threshold": 6,
+      "no_accepted_error": 3,
+      "all_frames_within_threshold": false
+    },
+    {
+      "source": "outputs/navlab/level_holdout/02/gim_dkm_c2_cov10_768/frames.csv",
+      "frames": 10,
+      "duration_s": 50.0,
+      "within_threshold": 10,
+      "accepted_over_threshold": 0,
+      "no_accepted_error": 0,
+      "all_frames_within_threshold": true
+    },
+    {
+      "source": "outputs/navlab/level_holdout/03/gim_dkm_c2_cov10_768/frames.csv",
+      "frames": 10,
+      "duration_s": 66.0,
+      "within_threshold": 10,
+      "accepted_over_threshold": 0,
+      "no_accepted_error": 0,
+      "all_frames_within_threshold": true
+    },
+    {
+      "source": "outputs/navlab/level_holdout/06/gim_dkm_c2_cov10_768/frames.csv",
+      "frames": 10,
+      "duration_s": 21.0,
+      "within_threshold": 0,
+      "accepted_over_threshold": 1,
+      "no_accepted_error": 9,
+      "all_frames_within_threshold": false
+    },
+    {
+      "source": "outputs/navlab/level_holdout/09/gim_dkm_c2_cov10_768/frames.csv",
+      "frames": 10,
+      "duration_s": 46.0,
+      "within_threshold": 9,
+      "accepted_over_threshold": 0,
+      "no_accepted_error": 1,
+      "all_frames_within_threshold": false
+    }
+  ],
+  "all_frames_passed_segments": 2,
+  "segment_count": 5
+}

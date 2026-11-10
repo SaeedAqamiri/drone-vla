@@ -458,3 +458,30 @@ matcher or an aircraft-to-image-centre offset.
 
 Compact machine-readable results accompanying this report are archived under
 [`docs/evidence/visual_localization`](evidence/visual_localization/README.md).
+
+## Oracle label-alignment diagnostic (not a flight test)
+
+Using the true current label solely to select up to two candidate map tiles,
+with a 10% visual coverage threshold and no prior jump gate, the later level
+segments yielded median matched image-centre discrepancies of 37.1 m (01,
+7/10 matched), 10.8 m (02, 10/10), 16.2 m (03, 10/10), 287.5 m (06, 8/10),
+and 17.5 m (09, 9/10). True coordinates determine candidate selection; this
+is an oracle diagnostic and cannot measure GPS-denied navigation or arrival.
+
+A further retrospective nearest-neighbour search over up to 12 labelled
+frames in either direction found that `06_0174`, `06_0175`, and `06_0178`
+lay 4.5, 15.2, and 9.4 m from labels `06_0180`, `06_0181`, and `06_0184`,
+respectively: six rows later and 14–15 s later according to the recorded dates.
+Other frames do not share a consistent six-row offset. For each matched frame
+in the four comparison segments (01, 02, 03, 09), the selected nearest label
+was the image's own label. Neighbour searching uses future labels and takes the
+minimum over as many as 25 candidates, so the distances are optimistic and do
+not establish a clock error. No correction was applied. Reproducible evidence:
+`docs/evidence/visual_localization/label_alignment/` and the scripts
+`audit_visloc_label_alignment.py`, `analyze_label_neighbors.py`.
+
+A strict retrospective proxy in `scripts/summarize_segment_proxy.py` asks
+whether all ten frames in each selected segment had an accepted fix within
+30 m: two of five pass. This is not an arrival probability. The segments are
+short, selected and correlated, and no aircraft/INS/flight-control mission has
+been evaluated end to end.

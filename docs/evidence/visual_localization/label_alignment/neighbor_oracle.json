@@ -1,0 +1,413 @@
+{
+  "note": "ORACLE diagnostic: map selection and nearest neighbouring labels use ground truth, including future labels. Searching 25 labels biases the minimum. No fixed timing correction or mission probability is established.",
+  "neighbor_window_frames": 12,
+  "studies": [
+    {
+      "study": "outputs/navlab/level_holdout/01",
+      "frames": [
+        {
+          "query_id": "01_0534",
+          "original_label_error_m": 40.01341649104531,
+          "nearest_label_id": "01_0534",
+          "nearest_label_index_offset": 0,
+          "nearest_label_time_offset_s": 0.0,
+          "nearest_label_distance_m": 40.01341649104531
+        },
+        {
+          "query_id": "01_0535",
+          "original_label_error_m": 34.06061961398058,
+          "nearest_label_id": "01_0535",
+          "nearest_label_index_offset": 0,
+          "nearest_label_time_offset_s": 0.0,
+          "nearest_label_distance_m": 34.06061961398058
+        },
+        {
+          "query_id": "01_0536",
+          "original_label_error_m": 37.651883637596704,
+          "nearest_label_id": "01_0536",
+          "nearest_label_index_offset": 0,
+          "nearest_label_time_offset_s": 0.0,
+          "nearest_label_distance_m": 37.651883637596704
+        },
+        {
+          "query_id": "01_0537",
+          "original_label_error_m": 46.64380964734022,
+          "nearest_label_id": "01_0537",
+          "nearest_label_index_offset": 0,
+          "nearest_label_time_offset_s": 0.0,
+          "nearest_label_distance_m": 46.64380964734022
+        },
+        {
+          "query_id": "01_0538",
+          "original_label_error_m": 37.09099462038144,
+          "nearest_label_id": "01_0538",
+          "nearest_label_index_offset": 0,
+          "nearest_label_time_offset_s": 0.0,
+          "nearest_label_distance_m": 37.09099462038144
+        },
+        {
+          "query_id": "01_0539",
+          "original_label_error_m": 37.11080230744158,
+          "nearest_label_id": "01_0539",
+          "nearest_label_index_offset": 0,
+          "nearest_label_time_offset_s": 0.0,
+          "nearest_label_distance_m": 37.11080230744158
+        },
+        {
+          "query_id": "01_0540",
+          "original_label_error_m": 24.386391383951338,
+          "nearest_label_id": "01_0540",
+          "nearest_label_index_offset": 0,
+          "nearest_label_time_offset_s": 0.0,
+          "nearest_label_distance_m": 24.386391383951338
+        }
+      ],
+      "summary": {
+        "matched_frames": 7,
+        "median_original_error_m": 37.11080230744158,
+        "median_nearest_label_distance_m": 37.11080230744158,
+        "median_nearest_index_offset": 0
+      }
+    },
+    {
+      "study": "outputs/navlab/level_holdout/02",
+      "frames": [
+        {
+          "query_id": "02_0071",
+          "original_label_error_m": 16.02360299929464,
+          "nearest_label_id": "02_0071",
+          "nearest_label_index_offset": 0,
+          "nearest_label_time_offset_s": 0.0,
+          "nearest_label_distance_m": 16.02360299929464
+        },
+        {
+          "query_id": "02_0072",
+          "original_label_error_m": 8.520094137999108,
+          "nearest_label_id": "02_0072",
+          "nearest_label_index_offset": 0,
+          "nearest_label_time_offset_s": 0.0,
+          "nearest_label_distance_m": 8.520094137999108
+        },
+        {
+          "query_id": "02_0073",
+          "original_label_error_m": 11.375889321210774,
+          "nearest_label_id": "02_0073",
+          "nearest_label_index_offset": 0,
+          "nearest_label_time_offset_s": 0.0,
+          "nearest_label_distance_m": 11.375889321210774
+        },
+        {
+          "query_id": "02_0074",
+          "original_label_error_m": 12.78033323587613,
+          "nearest_label_id": "02_0074",
+          "nearest_label_index_offset": 0,
+          "nearest_label_time_offset_s": 0.0,
+          "nearest_label_distance_m": 12.78033323587613
+        },
+        {
+          "query_id": "02_0075",
+          "original_label_error_m": 7.108242602939395,
+          "nearest_label_id": "02_0075",
+          "nearest_label_index_offset": 0,
+          "nearest_label_time_offset_s": 0.0,
+          "nearest_label_distance_m": 7.108242602939395
+        },
+        {
+          "query_id": "02_0076",
+          "original_label_error_m": 10.282162977887046,
+          "nearest_label_id": "02_0076",
+          "nearest_label_index_offset": 0,
+          "nearest_label_time_offset_s": 0.0,
+          "nearest_label_distance_m": 10.282162977887046
+        },
+        {
+          "query_id": "02_0077",
+          "original_label_error_m": 7.1198763475175735,
+          "nearest_label_id": "02_0077",
+          "nearest_label_index_offset": 0,
+          "nearest_label_time_offset_s": 0.0,
+          "nearest_label_distance_m": 7.1198763475175735
+        },
+        {
+          "query_id": "02_0078",
+          "original_label_error_m": 3.9883904582581464,
+          "nearest_label_id": "02_0078",
+          "nearest_label_index_offset": 0,
+          "nearest_label_time_offset_s": 0.0,
+          "nearest_label_distance_m": 3.9883904582581464
+        },
+        {
+          "query_id": "02_0079",
+          "original_label_error_m": 12.295197942615506,
+          "nearest_label_id": "02_0079",
+          "nearest_label_index_offset": 0,
+          "nearest_label_time_offset_s": 0.0,
+          "nearest_label_distance_m": 12.295197942615506
+        },
+        {
+          "query_id": "02_0080",
+          "original_label_error_m": 13.393363600804049,
+          "nearest_label_id": "02_0080",
+          "nearest_label_index_offset": 0,
+          "nearest_label_time_offset_s": 0.0,
+          "nearest_label_distance_m": 13.393363600804049
+        }
+      ],
+      "summary": {
+        "matched_frames": 10,
+        "median_original_error_m": 10.829026149548909,
+        "median_nearest_label_distance_m": 10.829026149548909,
+        "median_nearest_index_offset": 0.0
+      }
+    },
+    {
+      "study": "outputs/navlab/level_holdout/03",
+      "frames": [
+        {
+          "query_id": "03_0031",
+          "original_label_error_m": 26.43031768598353,
+          "nearest_label_id": "03_0031",
+          "nearest_label_index_offset": 0,
+          "nearest_label_time_offset_s": 0.0,
+          "nearest_label_distance_m": 26.43031768598353
+        },
+        {
+          "query_id": "03_0032",
+          "original_label_error_m": 15.359051309744986,
+          "nearest_label_id": "03_0032",
+          "nearest_label_index_offset": 0,
+          "nearest_label_time_offset_s": 0.0,
+          "nearest_label_distance_m": 15.359051309744986
+        },
+        {
+          "query_id": "03_0033",
+          "original_label_error_m": 16.369624175849246,
+          "nearest_label_id": "03_0033",
+          "nearest_label_index_offset": 0,
+          "nearest_label_time_offset_s": 0.0,
+          "nearest_label_distance_m": 16.369624175849246
+        },
+        {
+          "query_id": "03_0034",
+          "original_label_error_m": 16.232384298074166,
+          "nearest_label_id": "03_0034",
+          "nearest_label_index_offset": 0,
+          "nearest_label_time_offset_s": 0.0,
+          "nearest_label_distance_m": 16.232384298074166
+        },
+        {
+          "query_id": "03_0035",
+          "original_label_error_m": 24.653686593307988,
+          "nearest_label_id": "03_0035",
+          "nearest_label_index_offset": 0,
+          "nearest_label_time_offset_s": 0.0,
+          "nearest_label_distance_m": 24.653686593307988
+        },
+        {
+          "query_id": "03_0036",
+          "original_label_error_m": 10.970062314119366,
+          "nearest_label_id": "03_0036",
+          "nearest_label_index_offset": 0,
+          "nearest_label_time_offset_s": 0.0,
+          "nearest_label_distance_m": 10.970062314119366
+        },
+        {
+          "query_id": "03_0037",
+          "original_label_error_m": 25.4923142629595,
+          "nearest_label_id": "03_0037",
+          "nearest_label_index_offset": 0,
+          "nearest_label_time_offset_s": 0.0,
+          "nearest_label_distance_m": 25.4923142629595
+        },
+        {
+          "query_id": "03_0038",
+          "original_label_error_m": 16.099512929146485,
+          "nearest_label_id": "03_0038",
+          "nearest_label_index_offset": 0,
+          "nearest_label_time_offset_s": 0.0,
+          "nearest_label_distance_m": 16.099512929146485
+        },
+        {
+          "query_id": "03_0039",
+          "original_label_error_m": 4.098981401250787,
+          "nearest_label_id": "03_0039",
+          "nearest_label_index_offset": 0,
+          "nearest_label_time_offset_s": 0.0,
+          "nearest_label_distance_m": 4.098981401250787
+        },
+        {
+          "query_id": "03_0040",
+          "original_label_error_m": 0.8852661123481802,
+          "nearest_label_id": "03_0040",
+          "nearest_label_index_offset": 0,
+          "nearest_label_time_offset_s": 0.0,
+          "nearest_label_distance_m": 0.8852661123481802
+        }
+      ],
+      "summary": {
+        "matched_frames": 10,
+        "median_original_error_m": 16.165948613610325,
+        "median_nearest_label_distance_m": 16.165948613610325,
+        "median_nearest_index_offset": 0.0
+      }
+    },
+    {
+      "study": "outputs/navlab/level_holdout/06",
+      "frames": [
+        {
+          "query_id": "06_0174",
+          "original_label_error_m": 362.737181990128,
+          "nearest_label_id": "06_0180",
+          "nearest_label_index_offset": 6,
+          "nearest_label_time_offset_s": 14.0,
+          "nearest_label_distance_m": 4.464067372825904
+        },
+        {
+          "query_id": "06_0175",
+          "original_label_error_m": 369.4341931197004,
+          "nearest_label_id": "06_0181",
+          "nearest_label_index_offset": 6,
+          "nearest_label_time_offset_s": 15.0,
+          "nearest_label_distance_m": 15.174113798123429
+        },
+        {
+          "query_id": "06_0178",
+          "original_label_error_m": 368.7954078973923,
+          "nearest_label_id": "06_0184",
+          "nearest_label_index_offset": 6,
+          "nearest_label_time_offset_s": 15.0,
+          "nearest_label_distance_m": 9.427333517970961
+        },
+        {
+          "query_id": "06_0179",
+          "original_label_error_m": 335.1096693477055,
+          "nearest_label_id": "06_0184",
+          "nearest_label_index_offset": 5,
+          "nearest_label_time_offset_s": 12.0,
+          "nearest_label_distance_m": 138.26090454110843
+        },
+        {
+          "query_id": "06_0180",
+          "original_label_error_m": 239.88110286685136,
+          "nearest_label_id": "06_0183",
+          "nearest_label_index_offset": 3,
+          "nearest_label_time_offset_s": 7.0,
+          "nearest_label_distance_m": 153.3832809035576
+        },
+        {
+          "query_id": "06_0181",
+          "original_label_error_m": 175.60478485871732,
+          "nearest_label_id": "06_0182",
+          "nearest_label_index_offset": 1,
+          "nearest_label_time_offset_s": 2.0,
+          "nearest_label_distance_m": 164.72301922657783
+        },
+        {
+          "query_id": "06_0182",
+          "original_label_error_m": 153.2377315119509,
+          "nearest_label_id": "06_0181",
+          "nearest_label_index_offset": -1,
+          "nearest_label_time_offset_s": -2.0,
+          "nearest_label_distance_m": 144.3347623825953
+        },
+        {
+          "query_id": "06_0183",
+          "original_label_error_m": 224.59153731634777,
+          "nearest_label_id": "06_0185",
+          "nearest_label_index_offset": 2,
+          "nearest_label_time_offset_s": 78.0,
+          "nearest_label_distance_m": 125.92651650841728
+        }
+      ],
+      "summary": {
+        "matched_frames": 8,
+        "median_original_error_m": 287.4953861072784,
+        "median_nearest_label_distance_m": 132.09371052476286,
+        "median_nearest_index_offset": 4.0
+      }
+    },
+    {
+      "study": "outputs/navlab/level_holdout/09",
+      "frames": [
+        {
+          "query_id": "09_0066",
+          "original_label_error_m": 9.731885540564162,
+          "nearest_label_id": "09_0066",
+          "nearest_label_index_offset": 0,
+          "nearest_label_time_offset_s": 0.0,
+          "nearest_label_distance_m": 9.731885540564162
+        },
+        {
+          "query_id": "09_0067",
+          "original_label_error_m": 17.450491191648975,
+          "nearest_label_id": "09_0067",
+          "nearest_label_index_offset": 0,
+          "nearest_label_time_offset_s": 0.0,
+          "nearest_label_distance_m": 17.450491191648975
+        },
+        {
+          "query_id": "09_0068",
+          "original_label_error_m": 23.823095468624768,
+          "nearest_label_id": "09_0068",
+          "nearest_label_index_offset": 0,
+          "nearest_label_time_offset_s": 0.0,
+          "nearest_label_distance_m": 23.823095468624768
+        },
+        {
+          "query_id": "09_0069",
+          "original_label_error_m": 19.90704095532579,
+          "nearest_label_id": "09_0069",
+          "nearest_label_index_offset": 0,
+          "nearest_label_time_offset_s": 0.0,
+          "nearest_label_distance_m": 19.90704095532579
+        },
+        {
+          "query_id": "09_0070",
+          "original_label_error_m": 20.02494872376926,
+          "nearest_label_id": "09_0070",
+          "nearest_label_index_offset": 0,
+          "nearest_label_time_offset_s": 0.0,
+          "nearest_label_distance_m": 20.02494872376926
+        },
+        {
+          "query_id": "09_0071",
+          "original_label_error_m": 17.55122280280605,
+          "nearest_label_id": "09_0071",
+          "nearest_label_index_offset": 0,
+          "nearest_label_time_offset_s": 0.0,
+          "nearest_label_distance_m": 17.55122280280605
+        },
+        {
+          "query_id": "09_0072",
+          "original_label_error_m": 16.879446021903227,
+          "nearest_label_id": "09_0072",
+          "nearest_label_index_offset": 0,
+          "nearest_label_time_offset_s": 0.0,
+          "nearest_label_distance_m": 16.879446021903227
+        },
+        {
+          "query_id": "09_0073",
+          "original_label_error_m": 7.196523917442063,
+          "nearest_label_id": "09_0073",
+          "nearest_label_index_offset": 0,
+          "nearest_label_time_offset_s": 0.0,
+          "nearest_label_distance_m": 7.196523917442063
+        },
+        {
+          "query_id": "09_0074",
+          "original_label_error_m": 16.45579145646501,
+          "nearest_label_id": "09_0074",
+          "nearest_label_index_offset": 0,
+          "nearest_label_time_offset_s": 0.0,
+          "nearest_label_distance_m": 16.45579145646501
+        }
+      ],
+      "summary": {
+        "matched_frames": 9,
+        "median_original_error_m": 17.450491191648975,
+        "median_nearest_label_distance_m": 17.450491191648975,
+        "median_nearest_index_offset": 0
+      }
+    }
+  ]
+}
