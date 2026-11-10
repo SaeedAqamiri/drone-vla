@@ -1,0 +1,85 @@
+{
+  "note": "Prior-centred crop; label coverage is retrospective; sigma and camera footprint are heuristic.",
+  "frames": [
+    {
+      "query_id": "06_0174",
+      "bounds": {
+        "min_east": 259.9579253809102,
+        "min_north": -858.0221785101996,
+        "max_east": 956.8743385465739,
+        "max_north": -161.105765344536
+      },
+      "side_m": 696.9164131656637,
+      "truth_in_crop_retrospective": true
+    },
+    {
+      "query_id": "06_0175",
+      "bounds": {
+        "min_east": 264.13817910983926,
+        "min_north": -927.2063934553141,
+        "max_east": 985.054592275503,
+        "max_north": -206.28998028965043
+      },
+      "side_m": 720.9164131656637,
+      "truth_in_crop_retrospective": true
+    },
+    {
+      "query_id": "06_0176",
+      "bounds": {
+        "min_east": 268.31843283876833,
+        "min_north": -996.3906084004286,
+        "max_east": 1013.234846004432,
+        "max_north": -251.47419523476492
+      },
+      "side_m": 744.9164131656637,
+      "truth_in_crop_retrospective": true
+    },
+    {
+      "query_id": "06_0177",
+      "bounds": {
+        "min_east": 274.58881343216194,
+        "min_north": -1100.1669308181004,
+        "max_east": 1055.5052265978256,
+        "max_north": -319.25051765243654
+      },
+      "side_m": 780.9164131656637,
+      "truth_in_crop_retrospective": true
+    },
+    {
+      "query_id": "06_0178",
+      "bounds": null,
+      "side_m": null,
+      "truth_in_crop_retrospective": false
+    },
+    {
+      "query_id": "06_0179",
+      "bounds": null,
+      "side_m": null,
+      "truth_in_crop_retrospective": false
+    },
+    {
+      "query_id": "06_0180",
+      "bounds": null,
+      "side_m": null,
+      "truth_in_crop_retrospective": false
+    },
+    {
+      "query_id": "06_0181",
+      "bounds": null,
+      "side_m": null,
+      "truth_in_crop_retrospective": false
+    },
+    {
+      "query_id": "06_0182",
+      "bounds": null,
+      "side_m": null,
+      "truth_in_crop_retrospective": false
+    },
+    {
+      "query_id": "06_0183",
+      "bounds": null,
+      "side_m": null,
+      "truth_in_crop_retrospective": false
+    }
+  ]
+}

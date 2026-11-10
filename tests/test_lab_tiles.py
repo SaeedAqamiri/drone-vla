@@ -9,10 +9,33 @@ from affine import Affine
 
 from navlab.imagery import inspect_image
 from navlab.lab.synthetic import make_queries, make_scene
-from navlab.lab.tiles import TileStore, build_tiles_along_route
+from navlab.lab.tiles import TileStore, _read_tile, build_tiles_along_route
 
 
 class LabTilesTest(unittest.TestCase):
+    def test_read_tile_fully_outside_raster_is_empty(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            scene = make_scene(Path(tmp), size=512, seed=2, gsd_m=0.5)
+            with rasterio.open(scene["path"]) as ds:
+                image = _read_tile(ds, 1000, 1000, 32)
+            self.assertEqual(image.shape, (32, 32, 3))
+            self.assertFalse(np.any(image))
+
+    def test_candidates_include_tile_whose_edge_intersects_search(self):
+        # Deliberately bypass disk loading to test spatial candidate selection.
+        store = object.__new__(TileStore)
+        store.tiles = [
+            {"id": "contains", "east": 0, "north": 0, "bounds":
+             {"min_east": -100, "max_east": 100, "min_north": -100, "max_north": 100}},
+            {"id": "outside", "east": 300, "north": 0, "bounds":
+             {"min_east": 200, "max_east": 400, "min_north": -100, "max_north": 100}},
+        ]
+        store._east = np.array([0.0, 300.0])
+        store._north = np.array([0.0, 0.0])
+        self.assertEqual([t["id"] for t in store.candidates(95, 0, 10)], ["contains"])
+        self.assertEqual([t["id"] for t in store.candidates(105, 0, 10)], ["contains"])
+        self.assertEqual(store.candidates(120, 0, 10), [])
+
     def test_rotated_gsd_and_flag(self):
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "rotated.tif"

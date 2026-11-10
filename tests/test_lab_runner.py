@@ -3,11 +3,22 @@ import unittest
 from pathlib import Path
 
 from navlab.lab.runner import LabRunner, RunnerConfig
+from navlab.lab.candidates import Prior
 from navlab.lab.synthetic import make_queries, make_scene
 from navlab.lab.tiles import TileStore, build_tiles_along_route
 
 
 class LabRunnerTest(unittest.TestCase):
+    def test_prior_propagates_through_multiple_misses_and_updates_velocity(self):
+        prior = Prior(east=0, north=0, vx=10, timestamp=0, sigma=10, valid=True)
+        for timestamp in range(1, 5):
+            self.assertAlmostEqual(prior.predict(timestamp)[0], timestamp * 10)
+            prior.decay(timestamp)
+        self.assertGreater(prior.sigma, 10)
+        prior.update(50, 0, 5)
+        self.assertAlmostEqual(prior.vx, 10)
+        self.assertAlmostEqual(prior.predict(6)[0], 60)
+
     def test_synthetic_sequence_localizes(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

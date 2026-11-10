@@ -3,6 +3,8 @@
 from .tiles import TileStore, build_tiles_along_route
 from .sequences import QueryFrame, uav_visloc_queries
 from .runner import LabRunner, RunnerConfig
+from .candidates import Prior
+from .navigator import NavigationResult, VisualNavigator
 
 __all__ = [
     "TileStore",
@@ -11,4 +13,7 @@ __all__ = [
     "uav_visloc_queries",
     "LabRunner",
     "RunnerConfig",
+    "Prior",
+    "NavigationResult",
+    "VisualNavigator",
 ]

@@ -14,8 +14,14 @@ from .types import QueryFrame
 
 def _timestamp(value: str | None, index: int) -> float:
     if value:
+        text = value.strip()
         try:
-            return datetime.fromisoformat(value.strip()).timestamp()
+            # UAV-VisLoc 07 uses compact YYYYMMDDHMMSS with a one-digit
+            # hour. fromisoformat misreads the hour as a separator and treats
+            # minutes/seconds as hours/minutes (60x time error).
+            if text.isdigit() and len(text) in (13, 14):
+                return datetime.strptime(text, "%Y%m%d%H%M%S").timestamp()
+            return datetime.fromisoformat(text).timestamp()
         except ValueError:
             pass
     return float(index)
@@ -76,6 +82,12 @@ def uav_visloc_queries(
                 meta={
                     "num": number,
                     "date": row.get("date", ""),
+                    # Older CSVs may not contain these fields. Zero is used
+                    # above for backwards compatibility, but must not be
+                    # mistaken for a measured level attitude.
+                    "attitude_present": all(
+                        str(row.get(field) or "").strip() for field in ("Omega", "Kappa")
+                    ),
                     "pitch_deg": float(row.get("Omega") or 0.0),
                     "roll_deg": float(row.get("Kappa") or 0.0),
                     "yaw_alt_deg": float(row.get("Phi2") or 0.0),

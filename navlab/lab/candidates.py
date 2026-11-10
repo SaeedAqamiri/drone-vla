@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
@@ -19,6 +19,15 @@ class Prior:
     timestamp: float | None = None
     sigma: float = 30.0
     valid: bool = False
+    _fix_east: float | None = field(default=None, init=False, repr=False)
+    _fix_north: float | None = field(default=None, init=False, repr=False)
+    _fix_timestamp: float | None = field(default=None, init=False, repr=False)
+
+    def __post_init__(self) -> None:
+        if self.valid and self.east is not None and self.north is not None:
+            self._fix_east = float(self.east)
+            self._fix_north = float(self.north)
+            self._fix_timestamp = self.timestamp
 
     def predict(self, timestamp: float) -> tuple[float, float, float] | None:
         if not self.valid or self.east is None or self.north is None:
@@ -41,11 +50,11 @@ class Prior:
         sigma: float = 10.0,
         max_speed: float = 80.0,
     ) -> None:
-        if self.valid and self.timestamp is not None:
-            dt = float(timestamp) - float(self.timestamp)
-            if dt > 1e-6 and self.east is not None and self.north is not None:
-                vx = (float(east) - float(self.east)) / dt
-                vy = (float(north) - float(self.north)) / dt
+        if self.valid and self._fix_timestamp is not None:
+            dt = float(timestamp) - float(self._fix_timestamp)
+            if dt > 1e-6 and self._fix_east is not None and self._fix_north is not None:
+                vx = (float(east) - self._fix_east) / dt
+                vy = (float(north) - self._fix_north) / dt
                 speed = (vx * vx + vy * vy) ** 0.5
                 if speed <= max_speed:
                     self.vx = 0.5 * self.vx + 0.5 * vx
@@ -55,11 +64,17 @@ class Prior:
         self.timestamp = float(timestamp)
         self.sigma = float(sigma)
         self.valid = True
+        self._fix_east = self.east
+        self._fix_north = self.north
+        self._fix_timestamp = self.timestamp
 
     def decay(self, timestamp: float, drift_mps: float = 3.0) -> None:
         if not self.valid or self.timestamp is None:
             return
         dt = max(0.0, float(timestamp) - float(self.timestamp))
+        if self.east is not None and self.north is not None:
+            self.east += self.vx * dt
+            self.north += self.vy * dt
         self.sigma = max(self.sigma, 10.0) + drift_mps * dt
         self.timestamp = float(timestamp)
 

@@ -29,6 +29,12 @@ def _frame(index, accepted, error, reason, timestamp):
 
 
 class LabMetricsTest(unittest.TestCase):
+    def test_unlabelled_accepted_fix_does_not_count_as_false(self):
+        result = compute_summary([_frame(0, True, None, "ok", 0.0)])
+        self.assertIsNone(result["precision"])
+        self.assertIsNone(result["false_fix_rate"])
+        self.assertEqual(result["ground_truth_accepted"], 0)
+
     def test_summary_counts_and_false_fixes(self):
         config = RunnerConfig(max_error_m=20.0)
         frames = [

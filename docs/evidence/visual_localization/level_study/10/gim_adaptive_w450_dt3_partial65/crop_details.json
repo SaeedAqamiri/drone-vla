@@ -1,0 +1,205 @@
+{
+  "note": "Prior-centred crop; label coverage is retrospective; sigma and camera footprint are heuristic.",
+  "frames": [
+    {
+      "query_id": "10_0006",
+      "crop_diagnostic": {
+        "side_m": 696.8326913195984,
+        "sigma_m": 39.0,
+        "footprint_width_m": 450.0,
+        "uses_altitude_agl": false,
+        "rejection": null,
+        "valid_fraction": 0.744140625
+      },
+      "bounds": {
+        "min_east": -929.3253887417738,
+        "min_north": -368.77144657839744,
+        "max_east": -232.49269742217535,
+        "max_north": 328.061244741201
+      },
+      "side_m": 696.8326913195986,
+      "valid_fraction": 0.744140625,
+      "truth_in_crop_retrospective": true
+    },
+    {
+      "query_id": "10_0007",
+      "crop_diagnostic": {
+        "side_m": 732.8326913195984,
+        "sigma_m": 48.0,
+        "footprint_width_m": 450.0,
+        "uses_altitude_agl": false,
+        "rejection": null,
+        "valid_fraction": 0.7646484375
+      },
+      "bounds": {
+        "min_east": -923.9619297763261,
+        "min_north": -442.1221889500166,
+        "max_east": -191.1292384567276,
+        "max_north": 290.71050236958183
+      },
+      "side_m": 732.8326913195986,
+      "valid_fraction": 0.7646484375,
+      "truth_in_crop_retrospective": true
+    },
+    {
+      "query_id": "10_0008",
+      "crop_diagnostic": {
+        "side_m": 768.8326913195984,
+        "sigma_m": 57.0,
+        "footprint_width_m": 450.0,
+        "uses_altitude_agl": false,
+        "rejection": null,
+        "valid_fraction": 0.7822265625
+      },
+      "bounds": {
+        "min_east": -918.5984708108783,
+        "min_north": -515.4729313216358,
+        "max_east": -149.76577949127983,
+        "max_north": 253.3597599979627
+      },
+      "side_m": 768.8326913195986,
+      "valid_fraction": 0.7822265625,
+      "truth_in_crop_retrospective": true
+    },
+    {
+      "query_id": "10_0009",
+      "crop_diagnostic": {
+        "side_m": 816.8326913195984,
+        "sigma_m": 69.0,
+        "footprint_width_m": 450.0,
+        "uses_altitude_agl": false,
+        "rejection": null,
+        "valid_fraction": 0.8037109375
+      },
+      "bounds": {
+        "min_east": -911.4471921902813,
+        "min_north": -613.2739211504613,
+        "max_east": -94.61450087068283,
+        "max_north": 203.55877016913718
+      },
+      "side_m": 816.8326913195984,
+      "valid_fraction": 0.8037109375,
+      "truth_in_crop_retrospective": true
+    },
+    {
+      "query_id": "10_0010",
+      "crop_diagnostic": {
+        "side_m": 852.8326913195984,
+        "sigma_m": 78.0,
+        "footprint_width_m": 450.0,
+        "uses_altitude_agl": false,
+        "rejection": null,
+        "valid_fraction": 0.818359375
+      },
+      "bounds": {
+        "min_east": -906.0837332248335,
+        "min_north": -686.6246635220805,
+        "max_east": -53.25104190523507,
+        "max_north": 166.208027797518
+      },
+      "side_m": 852.8326913195984,
+      "valid_fraction": 0.818359375,
+      "truth_in_crop_retrospective": true
+    },
+    {
+      "query_id": "10_0011",
+      "crop_diagnostic": {
+        "side_m": 888.8326913195984,
+        "sigma_m": 87.0,
+        "footprint_width_m": 450.0,
+        "uses_altitude_agl": false,
+        "rejection": null,
+        "valid_fraction": 0.8283939361572266
+      },
+      "bounds": {
+        "min_east": -900.7202742593857,
+        "min_north": -759.9754058936996,
+        "max_east": -11.887582939787308,
+        "max_north": 128.85728542589885
+      },
+      "side_m": 888.8326913195984,
+      "valid_fraction": 0.8283939361572266,
+      "truth_in_crop_retrospective": true
+    },
+    {
+      "query_id": "10_0012",
+      "crop_diagnostic": {
+        "side_m": 924.8326913195984,
+        "sigma_m": 96.0,
+        "footprint_width_m": 450.0,
+        "uses_altitude_agl": false,
+        "rejection": null,
+        "valid_fraction": 0.7730693817138672
+      },
+      "bounds": {
+        "min_east": -895.356815293938,
+        "min_north": -833.3261482653188,
+        "max_east": 29.475876025660455,
+        "max_north": 91.50654305427969
+      },
+      "side_m": 924.8326913195984,
+      "valid_fraction": 0.7730693817138672,
+      "truth_in_crop_retrospective": true
+    },
+    {
+      "query_id": "10_0013",
+      "crop_diagnostic": {
+        "side_m": 600.8326913195984,
+        "sigma_m": 15.0,
+        "footprint_width_m": 450.0,
+        "uses_altitude_agl": false,
+        "rejection": null,
+        "valid_fraction": 1.0
+      },
+      "bounds": {
+        "min_east": -738.6565223205023,
+        "min_north": -725.9423080708291,
+        "max_east": -137.82383100090385,
+        "max_north": -125.10961675123065
+      },
+      "side_m": 600.8326913195984,
+      "valid_fraction": 1.0,
+      "truth_in_crop_retrospective": true
+    },
+    {
+      "query_id": "10_0014",
+      "crop_diagnostic": {
+        "side_m": 600.8326913195984,
+        "sigma_m": 15.0,
+        "footprint_width_m": 450.0,
+        "uses_altitude_agl": false,
+        "rejection": null,
+        "valid_fraction": 0.9912109375
+      },
+      "bounds": {
+        "min_east": -700.380392820749,
+        "min_north": -761.5336458294157,
+        "max_east": -99.54770150115047,
+        "max_north": -160.70095450981722
+      },
+      "side_m": 600.8326913195986,
+      "valid_fraction": 0.9912109375,
+      "truth_in_crop_retrospective": true
+    },
+    {
+      "query_id": "10_0015",
+      "crop_diagnostic": {
+        "side_m": 600.8326913195984,
+        "sigma_m": 15.0,
+        "footprint_width_m": 450.0,
+        "uses_altitude_agl": false,
+        "rejection": null,
+        "valid_fraction": 0.884765625
+      },
+      "bounds": {
+        "min_east": -686.5965319549455,
+        "min_north": -825.1688175775164,
+        "max_east": -85.7638406353471,
+        "max_north": -224.336126257918
+      },
+      "side_m": 600.8326913195983,
+      "valid_fraction": 0.884765625,
+      "truth_in_crop_retrospective": true
+    }
+  ]
+}

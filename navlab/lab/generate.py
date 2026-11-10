@@ -83,7 +83,7 @@ def generate_references(
                     "variant": view,
                     "seed": tile_seed,
                     "source_tile": tile["id"],
-                    "meta": {key: value for key, value in meta.items() if key != "prompt"},
+                    "meta": meta,
                 }
             )
 
@@ -95,6 +95,8 @@ def generate_references(
         "size": [width, height],
         "seeds": seeds,
         "base_seed": seed,
+        "altitude_m": altitude_m,
+        "style_refs": [str(path) for path in style_refs],
         "store": str(store.root),
         "tiles": references,
     }

@@ -1,0 +1,126 @@
+{
+  "config": {
+    "matcher": "gim_dkm",
+    "mode": "gray",
+    "max_dim": 768,
+    "max_candidates": 2,
+    "bootstrap_candidates": 20,
+    "base_radius": 60,
+    "max_radius": 800,
+    "sigma_scale": 3.0,
+    "global_fallback": false,
+    "attempt_every": 1,
+    "min_inliers": 15,
+    "min_ratio": 0.15,
+    "min_coverage": 0.1,
+    "ratio": 0.75,
+    "ransac_px": 5.0,
+    "max_jump_m": 120,
+    "jump_sigma_scale": 2,
+    "scale_tolerance": 0,
+    "camera_fov_deg": 73.0,
+    "fix_sigma": 6.0,
+    "max_speed_mps": 80,
+    "max_error_m": 30.0,
+    "confirmation": 1,
+    "confirmation_radius_m": 30,
+    "rng_seed": 0,
+    "dropout_start": null,
+    "dropout_length": 0,
+    "reference_kind": null,
+    "engine": "VisualNavigator",
+    "oracle_motion": false,
+    "motion_noise_m": 0.0,
+    "rotations": [
+      0,
+      90,
+      180,
+      270
+    ],
+    "adaptive_footprint_width_m": 450.0,
+    "crop_uncertainty_scale": 2.0,
+    "crop_max_side_m": 1500.0,
+    "crop_sigma_growth_mps": 3.0,
+    "crop_min_valid_fraction": 0.95,
+    "camera_gsd_m": null,
+    "limit_frames": null,
+    "visual_propagation": false,
+    "remote_gim_host": "ava@172.16.20.117",
+    "initial_prior": {
+      "lat": 40.34859894,
+      "lon": 115.7780859,
+      "timestamp": 1536152299.0,
+      "vx": 7.787819655149247,
+      "vy": -18.450247457206384,
+      "sigma_m": 30,
+      "initialization_frames": [
+        "10_0004",
+        "10_0005"
+      ]
+    }
+  },
+  "summary": {
+    "frames": 10,
+    "attempted": 10,
+    "matched": 0,
+    "accepted": 0,
+    "rejected": 10,
+    "match_rate": 0.0,
+    "fix_rate": 0.0,
+    "accepted_rate": 0.0,
+    "ground_truth_accepted": 0,
+    "correct_fixes": 0,
+    "false_fixes": 0,
+    "candidate_truth_coverage": 0.0,
+    "labelled_attempts": 10,
+    "fix_within_5m": 0.0,
+    "fix_within_10m": 0.0,
+    "fix_within_20m": 0.0,
+    "fix_within_30m": 0.0,
+    "precision": null,
+    "false_fix_rate": null,
+    "mean_error_m": null,
+    "median_error_m": null,
+    "p95_error_m": null,
+    "max_error_m": null,
+    "mean_prior_error_m": 15.49467850825191,
+    "p95_prior_error_m": 21.842347021042578,
+    "mean_latency_ms": 157.3756275993219,
+    "p95_latency_ms": 171.8151589993795,
+    "mean_candidates": 0,
+    "time_to_first_fix_s": null,
+    "mean_fix_interval_s": null,
+    "longest_gap_without_fix_s": 28.0,
+    "recovery_s": null,
+    "max_error_threshold_m": 30.0,
+    "failure_counts": {
+      "no_candidates": 10
+    }
+  },
+  "store": {
+    "root": "outputs/navlab/level_study/10/tiles",
+    "source": "data/raw/uav_visloc/UAV_VisLoc_dataset/10/satellite10.tif",
+    "gsd": 0.48828125,
+    "tile_px": 1024,
+    "tile_ground_m": 500.0,
+    "tiles": 28
+  },
+  "references": null,
+  "extra": {
+    "sequence": {
+      "dataset": "uav_visloc",
+      "map": "10",
+      "start_index": 0,
+      "selection": {
+        "first_level_deg": 3.0,
+        "max_segment_gap_s": 10.0
+      },
+      "initialization_frames": [
+        "10_0004",
+        "10_0005"
+      ],
+      "map_roi": "fixed bbox from evaluation segment plus margin; offline only"
+    },
+    "note": "2 pre-outage positions seed the prior; map ROI uses segment labels offline."
+  }
+}

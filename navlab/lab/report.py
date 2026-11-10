@@ -70,6 +70,11 @@ def write_run(
         "match_scale",
         "match_rotation",
         "match_reproj",
+        "match_query_rotation_deg",
+        "match_execution_errors",
+        "match_landmark_supported",
+        "match_landmark_total",
+        "candidate_truth_covered",
     ]
     flattened = []
     for row in frame_rows:
@@ -83,6 +88,11 @@ def write_run(
                 "match_scale": match.get("scale"),
                 "match_rotation": match.get("rotation"),
                 "match_reproj": match.get("reproj"),
+                "match_query_rotation_deg": match.get("query_rotation_deg"),
+                "match_execution_errors": json.dumps(match.get("execution_errors")) if match.get("execution_errors") else None,
+                "match_landmark_supported": match.get("landmark_supported"),
+                "match_landmark_total": match.get("landmark_total"),
+                "candidate_truth_covered": row.get("candidate_truth_covered"),
             }
         )
     _write_csv(out_dir / "frames.csv", flattened, fieldnames)
@@ -119,6 +129,12 @@ def write_run(
         "accepted_rate",
         "precision",
         "false_fix_rate",
+        "candidate_truth_coverage",
+        "fix_within_5m",
+        "fix_within_10m",
+        "fix_within_20m",
+        "fix_within_30m",
+        "longest_gap_without_fix_s",
         "mean_error_m",
         "median_error_m",
         "p95_error_m",

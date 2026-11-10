@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 
 from .bench import run_bench
+from .candidates import Prior
 from .generate import generate_references
 from .references import combine_references
 from .report import write_run
@@ -135,6 +136,7 @@ def _cmd_run(args: argparse.Namespace) -> int:
         max_dim=args.max_dim,
         max_candidates=args.max_candidates,
         bootstrap_candidates=args.bootstrap_candidates,
+        global_fallback=not args.no_global_fallback,
         base_radius=args.base_radius,
         max_radius=args.max_radius,
         attempt_every=args.attempt_every,
@@ -148,11 +150,22 @@ def _cmd_run(args: argparse.Namespace) -> int:
         confirmation_radius_m=args.confirmation_radius,
         rng_seed=args.rng_seed,
     )
+    initial_prior = None
+    if args.initial_lat is not None or args.initial_lon is not None:
+        if args.initial_lat is None or args.initial_lon is None:
+            raise SystemExit("--initial-lat and --initial-lon must be supplied together")
+        if not queries:
+            raise SystemExit("cannot initialize a prior with an empty sequence")
+        east, north = store.to_local(args.initial_lon, args.initial_lat)
+        initial_prior = Prior(east=east, north=north, vx=args.initial_vx,
+                              vy=args.initial_vy, timestamp=(args.initial_time if args.initial_time is not None else queries[0].timestamp),
+                              sigma=args.initial_sigma, valid=True)
     runner = LabRunner(
         store,
         queries,
         config,
         references=args.references,
+        initial_prior=initial_prior,
     )
     result = runner.run()
     reference_manifest = (
@@ -286,6 +299,7 @@ def build_parser() -> argparse.ArgumentParser:
     run_parser.add_argument("--max-dim", type=int, default=1024)
     run_parser.add_argument("--max-candidates", type=int, default=8)
     run_parser.add_argument("--bootstrap-candidates", type=int, default=20)
+    run_parser.add_argument("--no-global-fallback", action="store_true")
     run_parser.add_argument("--base-radius", type=float, default=60.0)
     run_parser.add_argument("--max-radius", type=float, default=600.0)
     run_parser.add_argument("--attempt-every", type=int, default=1)
@@ -298,6 +312,12 @@ def build_parser() -> argparse.ArgumentParser:
     run_parser.add_argument("--confirmation", type=int, default=1)
     run_parser.add_argument("--confirmation-radius", type=float, default=200.0)
     run_parser.add_argument("--rng-seed", type=int, default=0)
+    run_parser.add_argument("--initial-lat", type=float)
+    run_parser.add_argument("--initial-lon", type=float)
+    run_parser.add_argument("--initial-sigma", type=float, default=30.0)
+    run_parser.add_argument("--initial-time", type=float, help="timestamp of initial prior")
+    run_parser.add_argument("--initial-vx", type=float, default=0.0, help="initial east velocity m/s")
+    run_parser.add_argument("--initial-vy", type=float, default=0.0, help="initial north velocity m/s")
     run_parser.add_argument("--limit", type=int)
     run_parser.set_defaults(func=_cmd_run)
 

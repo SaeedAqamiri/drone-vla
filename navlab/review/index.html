@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>مرورگر تطبیق دیداری</title><link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<header class="topbar"><div class="brandmark">◈</div><div><div class="eyebrow">NAVLAB / VISUAL LOCALIZATION</div><h1>مرورگر تطبیق دیداری</h1><p>تصویر پرنده، نقشه و تصمیم ثبت‌شده در هر آزمایش</p></div><button id="refresh" class="refresh">↻ بروزرسانی آزمایش‌ها</button></header>
+<main class="layout">
+<aside class="sidebar">
+  <div class="aside-head"><span>کاوش آزمایش‌ها</span><span id="runsCount" class="tiny"></span></div>
+  <label>منطقه<select id="region"></select></label>
+  <label>جست‌وجوی نام آزمایش<input id="search" placeholder="مثلاً gim یا adaptive"></label>
+  <label>آزمایش<select id="run"></select></label>
+  <div id="runMeta" class="run-meta"></div>
+  <div class="divider"></div>
+  <div class="aside-head"><span>فریم‌ها</span><span id="frameCount" class="tiny"></span></div>
+  <div class="filters" id="filters"><button data-filter="all" class="active">همه</button><button data-filter="good">در محدوده</button><button data-filter="bad">پرخطا</button><button data-filter="rejected">ردشده</button></div>
+  <div id="frames" class="frames"></div>
+</aside>
+<section class="content">
+  <div class="content-head"><div><div class="eyebrow">FRAME INSPECTOR</div><h2 id="title">در حال آماده‌سازی…</h2><div id="subtitle" class="muted"></div></div><div id="status" class="badge"></div></div>
+  <div class="notice">خطا بر اساس مختصات ثبت‌شدهٔ دیتاست است؛ در UAV-VisLoc این مختصات مرکز تصویر معرفی شده، اما دقت آن باید جداگانه بررسی شود. نتایج پژوهشی‌اند و به‌تنهایی برای پرواز کافی نیستند.</div>
+  <div class="metrics" id="metrics"></div>
+  <div class="visual-card">
+    <div class="card-top"><div><b>تصویر و نقشه</b><span class="muted" id="candidateNote"></span></div><div class="control"><label for="tile">قطعهٔ نقشه</label><select id="tile"></select><button id="rematch" class="primary">نمایش نقاط تطبیق</button></div></div>
+    <div id="visuals" class="visuals" dir="ltr">
+      <div class="image-panel"><div class="panel-title">تصویر پرنده <span id="imageOrientation"></span></div><div class="image-wrap" id="queryWrap"><img id="queryImage" alt="تصویر دوربین"><div id="queryEmpty" class="empty">تصویر موجود نیست</div></div></div>
+      <div class="image-panel"><div class="panel-title">قطعهٔ نقشه <span id="tileArea"></span></div><div class="image-wrap" id="mapWrap"><img id="mapImage" alt="قطعه نقشه"><div id="mapEmpty" class="empty">قطعه‌ای ثبت نشده است</div><div id="markers"></div></div></div>
+      <svg id="lines" aria-hidden="true"></svg>
+    </div>
+    <div class="legend"><span><i class="dot prior"></i> P: پیش‌بینی اولیه</span><span><i class="dot estimate"></i> E: برآورد تصویر</span><span><i class="dot truth"></i> T: مختصات دیتاست</span><span id="matchNote"></span></div>
+    <details class="guide"><summary>این سه علامت یعنی چه؟</summary>
+      <p><b>P آبی — پیش‌بینی اولیه:</b> محل تخمینی پیش از تطبیق این فریم، از موقعیت و حرکت قبلی. در آزمایش‌های معمول از موقعیت معلومِ ابتدای مسیر شروع می‌شود؛ در آزمایش‌های مشخص‌شده با حرکت مرجع، حرکت واقعی برای بررسی استفاده شده است.</p>
+      <p><b>E قرمز — برآورد تصویر:</b> محل مرکز تصویر دوربین که با تطبیق تصویر با نقشه به دست آمده است؛ این عدد به‌تنهایی موقعیت سه‌بعدی کالیبره‌شدهٔ پرنده نیست.</p>
+      <p><b>T سبز — مختصات دیتاست:</b> مختصات مرجع برای محاسبهٔ اختلاف. مستندات UAV-VisLoc آن را مرکز تصویر روی زمین معرفی می‌کند؛ دقت و روش ثبت آن باید تأیید شوند.</p>
+      <p>فاصلهٔ E تا T خطای گزارش‌شده و فاصلهٔ P تا T خطای پیش‌بینی اولیه است. اگر داده‌ای ثبت نشده یا خارج قطعه باشد، علامت مربوط دیده نمی‌شود.</p>
+    </details>
+  </div>
+  <div class="footnote" id="details"></div>
+</section>
+</main>
+<script src="/app.js"></script>
+</body></html>

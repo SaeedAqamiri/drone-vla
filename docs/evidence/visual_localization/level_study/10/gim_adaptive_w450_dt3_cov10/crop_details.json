@@ -1,0 +1,155 @@
+{
+  "note": "Prior-centred crop; label coverage is retrospective; sigma and camera footprint are heuristic.",
+  "frames": [
+    {
+      "query_id": "10_0006",
+      "crop_diagnostic": {
+        "side_m": 696.8326913195984,
+        "sigma_m": 39.0,
+        "footprint_width_m": 450.0,
+        "uses_altitude_agl": false,
+        "rejection": "insufficient_map_fraction",
+        "valid_fraction": 0.744140625
+      },
+      "bounds": null,
+      "side_m": null,
+      "valid_fraction": null,
+      "truth_in_crop_retrospective": false
+    },
+    {
+      "query_id": "10_0007",
+      "crop_diagnostic": {
+        "side_m": 732.8326913195984,
+        "sigma_m": 48.0,
+        "footprint_width_m": 450.0,
+        "uses_altitude_agl": false,
+        "rejection": "insufficient_map_fraction",
+        "valid_fraction": 0.7646484375
+      },
+      "bounds": null,
+      "side_m": null,
+      "valid_fraction": null,
+      "truth_in_crop_retrospective": false
+    },
+    {
+      "query_id": "10_0008",
+      "crop_diagnostic": {
+        "side_m": 768.8326913195984,
+        "sigma_m": 57.0,
+        "footprint_width_m": 450.0,
+        "uses_altitude_agl": false,
+        "rejection": "insufficient_map_fraction",
+        "valid_fraction": 0.7822265625
+      },
+      "bounds": null,
+      "side_m": null,
+      "valid_fraction": null,
+      "truth_in_crop_retrospective": false
+    },
+    {
+      "query_id": "10_0009",
+      "crop_diagnostic": {
+        "side_m": 816.8326913195984,
+        "sigma_m": 69.0,
+        "footprint_width_m": 450.0,
+        "uses_altitude_agl": false,
+        "rejection": "insufficient_map_fraction",
+        "valid_fraction": 0.8037109375
+      },
+      "bounds": null,
+      "side_m": null,
+      "valid_fraction": null,
+      "truth_in_crop_retrospective": false
+    },
+    {
+      "query_id": "10_0010",
+      "crop_diagnostic": {
+        "side_m": 852.8326913195984,
+        "sigma_m": 78.0,
+        "footprint_width_m": 450.0,
+        "uses_altitude_agl": false,
+        "rejection": "insufficient_map_fraction",
+        "valid_fraction": 0.818359375
+      },
+      "bounds": null,
+      "side_m": null,
+      "valid_fraction": null,
+      "truth_in_crop_retrospective": false
+    },
+    {
+      "query_id": "10_0011",
+      "crop_diagnostic": {
+        "side_m": 888.8326913195984,
+        "sigma_m": 87.0,
+        "footprint_width_m": 450.0,
+        "uses_altitude_agl": false,
+        "rejection": "insufficient_map_fraction",
+        "valid_fraction": 0.8283939361572266
+      },
+      "bounds": null,
+      "side_m": null,
+      "valid_fraction": null,
+      "truth_in_crop_retrospective": false
+    },
+    {
+      "query_id": "10_0012",
+      "crop_diagnostic": {
+        "side_m": 924.8326913195984,
+        "sigma_m": 96.0,
+        "footprint_width_m": 450.0,
+        "uses_altitude_agl": false,
+        "rejection": "insufficient_map_fraction",
+        "valid_fraction": 0.7730693817138672
+      },
+      "bounds": null,
+      "side_m": null,
+      "valid_fraction": null,
+      "truth_in_crop_retrospective": false
+    },
+    {
+      "query_id": "10_0013",
+      "crop_diagnostic": {
+        "side_m": 960.8326913195984,
+        "sigma_m": 105.0,
+        "footprint_width_m": 450.0,
+        "uses_altitude_agl": false,
+        "rejection": "insufficient_map_fraction",
+        "valid_fraction": 0.7212295532226562
+      },
+      "bounds": null,
+      "side_m": null,
+      "valid_fraction": null,
+      "truth_in_crop_retrospective": false
+    },
+    {
+      "query_id": "10_0014",
+      "crop_diagnostic": {
+        "side_m": 996.8326913195984,
+        "sigma_m": 114.0,
+        "footprint_width_m": 450.0,
+        "uses_altitude_agl": false,
+        "rejection": "insufficient_map_fraction",
+        "valid_fraction": 0.6716518402099609
+      },
+      "bounds": null,
+      "side_m": null,
+      "valid_fraction": null,
+      "truth_in_crop_retrospective": false
+    },
+    {
+      "query_id": "10_0015",
+      "crop_diagnostic": {
+        "side_m": 1032.8326913195983,
+        "sigma_m": 123.0,
+        "footprint_width_m": 450.0,
+        "uses_altitude_agl": false,
+        "rejection": "insufficient_map_fraction",
+        "valid_fraction": 0.6236200332641602
+      },
+      "bounds": null,
+      "side_m": null,
+      "valid_fraction": null,
+      "truth_in_crop_retrospective": false
+    }
+  ]
+}

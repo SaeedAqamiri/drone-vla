@@ -1,0 +1,205 @@
+{
+  "note": "Prior-centred crop; label coverage is retrospective; sigma and camera footprint are heuristic.",
+  "frames": [
+    {
+      "query_id": "09_0066",
+      "crop_diagnostic": {
+        "side_m": 630.9164131656637,
+        "sigma_m": 45.0,
+        "footprint_width_m": 450.0,
+        "uses_altitude_agl": false,
+        "rejection": null,
+        "valid_fraction": 1.0
+      },
+      "bounds": {
+        "min_east": 68.6129680730586,
+        "min_north": 390.1215271718015,
+        "max_east": 699.5293812387223,
+        "max_north": 1021.0379403374652
+      },
+      "side_m": 630.9164131656637,
+      "valid_fraction": 1.0,
+      "truth_in_crop_retrospective": true
+    },
+    {
+      "query_id": "09_0067",
+      "crop_diagnostic": {
+        "side_m": 582.9164131656637,
+        "sigma_m": 21.0,
+        "footprint_width_m": 450.0,
+        "uses_altitude_agl": false,
+        "rejection": null,
+        "valid_fraction": 1.0
+      },
+      "bounds": {
+        "min_east": 18.87790970183005,
+        "min_north": 492.91021092260996,
+        "max_east": 601.7943228674937,
+        "max_north": 1075.8266240882735
+      },
+      "side_m": 582.9164131656637,
+      "valid_fraction": 1.0,
+      "truth_in_crop_retrospective": true
+    },
+    {
+      "query_id": "09_0068",
+      "crop_diagnostic": {
+        "side_m": 582.9164131656637,
+        "sigma_m": 21.0,
+        "footprint_width_m": 450.0,
+        "uses_altitude_agl": false,
+        "rejection": null,
+        "valid_fraction": 1.0
+      },
+      "bounds": {
+        "min_east": -58.313451093545524,
+        "min_north": 566.2637444570252,
+        "max_east": 524.6029620721182,
+        "max_north": 1149.180157622689
+      },
+      "side_m": 582.9164131656637,
+      "valid_fraction": 1.0,
+      "truth_in_crop_retrospective": true
+    },
+    {
+      "query_id": "09_0069",
+      "crop_diagnostic": {
+        "side_m": 582.9164131656637,
+        "sigma_m": 21.0,
+        "footprint_width_m": 450.0,
+        "uses_altitude_agl": false,
+        "rejection": null,
+        "valid_fraction": 1.0
+      },
+      "bounds": {
+        "min_east": -125.44958399850483,
+        "min_north": 634.2174806865005,
+        "max_east": 457.46682916715883,
+        "max_north": 1217.1338938521642
+      },
+      "side_m": 582.9164131656637,
+      "valid_fraction": 1.0,
+      "truth_in_crop_retrospective": true
+    },
+    {
+      "query_id": "09_0070",
+      "crop_diagnostic": {
+        "side_m": 582.9164131656637,
+        "sigma_m": 21.0,
+        "footprint_width_m": 450.0,
+        "uses_altitude_agl": false,
+        "rejection": null,
+        "valid_fraction": 1.0
+      },
+      "bounds": {
+        "min_east": -222.67583123122733,
+        "min_north": 701.660101779316,
+        "max_east": 360.24058193443636,
+        "max_north": 1284.5765149449799
+      },
+      "side_m": 582.9164131656637,
+      "valid_fraction": 1.0,
+      "truth_in_crop_retrospective": true
+    },
+    {
+      "query_id": "09_0071",
+      "crop_diagnostic": {
+        "side_m": 588.9164131656637,
+        "sigma_m": 24.0,
+        "footprint_width_m": 450.0,
+        "uses_altitude_agl": false,
+        "rejection": null,
+        "valid_fraction": 1.0
+      },
+      "bounds": {
+        "min_east": -338.54954741250845,
+        "min_north": 739.0691051234634,
+        "max_east": 250.36686575315525,
+        "max_north": 1327.985518289127
+      },
+      "side_m": 588.9164131656637,
+      "valid_fraction": 1.0,
+      "truth_in_crop_retrospective": true
+    },
+    {
+      "query_id": "09_0072",
+      "crop_diagnostic": {
+        "side_m": 582.9164131656637,
+        "sigma_m": 21.0,
+        "footprint_width_m": 450.0,
+        "uses_altitude_agl": false,
+        "rejection": null,
+        "valid_fraction": 1.0
+      },
+      "bounds": {
+        "min_east": -383.500724080816,
+        "min_north": 795.04709579812,
+        "max_east": 199.4156890848477,
+        "max_north": 1377.9635089637836
+      },
+      "side_m": 582.9164131656637,
+      "valid_fraction": 1.0,
+      "truth_in_crop_retrospective": true
+    },
+    {
+      "query_id": "09_0073",
+      "crop_diagnostic": {
+        "side_m": 582.9164131656637,
+        "sigma_m": 21.0,
+        "footprint_width_m": 450.0,
+        "uses_altitude_agl": false,
+        "rejection": null,
+        "valid_fraction": 1.0
+      },
+      "bounds": {
+        "min_east": -435.6865710679798,
+        "min_north": 888.5390720973265,
+        "max_east": 147.22984209768387,
+        "max_north": 1471.4554852629904
+      },
+      "side_m": 582.9164131656637,
+      "valid_fraction": 1.0,
+      "truth_in_crop_retrospective": true
+    },
+    {
+      "query_id": "09_0074",
+      "crop_diagnostic": {
+        "side_m": 620.9164131656637,
+        "sigma_m": 40.0,
+        "footprint_width_m": 450.0,
+        "uses_altitude_agl": false,
+        "rejection": null,
+        "valid_fraction": 1.0
+      },
+      "bounds": {
+        "min_east": -521.9612938567383,
+        "min_north": 937.2254320974406,
+        "max_east": 98.95511930892542,
+        "max_north": 1558.1418452631042
+      },
+      "side_m": 620.9164131656637,
+      "valid_fraction": 1.0,
+      "truth_in_crop_retrospective": true
+    },
+    {
+      "query_id": "09_0075",
+      "crop_diagnostic": {
+        "side_m": 582.9164131656637,
+        "sigma_m": 21.0,
+        "footprint_width_m": 450.0,
+        "uses_altitude_agl": false,
+        "rejection": null,
+        "valid_fraction": 1.0
+      },
+      "bounds": {
+        "min_east": -600.5241615027817,
+        "min_north": 1009.535543475425,
+        "max_east": -17.607748337117982,
+        "max_north": 1592.4519566410886
+      },
+      "side_m": 582.9164131656637,
+      "valid_fraction": 1.0,
+      "truth_in_crop_retrospective": true
+    }
+  ]
+}

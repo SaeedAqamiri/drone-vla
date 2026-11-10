@@ -34,8 +34,13 @@ def compute_summary(
 
     correct = [error for error in errors if error <= max_error]
     wrong = [error for error in errors if error > max_error]
+    coverage = [frame.candidate_truth_covered for frame in attempted
+                if frame.candidate_truth_covered is not None]
     timestamps = [frame.timestamp for frame in frames]
     accepted_times = [frame.timestamp for frame in accepted]
+    labelled_attempts = [frame for frame in attempted if frame.truth_east is not None and frame.truth_north is not None]
+    boundaries = ([timestamps[0]] + accepted_times + [timestamps[-1]]) if timestamps else []
+    longest_gap = max((b - a for a, b in zip(boundaries, boundaries[1:])), default=None)
     first_fix = (
         accepted_times[0] - timestamps[0] if accepted_times and timestamps else None
     )
@@ -62,8 +67,19 @@ def compute_summary(
         "match_rate": len(matched) / max(len(attempted), 1),
         "fix_rate": len(accepted) / max(total, 1),
         "accepted_rate": len(accepted) / max(len(attempted), 1),
-        "precision": len(correct) / max(len(accepted), 1),
-        "false_fix_rate": len(wrong) / max(len(accepted), 1),
+        # A fix without ground truth is unlabelled, not a false fix. Also,
+        # precision is undefined when no accepted fix has a known error.
+        "ground_truth_accepted": len(errors),
+        "correct_fixes": len(correct),
+        "false_fixes": len(wrong),
+        "candidate_truth_coverage": sum(coverage) / len(coverage) if coverage else None,
+        "labelled_attempts": len(labelled_attempts),
+        "fix_within_5m": sum(f.error_m is not None and f.error_m <= 5 for f in accepted) / len(labelled_attempts) if labelled_attempts else None,
+        "fix_within_10m": sum(f.error_m is not None and f.error_m <= 10 for f in accepted) / len(labelled_attempts) if labelled_attempts else None,
+        "fix_within_20m": sum(f.error_m is not None and f.error_m <= 20 for f in accepted) / len(labelled_attempts) if labelled_attempts else None,
+        "fix_within_30m": sum(f.error_m is not None and f.error_m <= 30 for f in accepted) / len(labelled_attempts) if labelled_attempts else None,
+        "precision": len(correct) / len(errors) if errors else None,
+        "false_fix_rate": len(wrong) / len(errors) if errors else None,
         "mean_error_m": statistics.mean(errors) if errors else None,
         "median_error_m": statistics.median(errors) if errors else None,
         "p95_error_m": _percentile(errors, 0.95),
@@ -81,6 +97,7 @@ def compute_summary(
         "mean_fix_interval_s": statistics.mean(fix_intervals)
         if fix_intervals
         else None,
+        "longest_gap_without_fix_s": longest_gap,
         "recovery_s": recovery_s,
         "max_error_threshold_m": max_error,
         "failure_counts": _failure_counts(frames),

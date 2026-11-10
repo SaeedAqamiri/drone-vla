@@ -4,13 +4,14 @@ import time
 from pathlib import Path
 
 import cv2
+import numpy as np
 
-from sat2aerial.matching import match_images
+from sat2aerial.matching import match_images, match_arrays
 
 from .types import MatchOutcome
 
 CLASSICAL = ("sift", "orb", "akaze")
-DEEP = ("loftr", "lightglue", "superpoint_lightglue")
+DEEP = ("loftr", "lightglue", "disk_lightglue", "loretta", "redi", "gim_loftr", "gim_dkm")
 
 
 class ClassicalMatcher:
@@ -42,9 +43,13 @@ class ClassicalMatcher:
         started = time.time()
         cv2.setRNGSeed(self.rng_seed)
         try:
-            result, homography = match_images(
-                ref,
-                query,
+            in_memory = isinstance(ref, np.ndarray) or isinstance(query, np.ndarray)
+            first = ref if not in_memory or isinstance(ref, np.ndarray) else cv2.imread(str(ref), cv2.IMREAD_COLOR)
+            second = query if not in_memory or isinstance(query, np.ndarray) else cv2.imread(str(query), cv2.IMREAD_COLOR)
+            fn = match_arrays if in_memory else match_images
+            result, homography = fn(
+                first if in_memory else ref,
+                second if in_memory else query,
                 mode=self.mode,
                 max_dim=self.max_dim,
                 ratio=self.ratio,
@@ -56,8 +61,8 @@ class ClassicalMatcher:
             )
         except Exception as error:
             return MatchOutcome(
-                ref=str(ref),
-                query=str(query),
+                ref="<array>" if isinstance(ref, np.ndarray) else str(ref),
+                query="<array>" if isinstance(query, np.ndarray) else str(query),
                 detector=self.detector,
                 inliers=0,
                 inlier_ratio=0.0,
@@ -68,10 +73,11 @@ class ClassicalMatcher:
                 latency_ms=(time.time() - started) * 1000.0,
                 success=False,
                 error=f"{type(error).__name__}: {error}",
+                execution_error=True,
             )
         return MatchOutcome(
-            ref=str(ref),
-            query=str(query),
+            ref="<array>" if isinstance(ref, np.ndarray) else str(ref),
+            query="<array>" if isinstance(query, np.ndarray) else str(query),
             detector=self.detector,
             inliers=int(result.inliers),
             inlier_ratio=float(result.inlier_ratio),
@@ -99,6 +105,26 @@ def get_matcher(
 ) -> ClassicalMatcher:
     key = name.lower().strip()
     if key in DEEP:
+        if key == "gim_dkm":
+            from .gim import GIMDKMMatcher
+            return GIMDKMMatcher(max_dim=max_dim, min_inliers=min_inliers,
+                                 min_ratio=min_ratio, min_coverage=min_coverage,
+                                 ransac_px=ransac_px)
+        if key == "gim_loftr":
+            from .gim import GIMLoFTRMatcher
+            return GIMLoFTRMatcher(max_dim=max_dim, min_inliers=min_inliers,
+                                   min_ratio=min_ratio, min_coverage=min_coverage,
+                                   ransac_px=ransac_px)
+        if key == "loretta":
+            from .loretta import LoRettaMatcher
+            return LoRettaMatcher(max_dim=max_dim, min_inliers=min_inliers,
+                                  min_ratio=min_ratio, min_coverage=min_coverage,
+                                  ransac_px=ransac_px)
+        if key == "redi":
+            from .redi import REDIMatcher
+            return REDIMatcher(max_dim=max_dim, min_inliers=min_inliers,
+                               min_ratio=min_ratio, min_coverage=min_coverage,
+                               ransac_px=ransac_px)
         from .deep import DeepMatcher
 
         return DeepMatcher(

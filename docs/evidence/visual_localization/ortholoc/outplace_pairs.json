@@ -1,0 +1,417 @@
+{
+  "note": "Paired samples are correlated; compare same query, supplied map, DSM and intrinsics. No flight trajectory or autonomous map retrieval is evaluated.",
+  "summary": {
+    "sift_same": {
+      "processed": 15,
+      "accepted": 14,
+      "within_5m": 14
+    },
+    "sift_cross": {
+      "processed": 15,
+      "accepted": 7,
+      "within_5m": 6
+    },
+    "gim_dkm_same": {
+      "processed": 15,
+      "accepted": 15,
+      "within_5m": 15
+    },
+    "gim_dkm_cross": {
+      "processed": 15,
+      "accepted": 13,
+      "within_5m": 13
+    }
+  },
+  "pairs": [
+    {
+      "site": "L08",
+      "same_domain": "L08_R0000.npz",
+      "cross_domain": "L08_xDOP0000.npz",
+      "same_query": true,
+      "same_intrinsics": true,
+      "same_extrinsics": true,
+      "same_dsm": true,
+      "same_dop": false,
+      "sift_same": {
+        "success": true,
+        "horizontal_error_m": 0.4983282788571827
+      },
+      "sift_cross": {
+        "success": false,
+        "horizontal_error_m": null
+      },
+      "gim_dkm_same": {
+        "success": true,
+        "horizontal_error_m": 0.23814383905599773
+      },
+      "gim_dkm_cross": {
+        "success": true,
+        "horizontal_error_m": 0.11964814489997515
+      }
+    },
+    {
+      "site": "L08",
+      "same_domain": "L08_R0107.npz",
+      "cross_domain": "L08_xDOP0107.npz",
+      "same_query": true,
+      "same_intrinsics": true,
+      "same_extrinsics": true,
+      "same_dsm": true,
+      "same_dop": false,
+      "sift_same": {
+        "success": true,
+        "horizontal_error_m": 0.05586165910823359
+      },
+      "sift_cross": {
+        "success": false,
+        "horizontal_error_m": null
+      },
+      "gim_dkm_same": {
+        "success": true,
+        "horizontal_error_m": 0.3910226203525969
+      },
+      "gim_dkm_cross": {
+        "success": true,
+        "horizontal_error_m": 0.4903548082020411
+      }
+    },
+    {
+      "site": "L08",
+      "same_domain": "L08_R0212.npz",
+      "cross_domain": "L08_xDOP0212.npz",
+      "same_query": true,
+      "same_intrinsics": true,
+      "same_extrinsics": true,
+      "same_dsm": true,
+      "same_dop": false,
+      "sift_same": {
+        "success": true,
+        "horizontal_error_m": 0.2487595909714603
+      },
+      "sift_cross": {
+        "success": false,
+        "horizontal_error_m": null
+      },
+      "gim_dkm_same": {
+        "success": true,
+        "horizontal_error_m": 0.08288980743757018
+      },
+      "gim_dkm_cross": {
+        "success": true,
+        "horizontal_error_m": 1.7801097695954489
+      }
+    },
+    {
+      "site": "L08",
+      "same_domain": "L08_R0317.npz",
+      "cross_domain": "L08_xDOP0317.npz",
+      "same_query": true,
+      "same_intrinsics": true,
+      "same_extrinsics": true,
+      "same_dsm": true,
+      "same_dop": false,
+      "sift_same": {
+        "success": false,
+        "horizontal_error_m": null
+      },
+      "sift_cross": {
+        "success": false,
+        "horizontal_error_m": null
+      },
+      "gim_dkm_same": {
+        "success": true,
+        "horizontal_error_m": 0.34126367612890435
+      },
+      "gim_dkm_cross": {
+        "success": false,
+        "horizontal_error_m": null
+      }
+    },
+    {
+      "site": "L08",
+      "same_domain": "L08_R0423.npz",
+      "cross_domain": "L08_xDOP0423.npz",
+      "same_query": true,
+      "same_intrinsics": true,
+      "same_extrinsics": true,
+      "same_dsm": true,
+      "same_dop": false,
+      "sift_same": {
+        "success": true,
+        "horizontal_error_m": 0.1247568649166688
+      },
+      "sift_cross": {
+        "success": false,
+        "horizontal_error_m": null
+      },
+      "gim_dkm_same": {
+        "success": true,
+        "horizontal_error_m": 0.2939546388058589
+      },
+      "gim_dkm_cross": {
+        "success": true,
+        "horizontal_error_m": 0.37680733042284026
+      }
+    },
+    {
+      "site": "L50",
+      "same_domain": "L50_R0000.npz",
+      "cross_domain": "L50_xDOP0000.npz",
+      "same_query": true,
+      "same_intrinsics": true,
+      "same_extrinsics": true,
+      "same_dsm": true,
+      "same_dop": false,
+      "sift_same": {
+        "success": true,
+        "horizontal_error_m": 0.05316679363704577
+      },
+      "sift_cross": {
+        "success": false,
+        "horizontal_error_m": null
+      },
+      "gim_dkm_same": {
+        "success": true,
+        "horizontal_error_m": 0.17522124618999108
+      },
+      "gim_dkm_cross": {
+        "success": true,
+        "horizontal_error_m": 0.1373902036596382
+      }
+    },
+    {
+      "site": "L50",
+      "same_domain": "L50_R0010.npz",
+      "cross_domain": "L50_xDOP0010.npz",
+      "same_query": true,
+      "same_intrinsics": true,
+      "same_extrinsics": true,
+      "same_dsm": true,
+      "same_dop": false,
+      "sift_same": {
+        "success": true,
+        "horizontal_error_m": 0.6886299986811594
+      },
+      "sift_cross": {
+        "success": true,
+        "horizontal_error_m": 1.3333912076407253
+      },
+      "gim_dkm_same": {
+        "success": true,
+        "horizontal_error_m": 0.37749785056496016
+      },
+      "gim_dkm_cross": {
+        "success": true,
+        "horizontal_error_m": 0.8816357596760314
+      }
+    },
+    {
+      "site": "L50",
+      "same_domain": "L50_R0020.npz",
+      "cross_domain": "L50_xDOP0020.npz",
+      "same_query": true,
+      "same_intrinsics": true,
+      "same_extrinsics": true,
+      "same_dsm": true,
+      "same_dop": false,
+      "sift_same": {
+        "success": true,
+        "horizontal_error_m": 1.02779499479078
+      },
+      "sift_cross": {
+        "success": false,
+        "horizontal_error_m": null
+      },
+      "gim_dkm_same": {
+        "success": true,
+        "horizontal_error_m": 0.348601866604032
+      },
+      "gim_dkm_cross": {
+        "success": false,
+        "horizontal_error_m": null
+      }
+    },
+    {
+      "site": "L50",
+      "same_domain": "L50_R0030.npz",
+      "cross_domain": "L50_xDOP0030.npz",
+      "same_query": true,
+      "same_intrinsics": true,
+      "same_extrinsics": true,
+      "same_dsm": true,
+      "same_dop": false,
+      "sift_same": {
+        "success": true,
+        "horizontal_error_m": 0.18564913822909604
+      },
+      "sift_cross": {
+        "success": true,
+        "horizontal_error_m": 1.5411545305174463
+      },
+      "gim_dkm_same": {
+        "success": true,
+        "horizontal_error_m": 0.10143022898540272
+      },
+      "gim_dkm_cross": {
+        "success": true,
+        "horizontal_error_m": 0.5378677456215749
+      }
+    },
+    {
+      "site": "L50",
+      "same_domain": "L50_R0040.npz",
+      "cross_domain": "L50_xDOP0040.npz",
+      "same_query": true,
+      "same_intrinsics": true,
+      "same_extrinsics": true,
+      "same_dsm": true,
+      "same_dop": false,
+      "sift_same": {
+        "success": true,
+        "horizontal_error_m": 0.3122496645972551
+      },
+      "sift_cross": {
+        "success": false,
+        "horizontal_error_m": null
+      },
+      "gim_dkm_same": {
+        "success": true,
+        "horizontal_error_m": 0.082202056415493
+      },
+      "gim_dkm_cross": {
+        "success": true,
+        "horizontal_error_m": 0.2710727932298866
+      }
+    },
+    {
+      "site": "L51",
+      "same_domain": "L51_R0000.npz",
+      "cross_domain": "L51_xDOP0000.npz",
+      "same_query": true,
+      "same_intrinsics": true,
+      "same_extrinsics": true,
+      "same_dsm": true,
+      "same_dop": false,
+      "sift_same": {
+        "success": true,
+        "horizontal_error_m": 0.25350300061849695
+      },
+      "sift_cross": {
+        "success": true,
+        "horizontal_error_m": 0.6511444353346901
+      },
+      "gim_dkm_same": {
+        "success": true,
+        "horizontal_error_m": 0.14991262956258278
+      },
+      "gim_dkm_cross": {
+        "success": true,
+        "horizontal_error_m": 0.7289239854310162
+      }
+    },
+    {
+      "site": "L51",
+      "same_domain": "L51_R0008.npz",
+      "cross_domain": "L51_xDOP0008.npz",
+      "same_query": true,
+      "same_intrinsics": true,
+      "same_extrinsics": true,
+      "same_dsm": true,
+      "same_dop": false,
+      "sift_same": {
+        "success": true,
+        "horizontal_error_m": 0.13342713903573022
+      },
+      "sift_cross": {
+        "success": true,
+        "horizontal_error_m": 1.5831858794331135
+      },
+      "gim_dkm_same": {
+        "success": true,
+        "horizontal_error_m": 0.6046844265909695
+      },
+      "gim_dkm_cross": {
+        "success": true,
+        "horizontal_error_m": 1.3520395421325078
+      }
+    },
+    {
+      "site": "L51",
+      "same_domain": "L51_R0016.npz",
+      "cross_domain": "L51_xDOP0016.npz",
+      "same_query": true,
+      "same_intrinsics": true,
+      "same_extrinsics": true,
+      "same_dsm": true,
+      "same_dop": false,
+      "sift_same": {
+        "success": true,
+        "horizontal_error_m": 0.39672413451055943
+      },
+      "sift_cross": {
+        "success": true,
+        "horizontal_error_m": 11.351732517988161
+      },
+      "gim_dkm_same": {
+        "success": true,
+        "horizontal_error_m": 0.19596289160649943
+      },
+      "gim_dkm_cross": {
+        "success": true,
+        "horizontal_error_m": 1.277730773946845
+      }
+    },
+    {
+      "site": "L51",
+      "same_domain": "L51_R0023.npz",
+      "cross_domain": "L51_xDOP0023.npz",
+      "same_query": true,
+      "same_intrinsics": true,
+      "same_extrinsics": true,
+      "same_dsm": true,
+      "same_dop": false,
+      "sift_same": {
+        "success": true,
+        "horizontal_error_m": 0.2654693203406145
+      },
+      "sift_cross": {
+        "success": true,
+        "horizontal_error_m": 1.8264068923954446
+      },
+      "gim_dkm_same": {
+        "success": true,
+        "horizontal_error_m": 0.18165561689380855
+      },
+      "gim_dkm_cross": {
+        "success": true,
+        "horizontal_error_m": 0.523766746574325
+      }
+    },
+    {
+      "site": "L51",
+      "same_domain": "L51_R0031.npz",
+      "cross_domain": "L51_xDOP0031.npz",
+      "same_query": true,
+      "same_intrinsics": true,
+      "same_extrinsics": true,
+      "same_dsm": true,
+      "same_dop": false,
+      "sift_same": {
+        "success": true,
+        "horizontal_error_m": 0.4738122785156922
+      },
+      "sift_cross": {
+        "success": true,
+        "horizontal_error_m": 1.2646565370301464
+      },
+      "gim_dkm_same": {
+        "success": true,
+        "horizontal_error_m": 0.5241572018861491
+      },
+      "gim_dkm_cross": {
+        "success": true,
+        "horizontal_error_m": 1.1206927197334648
+      }
+    }
+  ]
+}

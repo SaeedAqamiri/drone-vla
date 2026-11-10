@@ -1,0 +1,115 @@
+{
+  "note": "Prior-centred crop; label coverage is retrospective; sigma and camera footprint are heuristic.",
+  "frames": [
+    {
+      "query_id": "01_0531",
+      "bounds": {
+        "min_east": -18.73437922668245,
+        "min_north": -760.3689919895398,
+        "max_east": 678.1820339389812,
+        "max_north": -63.452578823876195
+      },
+      "side_m": 696.9164131656637,
+      "truth_in_crop_retrospective": true
+    },
+    {
+      "query_id": "01_0532",
+      "bounds": {
+        "min_east": -36.73437922668245,
+        "min_north": -857.7583277689538,
+        "max_east": 696.1820339389812,
+        "max_north": -124.84191460329009
+      },
+      "side_m": 732.9164131656637,
+      "truth_in_crop_retrospective": true
+    },
+    {
+      "query_id": "01_0533",
+      "bounds": {
+        "min_east": -60.73437922668245,
+        "min_north": -987.610775474839,
+        "max_east": 720.1820339389812,
+        "max_north": -206.6943623091753
+      },
+      "side_m": 780.9164131656637,
+      "truth_in_crop_retrospective": true
+    },
+    {
+      "query_id": "01_0534",
+      "bounds": {
+        "min_east": -78.73437922668245,
+        "min_north": -1085.0001112542527,
+        "max_east": 738.1820339389812,
+        "max_north": -268.08369808858913
+      },
+      "side_m": 816.9164131656637,
+      "truth_in_crop_retrospective": true
+    },
+    {
+      "query_id": "01_0535",
+      "bounds": {
+        "min_east": 34.6088512630771,
+        "min_north": -995.875257212172,
+        "max_east": 635.5252644287408,
+        "max_north": -394.95884404650826
+      },
+      "side_m": 600.9164131656637,
+      "truth_in_crop_retrospective": true
+    },
+    {
+      "query_id": "01_0536",
+      "bounds": {
+        "min_east": 3.3458485720094586,
+        "min_north": -1125.3809201150925,
+        "max_east": 668.2622617376732,
+        "max_north": -460.4645069494287
+      },
+      "side_m": 664.9164131656637,
+      "truth_in_crop_retrospective": true
+    },
+    {
+      "query_id": "01_0537",
+      "bounds": {
+        "min_east": -14.101403446291272,
+        "min_north": -1216.5101672922829,
+        "max_east": 686.8150097193725,
+        "max_north": -515.593754126619
+      },
+      "side_m": 700.9164131656637,
+      "truth_in_crop_retrospective": true
+    },
+    {
+      "query_id": "01_0538",
+      "bounds": {
+        "min_east": -31.548655464592002,
+        "min_north": -1307.6394144694732,
+        "max_east": 705.3677577010717,
+        "max_north": -570.7230013038094
+      },
+      "side_m": 736.9164131656637,
+      "truth_in_crop_retrospective": true
+    },
+    {
+      "query_id": "01_0539",
+      "bounds": {
+        "min_east": -54.81165815565964,
+        "min_north": -1429.1450773723936,
+        "max_east": 730.104755010004,
+        "max_north": -644.2286642067298
+      },
+      "side_m": 784.9164131656637,
+      "truth_in_crop_retrospective": true
+    },
+    {
+      "query_id": "01_0540",
+      "bounds": {
+        "min_east": 56.20930657907974,
+        "min_north": -1390.6519842594657,
+        "max_east": 657.1257197447435,
+        "max_north": -789.7355710938022
+      },
+      "side_m": 600.9164131656637,
+      "truth_in_crop_retrospective": true
+    }
+  ]
+}

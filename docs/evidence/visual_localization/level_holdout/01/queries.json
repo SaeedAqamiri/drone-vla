@@ -1,0 +1,199 @@
+{
+  "meta": {
+    "dataset": "uav_visloc",
+    "map": "01",
+    "start_index": 0,
+    "selection": {
+      "first_level_deg": 3.0,
+      "level_segment_index": 1,
+      "max_segment_gap_s": 10.0
+    },
+    "initialization_frames": [
+      "01_0529",
+      "01_0530"
+    ],
+    "map_roi": "fixed bbox from evaluation segment plus margin; offline only"
+  },
+  "queries": [
+    {
+      "id": "01_0531",
+      "path": "data/raw/uav_visloc/UAV_VisLoc_dataset/01/drone/01_0531.JPG",
+      "timestamp": 1537174554.0,
+      "lat": 29.73446369,
+      "lon": 115.9871513,
+      "altitude": 406.32,
+      "yaw": 168.375107,
+      "meta": {
+        "num": 531,
+        "date": "2018-09-17T13:25:54",
+        "attitude_present": true,
+        "pitch_deg": -1.122997,
+        "roll_deg": -1.266237,
+        "yaw_alt_deg": -179.828534
+      },
+      "has_truth": true
+    },
+    {
+      "id": "01_0532",
+      "path": "data/raw/uav_visloc/UAV_VisLoc_dataset/01/drone/01_0532.JPG",
+      "timestamp": 1537174557.0,
+      "lat": 29.73375323,
+      "lon": 115.9871513,
+      "altitude": 405.81,
+      "yaw": 167.452645,
+      "meta": {
+        "num": 532,
+        "date": "2018-09-17T13:25:57",
+        "attitude_present": true,
+        "pitch_deg": 1.438124,
+        "roll_deg": -0.704738,
+        "yaw_alt_deg": -179.570703
+      },
+      "has_truth": true
+    },
+    {
+      "id": "01_0533",
+      "path": "data/raw/uav_visloc/UAV_VisLoc_dataset/01/drone/01_0533.JPG",
+      "timestamp": 1537174561.0,
+      "lat": 29.73303703,
+      "lon": 115.9871399,
+      "altitude": 405.49,
+      "yaw": 168.850662,
+      "meta": {
+        "num": 533,
+        "date": "2018-09-17T13:26:01",
+        "attitude_present": true,
+        "pitch_deg": -0.452637,
+        "roll_deg": 1.243318,
+        "yaw_alt_deg": -178.745643
+      },
+      "has_truth": true
+    },
+    {
+      "id": "01_0534",
+      "path": "data/raw/uav_visloc/UAV_VisLoc_dataset/01/drone/01_0534.JPG",
+      "timestamp": 1537174564.0,
+      "lat": 29.73232656,
+      "lon": 115.9871399,
+      "altitude": 405.28,
+      "yaw": 166.209327,
+      "meta": {
+        "num": 534,
+        "date": "2018-09-17T13:26:04",
+        "attitude_present": true,
+        "pitch_deg": 1.300614,
+        "roll_deg": 0.27502,
+        "yaw_alt_deg": -179.759779
+      },
+      "has_truth": true
+    },
+    {
+      "id": "01_0535",
+      "path": "data/raw/uav_visloc/UAV_VisLoc_dataset/01/drone/01_0535.JPG",
+      "timestamp": 1537174567.0,
+      "lat": 29.73161609,
+      "lon": 115.9871284,
+      "altitude": 405.47,
+      "yaw": 163.619558,
+      "meta": {
+        "num": 535,
+        "date": "2018-09-17T13:26:07",
+        "attitude_present": true,
+        "pitch_deg": 1.031324,
+        "roll_deg": 0.95111,
+        "yaw_alt_deg": 178.843046
+      },
+      "has_truth": true
+    },
+    {
+      "id": "01_0536",
+      "path": "data/raw/uav_visloc/UAV_VisLoc_dataset/01/drone/01_0536.JPG",
+      "timestamp": 1537174571.0,
+      "lat": 29.7308999,
+      "lon": 115.9871399,
+      "altitude": 405.86,
+      "yaw": 162.76585,
+      "meta": {
+        "num": 536,
+        "date": "2018-09-17T13:26:11",
+        "attitude_present": true,
+        "pitch_deg": 2.257454,
+        "roll_deg": 1.22613,
+        "yaw_alt_deg": 177.828911
+      },
+      "has_truth": true
+    },
+    {
+      "id": "01_0537",
+      "path": "data/raw/uav_visloc/UAV_VisLoc_dataset/01/drone/01_0537.JPG",
+      "timestamp": 1537174574.0,
+      "lat": 29.73018943,
+      "lon": 115.9871513,
+      "altitude": 406.24,
+      "yaw": 162.725743,
+      "meta": {
+        "num": 537,
+        "date": "2018-09-17T13:26:14",
+        "attitude_present": true,
+        "pitch_deg": 2.566851,
+        "roll_deg": 0.389611,
+        "yaw_alt_deg": 179.4733
+      },
+      "has_truth": true
+    },
+    {
+      "id": "01_0538",
+      "path": "data/raw/uav_visloc/UAV_VisLoc_dataset/01/drone/01_0538.JPG",
+      "timestamp": 1537174577.0,
+      "lat": 29.72947896,
+      "lon": 115.9871743,
+      "altitude": 405.78,
+      "yaw": 164.043546,
+      "meta": {
+        "num": 538,
+        "date": "2018-09-17T13:26:17",
+        "attitude_present": true,
+        "pitch_deg": 1.059972,
+        "roll_deg": 0.143239,
+        "yaw_alt_deg": 179.759779
+      },
+      "has_truth": true
+    },
+    {
+      "id": "01_0539",
+      "path": "data/raw/uav_visloc/UAV_VisLoc_dataset/01/drone/01_0539.JPG",
+      "timestamp": 1537174581.0,
+      "lat": 29.72875703,
+      "lon": 115.9871743,
+      "altitude": 405.91,
+      "yaw": 163.413293,
+      "meta": {
+        "num": 539,
+        "date": "2018-09-17T13:26:21",
+        "attitude_present": true,
+        "pitch_deg": 2.045459,
+        "roll_deg": 0.469825,
+        "yaw_alt_deg": 179.943125
+      },
+      "has_truth": true
+    },
+    {
+      "id": "01_0540",
+      "path": "data/raw/uav_visloc/UAV_VisLoc_dataset/01/drone/01_0540.JPG",
+      "timestamp": 1537174584.0,
+      "lat": 29.7280523,
+      "lon": 115.9871513,
+      "altitude": 405.61,
+      "yaw": 164.954549,
+      "meta": {
+        "num": 540,
+        "date": "2018-09-17T13:26:24",
+        "attitude_present": true,
+        "pitch_deg": 1.014135,
+        "roll_deg": 0.527121,
+        "yaw_alt_deg": 179.903018
+      },
+      "has_truth": true
+    }
+  ]
+}

@@ -1,0 +1,205 @@
+{
+  "note": "Prior-centred crop; label coverage is retrospective; sigma and camera footprint are heuristic.",
+  "frames": [
+    {
+      "query_id": "05_0397",
+      "crop_diagnostic": {
+        "side_m": 684.8326913195984,
+        "sigma_m": 36.0,
+        "footprint_width_m": 450.0,
+        "uses_altitude_agl": false,
+        "rejection": null,
+        "valid_fraction": 0.6881656646728516
+      },
+      "bounds": {
+        "min_east": -1396.9012618555857,
+        "min_north": -1024.5078245237626,
+        "max_east": -712.0685705359874,
+        "max_north": -339.67513320416407
+      },
+      "side_m": 684.8326913195983,
+      "valid_fraction": 0.6881656646728516,
+      "truth_in_crop_retrospective": true
+    },
+    {
+      "query_id": "05_0398",
+      "crop_diagnostic": {
+        "side_m": 708.8326913195984,
+        "sigma_m": 42.0,
+        "footprint_width_m": 450.0,
+        "uses_altitude_agl": false,
+        "rejection": null,
+        "valid_fraction": 0.7164459228515625
+      },
+      "bounds": {
+        "min_east": -1369.4612078088314,
+        "min_north": -1035.6614751047073,
+        "max_east": -660.6285164892329,
+        "max_north": -326.8287837851089
+      },
+      "side_m": 708.8326913195986,
+      "valid_fraction": 0.7164459228515625,
+      "truth_in_crop_retrospective": true
+    },
+    {
+      "query_id": "05_0399",
+      "crop_diagnostic": {
+        "side_m": 744.8326913195984,
+        "sigma_m": 51.0,
+        "footprint_width_m": 450.0,
+        "uses_altitude_agl": false,
+        "rejection": null,
+        "valid_fraction": 0.75457763671875
+      },
+      "bounds": {
+        "min_east": -1328.3011267386998,
+        "min_north": -1052.3919509761247,
+        "max_east": -583.4684354191013,
+        "max_north": -307.5592596565262
+      },
+      "side_m": 744.8326913195986,
+      "valid_fraction": 0.75457763671875,
+      "truth_in_crop_retrospective": true
+    },
+    {
+      "query_id": "05_0400",
+      "crop_diagnostic": {
+        "side_m": 588.8326913195984,
+        "sigma_m": 12.0,
+        "footprint_width_m": 450.0,
+        "uses_altitude_agl": false,
+        "rejection": null,
+        "valid_fraction": 0.8642578125
+      },
+      "bounds": {
+        "min_east": -1136.9658738044661,
+        "min_north": -992.459195667326,
+        "max_east": -548.1331824848678,
+        "max_north": -403.6265043477276
+      },
+      "side_m": 588.8326913195983,
+      "valid_fraction": 0.8642578125,
+      "truth_in_crop_retrospective": true
+    },
+    {
+      "query_id": "05_0401",
+      "crop_diagnostic": {
+        "side_m": 588.8326913195984,
+        "sigma_m": 12.0,
+        "footprint_width_m": 450.0,
+        "uses_altitude_agl": false,
+        "rejection": null,
+        "valid_fraction": 0.861328125
+      },
+      "bounds": {
+        "min_east": -1073.8766909132496,
+        "min_north": -994.438924182374,
+        "max_east": -485.0439995936511,
+        "max_north": -405.60623286277547
+      },
+      "side_m": 588.8326913195986,
+      "valid_fraction": 0.861328125,
+      "truth_in_crop_retrospective": true
+    },
+    {
+      "query_id": "05_0402",
+      "crop_diagnostic": {
+        "side_m": 588.8326913195984,
+        "sigma_m": 12.0,
+        "footprint_width_m": 450.0,
+        "uses_altitude_agl": false,
+        "rejection": null,
+        "valid_fraction": 0.9208984375
+      },
+      "bounds": {
+        "min_east": -1010.2604071230639,
+        "min_north": -958.9102673775028,
+        "max_east": -421.42771580346545,
+        "max_north": -370.0775760579043
+      },
+      "side_m": 588.8326913195986,
+      "valid_fraction": 0.9208984375,
+      "truth_in_crop_retrospective": true
+    },
+    {
+      "query_id": "05_0403",
+      "crop_diagnostic": {
+        "side_m": 600.8326913195984,
+        "sigma_m": 15.0,
+        "footprint_width_m": 450.0,
+        "uses_altitude_agl": false,
+        "rejection": null,
+        "valid_fraction": 0.8271484375
+      },
+      "bounds": {
+        "min_east": -938.2049183060524,
+        "min_north": -1016.6227655803893,
+        "max_east": -337.372226986454,
+        "max_north": -415.79007426079096
+      },
+      "side_m": 600.8326913195983,
+      "valid_fraction": 0.8271484375,
+      "truth_in_crop_retrospective": true
+    },
+    {
+      "query_id": "05_0404",
+      "crop_diagnostic": {
+        "side_m": 588.8326913195984,
+        "sigma_m": 12.0,
+        "footprint_width_m": 450.0,
+        "uses_altitude_agl": false,
+        "rejection": null,
+        "valid_fraction": 0.892578125
+      },
+      "bounds": {
+        "min_east": -908.6350000456596,
+        "min_north": -976.0594228680259,
+        "max_east": -319.8023087260611,
+        "max_north": -387.2267315484274
+      },
+      "side_m": 588.8326913195986,
+      "valid_fraction": 0.892578125,
+      "truth_in_crop_retrospective": true
+    },
+    {
+      "query_id": "05_0405",
+      "crop_diagnostic": {
+        "side_m": 588.8326913195984,
+        "sigma_m": 12.0,
+        "footprint_width_m": 450.0,
+        "uses_altitude_agl": false,
+        "rejection": null,
+        "valid_fraction": 0.8701171875
+      },
+      "bounds": {
+        "min_east": -843.7121656109662,
+        "min_north": -989.2930982010112,
+        "max_east": -254.87947429136767,
+        "max_north": -400.4604068814128
+      },
+      "side_m": 588.8326913195986,
+      "valid_fraction": 0.8701171875,
+      "truth_in_crop_retrospective": true
+    },
+    {
+      "query_id": "05_0406",
+      "crop_diagnostic": {
+        "side_m": 588.8326913195984,
+        "sigma_m": 12.0,
+        "footprint_width_m": 450.0,
+        "uses_altitude_agl": false,
+        "rejection": null,
+        "valid_fraction": 0.8798828125
+      },
+      "bounds": {
+        "min_east": -790.4626594215825,
+        "min_north": -983.3481859742255,
+        "max_east": -201.6299681019841,
+        "max_north": -394.51549465462705
+      },
+      "side_m": 588.8326913195984,
+      "valid_fraction": 0.8798828125,
+      "truth_in_crop_retrospective": true
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "note": "Deterministic evenly spaced R files per site; no sample contents examined in selection.",
+  "source": "https://cvg.cit.tum.de/webshare/g/papers/Dhaouadi/OrthoLoC/full/test_outPlace/",
+  "sites": {
+    "L08": {
+      "population": 423,
+      "files": [
+        "L08_R0000.npz",
+        "L08_R0107.npz",
+        "L08_R0212.npz",
+        "L08_R0317.npz",
+        "L08_R0423.npz"
+      ]
+    },
+    "L50": {
+      "population": 41,
+      "files": [
+        "L50_R0000.npz",
+        "L50_R0010.npz",
+        "L50_R0020.npz",
+        "L50_R0030.npz",
+        "L50_R0040.npz"
+      ]
+    },
+    "L51": {
+      "population": 32,
+      "files": [
+        "L51_R0000.npz",
+        "L51_R0008.npz",
+        "L51_R0016.npz",
+        "L51_R0023.npz",
+        "L51_R0031.npz"
+      ]
+    }
+  }
+}

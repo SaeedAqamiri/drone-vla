@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import math
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict, dataclass, field, replace
 from pathlib import Path
 from typing import Any
 
@@ -33,9 +33,11 @@ class RunnerConfig:
     ratio: float = 0.75
     ransac_px: float = 5.0
     max_jump_m: float = 250.0
+    jump_sigma_scale: float = 2.0
     scale_tolerance: float = 1.0
     camera_fov_deg: float = 73.0
     fix_sigma: float = 6.0
+    max_speed_mps: float = 80.0
     max_error_m: float = 30.0
     confirmation: int = 1
     confirmation_radius_m: float = 200.0
@@ -66,11 +68,13 @@ class LabRunner:
         queries: list[QueryFrame],
         config: RunnerConfig | None = None,
         references: str | Path | None = None,
+        initial_prior: Prior | None = None,
     ):
         self.base_store = store
         self.store = store.with_references(references) if references else store
         self.queries = list(queries)
         self.config = config or RunnerConfig()
+        self.initial_prior = initial_prior
 
     def _query_shape(self, query: QueryFrame) -> tuple[int, int] | None:
         image = cv2.imread(str(query.path), cv2.IMREAD_GRAYSCALE)
@@ -108,11 +112,9 @@ class LabRunner:
         outcome: MatchOutcome,
         query_shape: tuple[int, int],
     ) -> tuple[float, float]:
-        center_east = float(tile["east"])
-        center_north = float(tile["north"])
         homography = outcome.homography
         if homography is None:
-            return center_east, center_north
+            return float("nan"), float("nan")
         height, width = query_shape
         query_factor = min(
             1.0, self.config.max_dim / float(max(height, width, 1))
@@ -126,7 +128,9 @@ class LabRunner:
             inverse = np.linalg.inv(homography)
             ref_point = cv2.perspectiveTransform(center, inverse)[0, 0]
         except np.linalg.LinAlgError:
-            return center_east, center_north
+            # A singular transform cannot localize the image center. Returning
+            # the tile center here would fabricate a plausible position.
+            return float("nan"), float("nan")
         tile_px = float(tile.get("tile_px") or self.config.max_dim)
         ref_factor = min(1.0, self.config.max_dim / tile_px)
         ref_x = float(ref_point[0]) / ref_factor
@@ -148,6 +152,8 @@ class LabRunner:
         )
 
     def run(self) -> RunResult:
+        if any(b.timestamp <= a.timestamp for a, b in zip(self.queries, self.queries[1:])):
+            raise ValueError("query timestamps must increase strictly; split the sequence at time discontinuities")
         matcher = get_matcher(
             self.config.matcher,
             mode=self.config.mode,
@@ -167,7 +173,7 @@ class LabRunner:
             sigma_scale=self.config.sigma_scale,
             global_fallback=self.config.global_fallback,
         )
-        prior = Prior()
+        prior = replace(self.initial_prior) if self.initial_prior else Prior()
         pending: tuple[float, float] | None = None
         frames: list[FrameResult] = []
         dropout_start = self.config.dropout_start
@@ -266,11 +272,25 @@ class LabRunner:
                     limit=self.config.bootstrap_candidates,
                 )
 
+            # Ground truth is used only to score candidate coverage, never to
+            # select candidates, rank them, or update the navigation prior.
+            candidate_truth_covered = None
+            if truth_east is not None and truth_north is not None:
+                candidate_truth_covered = any(
+                    t["bounds"]["min_east"] <= truth_east <= t["bounds"]["max_east"]
+                    and t["bounds"]["min_north"] <= truth_north <= t["bounds"]["max_north"]
+                    for t in candidates
+                )
+
             best_tile: dict[str, Any] | None = None
             best_outcome: MatchOutcome | None = None
             latency = 0.0
             for tile in candidates:
                 outcome = matcher.match(self.store.path_for(tile), query.path)
+                if outcome.execution_error:
+                    raise RuntimeError(
+                        f"matcher failed for {query.id} and {tile['id']}: {outcome.error}"
+                    )
                 latency += outcome.latency_ms
                 if best_outcome is None or self._score(outcome) > self._score(
                     best_outcome
@@ -302,6 +322,7 @@ class LabRunner:
                         prior_error_m=prior_error,
                         latency_ms=latency,
                         reason="no_candidates",
+                        candidate_truth_covered=candidate_truth_covered,
                     )
                 )
                 continue
@@ -312,13 +333,16 @@ class LabRunner:
             position_east, position_north = self._refine_position(
                 best_tile, best_outcome, query_shape
             )
+            geometry_valid = math.isfinite(position_east) and math.isfinite(position_north)
+            if matched and not geometry_valid:
+                reason = "invalid_geometry"
             error_m = (
                 math.hypot(position_east - truth_east, position_north - truth_north)
-                if truth_east is not None and truth_north is not None
+                if geometry_valid and truth_east is not None and truth_north is not None
                 else None
             )
 
-            if matched:
+            if matched and geometry_valid:
                 expected_scale = self._expected_scale(query, best_tile, query_shape)
                 if (
                     self.config.scale_tolerance > 0
@@ -337,7 +361,7 @@ class LabRunner:
 
             if accepted and predicted is not None:
                 jump = math.hypot(position_east - predicted[0], position_north - predicted[1])
-                if jump > self.config.max_jump_m + 2.0 * predicted[2]:
+                if jump > self.config.max_jump_m + self.config.jump_sigma_scale * predicted[2]:
                     accepted = False
                     reason = "jump"
                 else:
@@ -369,6 +393,7 @@ class LabRunner:
                     position_north,
                     timestamp,
                     sigma=self.config.fix_sigma,
+                    max_speed=self.config.max_speed_mps,
                 )
             elif prior.valid:
                 prior.decay(timestamp)
@@ -394,12 +419,19 @@ class LabRunner:
                     latency_ms=latency,
                     reason=reason,
                     match=best_outcome.as_dict(),
+                    candidate_truth_covered=candidate_truth_covered,
                 )
             )
 
         summary = compute_summary(frames, self.config)
+        config = asdict(self.config)
+        if self.initial_prior is not None:
+            config["initial_prior"] = {
+                key: getattr(self.initial_prior, key)
+                for key in ("east", "north", "vx", "vy", "timestamp", "sigma", "valid")
+            }
         return RunResult(
             frames=frames,
-            config=asdict(self.config),
+            config=config,
             summary=summary,
         )

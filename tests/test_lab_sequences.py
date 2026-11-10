@@ -6,10 +6,13 @@ from pathlib import Path
 import cv2
 import numpy as np
 
-from navlab.lab.sequences import uav_visloc_queries
+from navlab.lab.sequences import _timestamp, uav_visloc_queries
 
 
 class LabSequencesTest(unittest.TestCase):
+    def test_compact_single_digit_hour_preserves_seconds(self):
+        self.assertEqual(_timestamp("2018071250119 ", 1) - _timestamp("2018071250114 ", 0), 5)
+
     def test_uav_visloc_filter_sort_and_pose(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
@@ -66,6 +69,22 @@ class LabSequencesTest(unittest.TestCase):
             self.assertAlmostEqual(queries[0].altitude, 467.0)
             self.assertAlmostEqual(queries[0].yaw, -39.0)
             self.assertGreater(queries[1].timestamp, queries[0].timestamp)
+            self.assertTrue(queries[0].meta["attitude_present"])
+
+    def test_missing_attitude_is_not_a_measured_zero(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            drone = root / "07" / "drone"
+            drone.mkdir(parents=True)
+            cv2.imwrite(str(drone / "07_0001.JPG"), np.zeros((8, 8, 3), np.uint8))
+            row = {"num": "1", "filename": "07_0001.JPG", "date": "2018071250114",
+                   "lat": "40", "lon": "115", "height": "688"}
+            with (root / "07" / "07.csv").open("w", newline="") as handle:
+                writer = csv.DictWriter(handle, fieldnames=list(row))
+                writer.writeheader()
+                writer.writerow(row)
+            query = uav_visloc_queries(root, "07")[0]
+            self.assertFalse(query.meta["attitude_present"])
 
 
 if __name__ == "__main__":

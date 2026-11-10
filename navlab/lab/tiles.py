@@ -10,6 +10,7 @@ import numpy as np
 import rasterio
 from pyproj import Transformer
 from rasterio.enums import Resampling
+from rasterio.errors import WindowError
 from rasterio.vrt import WarpedVRT
 from rasterio.warp import calculate_default_transform
 from rasterio.windows import Window
@@ -69,7 +70,10 @@ def _read_tile(vrt, col_off: int, row_off: int, tile_px: int) -> np.ndarray:
     canvas = np.zeros((bands, tile_px, tile_px), dtype=vrt.dtypes[0])
     request = Window(col_off, row_off, tile_px, tile_px)
     extent = Window(0, 0, vrt.width, vrt.height)
-    intersection = request.intersection(extent)
+    try:
+        intersection = request.intersection(extent)
+    except WindowError:
+        return np.zeros((tile_px, tile_px, 3), dtype=np.uint8)
     if intersection.width > 0 and intersection.height > 0:
         intersection = Window(
             int(round(intersection.col_off)),
@@ -139,6 +143,9 @@ def _build_from_centers(
             for index, (east, north) in enumerate(ordered):
                 col_off = int(round((east - left) / gsd - tile_px / 2.0))
                 row_off = int(round((top - north) / gsd - tile_px / 2.0))
+                if (col_off >= vrt.width or row_off >= vrt.height
+                        or col_off + tile_px <= 0 or row_off + tile_px <= 0):
+                    continue
                 image = _read_tile(vrt, col_off, row_off, tile_px)
                 tile_id = f"{prefix or source.stem}_{index:05d}"
                 image_path = tiles_dir / f"{tile_id}.png"
@@ -363,8 +370,20 @@ class TileStore:
     ) -> list[dict[str, Any]]:
         if not self.tiles:
             return []
-        distances = (self._east - east) ** 2 + (self._north - north) ** 2
-        order = np.argsort(distances)
+        center_distances = (self._east - east) ** 2 + (self._north - north) ** 2
+        # Test the distance to the tile rectangle, not just its centre. A
+        # position near an edge may be inside a tile whose centre is far away.
+        distances = []
+        for tile in self.tiles:
+            bounds = tile.get("bounds")
+            if not bounds:
+                distances.append(float("inf"))
+                continue
+            dx = max(bounds["min_east"] - east, 0.0, east - bounds["max_east"])
+            dy = max(bounds["min_north"] - north, 0.0, north - bounds["max_north"])
+            distances.append(dx * dx + dy * dy)
+        distances = np.asarray(distances)
+        order = np.lexsort((center_distances, distances))
         selected: list[dict[str, Any]] = []
         for index in order:
             if distances[index] > radius**2:

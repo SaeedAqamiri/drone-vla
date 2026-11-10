@@ -25,8 +25,8 @@ def _device():
     return torch.device("cpu")
 
 
-def _read_rgb(path: str | Path, max_dim: int) -> tuple[np.ndarray, float] | None:
-    image = cv2.imread(str(path), cv2.IMREAD_COLOR)
+def _read_rgb(path: str | Path | np.ndarray, max_dim: int) -> tuple[np.ndarray, float] | None:
+    image = path if isinstance(path, np.ndarray) else cv2.imread(str(path), cv2.IMREAD_COLOR)
     if image is None:
         return None
     height, width = image.shape[:2]
@@ -174,7 +174,7 @@ class DeepMatcher:
         self._aux = None
         if self.kind == "loftr":
             self._model = KF.LoFTR(pretrained="outdoor").to(self.device).eval()
-        elif self.kind in {"lightglue", "superpoint_lightglue", "disk_lightglue"}:
+        elif self.kind in {"lightglue", "disk_lightglue"}:
             self._aux = KF.DISK.from_pretrained("depth").to(self.device).eval()
             self._model = KF.LightGlue("disk").to(self.device).eval()
         else:
@@ -182,12 +182,14 @@ class DeepMatcher:
 
     def match(self, ref: str | Path, query: str | Path) -> MatchOutcome:
         started = time.time()
+        ref_name = "<array>" if isinstance(ref, np.ndarray) else str(ref)
+        query_name = "<array>" if isinstance(query, np.ndarray) else str(query)
         ref_image = _read_rgb(ref, self.max_dim)
         query_image = _read_rgb(query, self.max_dim)
         if ref_image is None or query_image is None:
             return MatchOutcome(
-                ref=str(ref),
-                query=str(query),
+                ref=ref_name,
+                query=query_name,
                 detector=self.kind,
                 inliers=0,
                 inlier_ratio=0.0,
@@ -198,6 +200,7 @@ class DeepMatcher:
                 latency_ms=(time.time() - started) * 1000.0,
                 success=False,
                 error="image read failed",
+                execution_error=True,
             )
         ref_image_array, _ = ref_image
         query_image_array, _ = query_image
@@ -260,8 +263,8 @@ class DeepMatcher:
                     dst = kp_query[matches[:, 1]].detach().cpu().numpy()
         except Exception as error:
             return MatchOutcome(
-                ref=str(ref),
-                query=str(query),
+                ref=ref_name,
+                query=query_name,
                 detector=self.kind,
                 inliers=0,
                 inlier_ratio=0.0,
@@ -272,10 +275,11 @@ class DeepMatcher:
                 latency_ms=(time.time() - started) * 1000.0,
                 success=False,
                 error=f"{type(error).__name__}: {error}",
+                execution_error=True,
             )
         return _homography_outcome(
-            str(ref),
-            str(query),
+            ref_name,
+            query_name,
             self.kind,
             src,
             dst,

@@ -62,6 +62,9 @@ class MatchOutcome:
     success: bool
     error: str = ""
     homography: np.ndarray | None = None
+    execution_error: bool = False
+    landmark_supported: int | None = None
+    landmark_total: int | None = None
 
     def as_dict(self) -> dict[str, Any]:
         return {
@@ -77,6 +80,9 @@ class MatchOutcome:
             "latency_ms": round(self.latency_ms, 2),
             "success": self.success,
             "error": self.error,
+            "execution_error": self.execution_error,
+            "landmark_supported": self.landmark_supported,
+            "landmark_total": self.landmark_total,
         }
 
 
@@ -101,6 +107,7 @@ class FrameResult:
     latency_ms: float
     reason: str
     match: dict[str, Any] | None = None
+    candidate_truth_covered: bool | None = None
 
     def as_dict(self) -> dict[str, Any]:
         return {
@@ -125,4 +132,5 @@ class FrameResult:
             "latency_ms": round(self.latency_ms, 2),
             "reason": self.reason,
             "match": self.match,
+            "candidate_truth_covered": self.candidate_truth_covered,
         }

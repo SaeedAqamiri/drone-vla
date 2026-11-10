@@ -249,3 +249,14 @@ env_flight/bin/python -m navlab
 - آستانهٔ موفقیت تطبیق: inliers ≥ 15، ratio ≥ 0.15 و **coverage ≥ 0.03**.
 - SITL تست شد: اتصال MAVSDK، takeoff، ۳ waypoint، geofence و land. HITL فاز بعد (Gazebo Classic یا SIH).
 - جزئیات: `navlab/README.md`؛ تست‌ها: ۱۶/۱۶.
+
+### مرور نتایج مکان‌یابی دیداری
+
+برای دیدن فریم‌های پذیرفته‌شده، پرخطا و ردشده در آزمایش‌های محلی:
+
+```bash
+cd /home/arman/drone-vla
+env_flight/bin/python scripts/localization_review.py --port 8765
+```
+
+در مرورگر همین ماشین `http://127.0.0.1:8765/` را باز کنید. دکمهٔ «نمایش نقاط تطبیق» برای مدل‌های پشتیبانی‌شده نقاط را دوباره محاسبه می‌کند؛ نتیجهٔ تصمیم قبلی تغییر نمی‌کند. گزارش وضعیت و محدودیت‌ها در [docs/GPS_DENIED_STATUS_FA.md](docs/GPS_DENIED_STATUS_FA.md) و خروجی‌های عددی گزیده در [docs/evidence/visual_localization](docs/evidence/visual_localization/README.md) هستند.
