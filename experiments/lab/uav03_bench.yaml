@@ -1,0 +1,18 @@
+store: outputs/navlab/lab/uav03_tiles_q
+queries: outputs/navlab/lab/uav03_queries.json
+reference_sets:
+  - name: satellite
+  - name: generated_dummy
+    references: outputs/navlab/lab/uav03_tiles_q/generated_refs/references_nadir.json
+    reference_kind: generated
+matchers: [sift, orb, akaze]
+modes: [gray, edges]
+runner:
+  base_radius: 120
+  max_radius: 800
+  max_jump_m: 300
+  scale_tolerance: 1.0
+  max_candidates: 8
+  bootstrap_candidates: 20
+  confirmation: 2
+  rng_seed: 0

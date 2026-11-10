@@ -31,6 +31,13 @@ def main():
     p.add_argument("--outdir", required=True)
     p.add_argument("--trigger", type=str, default=None, help="wait until this file exists, then capture")
     p.add_argument("--done", type=str, default=None, help="keep capturing until this file exists")
+    p.add_argument(
+        "--size",
+        type=int,
+        default=256,
+        help="resize frames to NxN before saving (0 keeps native resolution); "
+        "the rotor contract expects 256",
+    )
     args = p.parse_args()
 
     outdir = Path(args.outdir)
@@ -88,6 +95,18 @@ def main():
         sys.exit(1)
 
     arr = np.stack(frames).astype(np.uint8)
+    if args.size and arr.shape[1] != args.size:
+        try:
+            import cv2
+
+            arr = np.stack(
+                [
+                    cv2.resize(frame, (args.size, args.size), interpolation=cv2.INTER_AREA)
+                    for frame in arr
+                ]
+            )
+        except Exception as error:  # noqa: BLE001
+            print(f"resize skipped ({type(error).__name__}: {error})", flush=True)
     np.save(outdir / "frames.npy", arr)
     with open(outdir / "frame_ts.csv", "w", newline="") as f:
         w = csv.writer(f)

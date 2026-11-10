@@ -1,0 +1,646 @@
+<?xml version="1.0" ?>
+<sdf version="1.9">
+  <world name="field">
+    <!-- Lock step: ``type="ignore"`` hands the stepping clock to the ArduPilot
+         plugin, which advances the world once per SITL servo packet. The
+         free-running alternative (``type="ode"`` + lock_step 0) leaves the two
+         simulators unsynchronised and the rate loop cannot hold attitude. This
+         is the same configuration ardupilot_gazebo's own worlds use. -->
+    <physics name="1ms" type="ignore">
+      <max_step_size>0.001</max_step_size>
+      <real_time_factor>1.0</real_time_factor>
+    </physics>
+
+    <plugin filename="gz-sim-physics-system" name="gz::sim::systems::Physics"/>
+    <plugin filename="gz-sim-sensors-system" name="gz::sim::systems::Sensors">
+      <render_engine>ogre2</render_engine>
+    </plugin>
+    <plugin filename="gz-sim-user-commands-system" name="gz::sim::systems::UserCommands"/>
+    <plugin filename="gz-sim-scene-broadcaster-system" name="gz::sim::systems::SceneBroadcaster"/>
+    <plugin filename="gz-sim-imu-system" name="gz::sim::systems::Imu"/>
+    <plugin filename="gz-sim-navsat-system" name="gz::sim::systems::NavSat"/>
+    <plugin filename="gz-sim-air-pressure-system" name="gz::sim::systems::AirPressure"/>
+    <plugin filename="gz-sim-magnetometer-system" name="gz::sim::systems::Magnetometer">
+      <use_units_gauss>false</use_units_gauss>
+      <use_earth_frame_ned>false</use_earth_frame_ned>
+    </plugin>
+
+    <gravity>0 0 -9.8</gravity>
+    <magnetic_field>6e-06 2.3e-05 -4.2e-05</magnetic_field>
+    <atmosphere type="adiabatic"/>
+    <scene>
+      <ambient>0.55 0.55 0.55 1</ambient>
+      <background>0.55 0.7 0.9 1</background>
+      <grid>false</grid>
+      <sky><clouds><speed>12</speed></clouds></sky>
+      <shadows>true</shadows>
+    </scene>
+    <light name="sun" type="directional">
+      <cast_shadows>true</cast_shadows>
+      <pose>0 0 500 0 0 0</pose>
+      <intensity>1</intensity>
+      <direction>0.3 0.2 -1</direction>
+      <diffuse>0.95 0.95 0.95 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <attenuation>
+        <range>2000</range>
+        <constant>1</constant>
+        <linear>0</linear>
+        <quadratic>0</quadratic>
+      </attenuation>
+    </light>
+
+    <include>
+      <uri>model://textured_ground</uri>
+      <name>ground</name>
+      <pose>0 0 0 0 0 0</pose>
+    </include>
+
+    <model name="tree_0">
+      <static>true</static>
+      <pose>-32.17 61.25 0 0 0 0</pose>
+      <link name="trunk">
+        <pose>0 0 1.558 0 0 0</pose>
+        <visual name="bark">
+          <geometry><cylinder><radius>0.268</radius><length>3.115</length></cylinder></geometry>
+          <material>
+            <ambient>0.28 0.18 0.10 1</ambient>
+            <diffuse>0.36 0.23 0.13 1</diffuse>
+          </material>
+        </visual>
+        <visual name="canopy">
+          <pose>0 0 2.567 0 0 0</pose>
+          <geometry><sphere><radius>1.683</radius></sphere></geometry>
+          <material>
+            <ambient>0.200 0.286 0.143 1</ambient>
+            <diffuse>0.229 0.406 0.157 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="tree_1">
+      <static>true</static>
+      <pose>-27.61 11.36 0 0 0 0</pose>
+      <link name="trunk">
+        <pose>0 0 1.187 0 0 0</pose>
+        <visual name="bark">
+          <geometry><cylinder><radius>0.222</radius><length>2.374</length></cylinder></geometry>
+          <material>
+            <ambient>0.28 0.18 0.10 1</ambient>
+            <diffuse>0.36 0.23 0.13 1</diffuse>
+          </material>
+        </visual>
+        <visual name="canopy">
+          <pose>0 0 1.857 0 0 0</pose>
+          <geometry><sphere><radius>1.117</radius></sphere></geometry>
+          <material>
+            <ambient>0.180 0.257 0.128 1</ambient>
+            <diffuse>0.205 0.377 0.141 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="tree_2">
+      <static>true</static>
+      <pose>7.34 16.88 0 0 0 0</pose>
+      <link name="trunk">
+        <pose>0 0 2.424 0 0 0</pose>
+        <visual name="bark">
+          <geometry><cylinder><radius>0.213</radius><length>4.848</length></cylinder></geometry>
+          <material>
+            <ambient>0.28 0.18 0.10 1</ambient>
+            <diffuse>0.36 0.23 0.13 1</diffuse>
+          </material>
+        </visual>
+        <visual name="canopy">
+          <pose>0 0 3.102 0 0 0</pose>
+          <geometry><sphere><radius>1.130</radius></sphere></geometry>
+          <material>
+            <ambient>0.231 0.330 0.165 1</ambient>
+            <diffuse>0.264 0.450 0.181 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="tree_3">
+      <static>true</static>
+      <pose>-37.58 -28.88 0 0 0 0</pose>
+      <link name="trunk">
+        <pose>0 0 2.595 0 0 0</pose>
+        <visual name="bark">
+          <geometry><cylinder><radius>0.173</radius><length>5.190</length></cylinder></geometry>
+          <material>
+            <ambient>0.28 0.18 0.10 1</ambient>
+            <diffuse>0.36 0.23 0.13 1</diffuse>
+          </material>
+        </visual>
+        <visual name="canopy">
+          <pose>0 0 3.335 0 0 0</pose>
+          <geometry><sphere><radius>1.234</radius></sphere></geometry>
+          <material>
+            <ambient>0.184 0.263 0.131 1</ambient>
+            <diffuse>0.210 0.383 0.144 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="tree_4">
+      <static>true</static>
+      <pose>17.52 1.85 0 0 0 0</pose>
+      <link name="trunk">
+        <pose>0 0 1.691 0 0 0</pose>
+        <visual name="bark">
+          <geometry><cylinder><radius>0.209</radius><length>3.381</length></cylinder></geometry>
+          <material>
+            <ambient>0.28 0.18 0.10 1</ambient>
+            <diffuse>0.36 0.23 0.13 1</diffuse>
+          </material>
+        </visual>
+        <visual name="canopy">
+          <pose>0 0 2.564 0 0 0</pose>
+          <geometry><sphere><radius>1.455</radius></sphere></geometry>
+          <material>
+            <ambient>0.210 0.299 0.150 1</ambient>
+            <diffuse>0.240 0.419 0.165 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="tree_5">
+      <static>true</static>
+      <pose>-15.84 -12.66 0 0 0 0</pose>
+      <link name="trunk">
+        <pose>0 0 1.234 0 0 0</pose>
+        <visual name="bark">
+          <geometry><cylinder><radius>0.199</radius><length>2.469</length></cylinder></geometry>
+          <material>
+            <ambient>0.28 0.18 0.10 1</ambient>
+            <diffuse>0.36 0.23 0.13 1</diffuse>
+          </material>
+        </visual>
+        <visual name="canopy">
+          <pose>0 0 1.826 0 0 0</pose>
+          <geometry><sphere><radius>0.986</radius></sphere></geometry>
+          <material>
+            <ambient>0.196 0.280 0.140 1</ambient>
+            <diffuse>0.224 0.400 0.154 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="tree_6">
+      <static>true</static>
+      <pose>-50.40 12.88 0 0 0 0</pose>
+      <link name="trunk">
+        <pose>0 0 2.517 0 0 0</pose>
+        <visual name="bark">
+          <geometry><cylinder><radius>0.158</radius><length>5.035</length></cylinder></geometry>
+          <material>
+            <ambient>0.28 0.18 0.10 1</ambient>
+            <diffuse>0.36 0.23 0.13 1</diffuse>
+          </material>
+        </visual>
+        <visual name="canopy">
+          <pose>0 0 3.574 0 0 0</pose>
+          <geometry><sphere><radius>1.760</radius></sphere></geometry>
+          <material>
+            <ambient>0.251 0.358 0.179 1</ambient>
+            <diffuse>0.287 0.478 0.197 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="tree_7">
+      <static>true</static>
+      <pose>13.57 -0.96 0 0 0 0</pose>
+      <link name="trunk">
+        <pose>0 0 1.656 0 0 0</pose>
+        <visual name="bark">
+          <geometry><cylinder><radius>0.225</radius><length>3.313</length></cylinder></geometry>
+          <material>
+            <ambient>0.28 0.18 0.10 1</ambient>
+            <diffuse>0.36 0.23 0.13 1</diffuse>
+          </material>
+        </visual>
+        <visual name="canopy">
+          <pose>0 0 2.600 0 0 0</pose>
+          <geometry><sphere><radius>1.573</radius></sphere></geometry>
+          <material>
+            <ambient>0.188 0.268 0.134 1</ambient>
+            <diffuse>0.215 0.388 0.148 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="tree_8">
+      <static>true</static>
+      <pose>-22.51 7.33 0 0 0 0</pose>
+      <link name="trunk">
+        <pose>0 0 1.786 0 0 0</pose>
+        <visual name="bark">
+          <geometry><cylinder><radius>0.226</radius><length>3.572</length></cylinder></geometry>
+          <material>
+            <ambient>0.28 0.18 0.10 1</ambient>
+            <diffuse>0.36 0.23 0.13 1</diffuse>
+          </material>
+        </visual>
+        <visual name="canopy">
+          <pose>0 0 2.631 0 0 0</pose>
+          <geometry><sphere><radius>1.409</radius></sphere></geometry>
+          <material>
+            <ambient>0.248 0.355 0.177 1</ambient>
+            <diffuse>0.284 0.475 0.195 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="tree_9">
+      <static>true</static>
+      <pose>2.38 46.29 0 0 0 0</pose>
+      <link name="trunk">
+        <pose>0 0 1.158 0 0 0</pose>
+        <visual name="bark">
+          <geometry><cylinder><radius>0.242</radius><length>2.316</length></cylinder></geometry>
+          <material>
+            <ambient>0.28 0.18 0.10 1</ambient>
+            <diffuse>0.36 0.23 0.13 1</diffuse>
+          </material>
+        </visual>
+        <visual name="canopy">
+          <pose>0 0 1.946 0 0 0</pose>
+          <geometry><sphere><radius>1.313</radius></sphere></geometry>
+          <material>
+            <ambient>0.161 0.230 0.115 1</ambient>
+            <diffuse>0.184 0.350 0.126 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="tree_10">
+      <static>true</static>
+      <pose>-0.43 10.14 0 0 0 0</pose>
+      <link name="trunk">
+        <pose>0 0 1.652 0 0 0</pose>
+        <visual name="bark">
+          <geometry><cylinder><radius>0.211</radius><length>3.303</length></cylinder></geometry>
+          <material>
+            <ambient>0.28 0.18 0.10 1</ambient>
+            <diffuse>0.36 0.23 0.13 1</diffuse>
+          </material>
+        </visual>
+        <visual name="canopy">
+          <pose>0 0 2.456 0 0 0</pose>
+          <geometry><sphere><radius>1.340</radius></sphere></geometry>
+          <material>
+            <ambient>0.151 0.215 0.108 1</ambient>
+            <diffuse>0.172 0.335 0.118 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="tree_11">
+      <static>true</static>
+      <pose>-5.65 -25.80 0 0 0 0</pose>
+      <link name="trunk">
+        <pose>0 0 1.493 0 0 0</pose>
+        <visual name="bark">
+          <geometry><cylinder><radius>0.284</radius><length>2.986</length></cylinder></geometry>
+          <material>
+            <ambient>0.28 0.18 0.10 1</ambient>
+            <diffuse>0.36 0.23 0.13 1</diffuse>
+          </material>
+        </visual>
+        <visual name="canopy">
+          <pose>0 0 2.358 0 0 0</pose>
+          <geometry><sphere><radius>1.441</radius></sphere></geometry>
+          <material>
+            <ambient>0.241 0.345 0.172 1</ambient>
+            <diffuse>0.276 0.465 0.190 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="tree_12">
+      <static>true</static>
+      <pose>-19.45 -3.89 0 0 0 0</pose>
+      <link name="trunk">
+        <pose>0 0 1.264 0 0 0</pose>
+        <visual name="bark">
+          <geometry><cylinder><radius>0.178</radius><length>2.528</length></cylinder></geometry>
+          <material>
+            <ambient>0.28 0.18 0.10 1</ambient>
+            <diffuse>0.36 0.23 0.13 1</diffuse>
+          </material>
+        </visual>
+        <visual name="canopy">
+          <pose>0 0 1.988 0 0 0</pose>
+          <geometry><sphere><radius>1.207</radius></sphere></geometry>
+          <material>
+            <ambient>0.166 0.237 0.119 1</ambient>
+            <diffuse>0.190 0.357 0.131 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="tree_13">
+      <static>true</static>
+      <pose>-67.25 9.45 0 0 0 0</pose>
+      <link name="trunk">
+        <pose>0 0 2.294 0 0 0</pose>
+        <visual name="bark">
+          <geometry><cylinder><radius>0.197</radius><length>4.589</length></cylinder></geometry>
+          <material>
+            <ambient>0.28 0.18 0.10 1</ambient>
+            <diffuse>0.36 0.23 0.13 1</diffuse>
+          </material>
+        </visual>
+        <visual name="canopy">
+          <pose>0 0 3.000 0 0 0</pose>
+          <geometry><sphere><radius>1.176</radius></sphere></geometry>
+          <material>
+            <ambient>0.260 0.372 0.186 1</ambient>
+            <diffuse>0.298 0.492 0.205 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="tree_14">
+      <static>true</static>
+      <pose>44.74 -7.23 0 0 0 0</pose>
+      <link name="trunk">
+        <pose>0 0 1.449 0 0 0</pose>
+        <visual name="bark">
+          <geometry><cylinder><radius>0.217</radius><length>2.898</length></cylinder></geometry>
+          <material>
+            <ambient>0.28 0.18 0.10 1</ambient>
+            <diffuse>0.36 0.23 0.13 1</diffuse>
+          </material>
+        </visual>
+        <visual name="canopy">
+          <pose>0 0 2.074 0 0 0</pose>
+          <geometry><sphere><radius>1.042</radius></sphere></geometry>
+          <material>
+            <ambient>0.207 0.296 0.148 1</ambient>
+            <diffuse>0.236 0.416 0.163 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="tree_15">
+      <static>true</static>
+      <pose>14.65 -12.06 0 0 0 0</pose>
+      <link name="trunk">
+        <pose>0 0 1.773 0 0 0</pose>
+        <visual name="bark">
+          <geometry><cylinder><radius>0.245</radius><length>3.546</length></cylinder></geometry>
+          <material>
+            <ambient>0.28 0.18 0.10 1</ambient>
+            <diffuse>0.36 0.23 0.13 1</diffuse>
+          </material>
+        </visual>
+        <visual name="canopy">
+          <pose>0 0 2.825 0 0 0</pose>
+          <geometry><sphere><radius>1.753</radius></sphere></geometry>
+          <material>
+            <ambient>0.237 0.338 0.169 1</ambient>
+            <diffuse>0.271 0.458 0.186 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="tree_16">
+      <static>true</static>
+      <pose>-44.79 16.74 0 0 0 0</pose>
+      <link name="trunk">
+        <pose>0 0 1.516 0 0 0</pose>
+        <visual name="bark">
+          <geometry><cylinder><radius>0.165</radius><length>3.031</length></cylinder></geometry>
+          <material>
+            <ambient>0.28 0.18 0.10 1</ambient>
+            <diffuse>0.36 0.23 0.13 1</diffuse>
+          </material>
+        </visual>
+        <visual name="canopy">
+          <pose>0 0 2.505 0 0 0</pose>
+          <geometry><sphere><radius>1.649</radius></sphere></geometry>
+          <material>
+            <ambient>0.212 0.303 0.151 1</ambient>
+            <diffuse>0.242 0.423 0.166 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="tree_17">
+      <static>true</static>
+      <pose>16.15 -8.00 0 0 0 0</pose>
+      <link name="trunk">
+        <pose>0 0 1.023 0 0 0</pose>
+        <visual name="bark">
+          <geometry><cylinder><radius>0.227</radius><length>2.046</length></cylinder></geometry>
+          <material>
+            <ambient>0.28 0.18 0.10 1</ambient>
+            <diffuse>0.36 0.23 0.13 1</diffuse>
+          </material>
+        </visual>
+        <visual name="canopy">
+          <pose>0 0 1.948 0 0 0</pose>
+          <geometry><sphere><radius>1.542</radius></sphere></geometry>
+          <material>
+            <ambient>0.292 0.418 0.209 1</ambient>
+            <diffuse>0.334 0.538 0.230 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="tree_18">
+      <static>true</static>
+      <pose>-7.70 -9.06 0 0 0 0</pose>
+      <link name="trunk">
+        <pose>0 0 1.977 0 0 0</pose>
+        <visual name="bark">
+          <geometry><cylinder><radius>0.208</radius><length>3.955</length></cylinder></geometry>
+          <material>
+            <ambient>0.28 0.18 0.10 1</ambient>
+            <diffuse>0.36 0.23 0.13 1</diffuse>
+          </material>
+        </visual>
+        <visual name="canopy">
+          <pose>0 0 2.617 0 0 0</pose>
+          <geometry><sphere><radius>1.066</radius></sphere></geometry>
+          <material>
+            <ambient>0.266 0.380 0.190 1</ambient>
+            <diffuse>0.304 0.500 0.209 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="tree_19">
+      <static>true</static>
+      <pose>-12.83 -56.30 0 0 0 0</pose>
+      <link name="trunk">
+        <pose>0 0 2.068 0 0 0</pose>
+        <visual name="bark">
+          <geometry><cylinder><radius>0.255</radius><length>4.136</length></cylinder></geometry>
+          <material>
+            <ambient>0.28 0.18 0.10 1</ambient>
+            <diffuse>0.36 0.23 0.13 1</diffuse>
+          </material>
+        </visual>
+        <visual name="canopy">
+          <pose>0 0 2.979 0 0 0</pose>
+          <geometry><sphere><radius>1.518</radius></sphere></geometry>
+          <material>
+            <ambient>0.179 0.256 0.128 1</ambient>
+            <diffuse>0.205 0.376 0.141 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="tree_20">
+      <static>true</static>
+      <pose>-57.52 -22.70 0 0 0 0</pose>
+      <link name="trunk">
+        <pose>0 0 1.647 0 0 0</pose>
+        <visual name="bark">
+          <geometry><cylinder><radius>0.175</radius><length>3.294</length></cylinder></geometry>
+          <material>
+            <ambient>0.28 0.18 0.10 1</ambient>
+            <diffuse>0.36 0.23 0.13 1</diffuse>
+          </material>
+        </visual>
+        <visual name="canopy">
+          <pose>0 0 2.199 0 0 0</pose>
+          <geometry><sphere><radius>0.920</radius></sphere></geometry>
+          <material>
+            <ambient>0.152 0.217 0.109 1</ambient>
+            <diffuse>0.174 0.337 0.120 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="tree_21">
+      <static>true</static>
+      <pose>-6.67 2.86 0 0 0 0</pose>
+      <link name="trunk">
+        <pose>0 0 2.187 0 0 0</pose>
+        <visual name="bark">
+          <geometry><cylinder><radius>0.259</radius><length>4.375</length></cylinder></geometry>
+          <material>
+            <ambient>0.28 0.18 0.10 1</ambient>
+            <diffuse>0.36 0.23 0.13 1</diffuse>
+          </material>
+        </visual>
+        <visual name="canopy">
+          <pose>0 0 3.232 0 0 0</pose>
+          <geometry><sphere><radius>1.741</radius></sphere></geometry>
+          <material>
+            <ambient>0.254 0.363 0.182 1</ambient>
+            <diffuse>0.291 0.483 0.200 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="tree_22">
+      <static>true</static>
+      <pose>-49.90 24.75 0 0 0 0</pose>
+      <link name="trunk">
+        <pose>0 0 2.328 0 0 0</pose>
+        <visual name="bark">
+          <geometry><cylinder><radius>0.160</radius><length>4.655</length></cylinder></geometry>
+          <material>
+            <ambient>0.28 0.18 0.10 1</ambient>
+            <diffuse>0.36 0.23 0.13 1</diffuse>
+          </material>
+        </visual>
+        <visual name="canopy">
+          <pose>0 0 2.882 0 0 0</pose>
+          <geometry><sphere><radius>0.924</radius></sphere></geometry>
+          <material>
+            <ambient>0.170 0.243 0.121 1</ambient>
+            <diffuse>0.194 0.363 0.133 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="tree_23">
+      <static>true</static>
+      <pose>28.82 -9.61 0 0 0 0</pose>
+      <link name="trunk">
+        <pose>0 0 2.431 0 0 0</pose>
+        <visual name="bark">
+          <geometry><cylinder><radius>0.205</radius><length>4.863</length></cylinder></geometry>
+          <material>
+            <ambient>0.28 0.18 0.10 1</ambient>
+            <diffuse>0.36 0.23 0.13 1</diffuse>
+          </material>
+        </visual>
+        <visual name="canopy">
+          <pose>0 0 3.322 0 0 0</pose>
+          <geometry><sphere><radius>1.485</radius></sphere></geometry>
+          <material>
+            <ambient>0.197 0.282 0.141 1</ambient>
+            <diffuse>0.226 0.402 0.155 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="tree_24">
+      <static>true</static>
+      <pose>16.83 -35.17 0 0 0 0</pose>
+      <link name="trunk">
+        <pose>0 0 2.653 0 0 0</pose>
+        <visual name="bark">
+          <geometry><cylinder><radius>0.272</radius><length>5.307</length></cylinder></geometry>
+          <material>
+            <ambient>0.28 0.18 0.10 1</ambient>
+            <diffuse>0.36 0.23 0.13 1</diffuse>
+          </material>
+        </visual>
+        <visual name="canopy">
+          <pose>0 0 3.723 0 0 0</pose>
+          <geometry><sphere><radius>1.782</radius></sphere></geometry>
+          <material>
+            <ambient>0.191 0.273 0.136 1</ambient>
+            <diffuse>0.218 0.393 0.150 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="tree_25">
+      <static>true</static>
+      <pose>-8.00 46.72 0 0 0 0</pose>
+      <link name="trunk">
+        <pose>0 0 2.233 0 0 0</pose>
+        <visual name="bark">
+          <geometry><cylinder><radius>0.214</radius><length>4.466</length></cylinder></geometry>
+          <material>
+            <ambient>0.28 0.18 0.10 1</ambient>
+            <diffuse>0.36 0.23 0.13 1</diffuse>
+          </material>
+        </visual>
+        <visual name="canopy">
+          <pose>0 0 2.855 0 0 0</pose>
+          <geometry><sphere><radius>1.036</radius></sphere></geometry>
+          <material>
+            <ambient>0.178 0.255 0.127 1</ambient>
+            <diffuse>0.204 0.375 0.140 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <include>
+      <uri>model://x500_apm</uri>
+      <name>x500</name>
+      <pose>0 0 0.5 0 0 0</pose>
+    </include>
+
+    <spherical_coordinates>
+      <surface_model>EARTH_WGS84</surface_model>
+      <world_frame_orientation>ENU</world_frame_orientation>
+      <latitude_deg>47.397971057728974</latitude_deg>
+      <longitude_deg>8.546163739800146</longitude_deg>
+      <elevation>0</elevation>
+    </spherical_coordinates>
+  </world>
+</sdf>

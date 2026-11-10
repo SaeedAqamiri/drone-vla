@@ -1,0 +1,1 @@
+roll=-179.1 pitch=-1.9 yaw=-4.1 requested=6

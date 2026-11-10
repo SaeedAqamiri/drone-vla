@@ -1,0 +1,19 @@
+store: outputs/navlab/lab/real_scene_probe/tiles
+queries: outputs/navlab/lab/real_scene_probe/queries.json
+reference_sets:
+  - name: satellite
+  - name: generated_sglang
+    references: outputs/navlab/lab/real_scene_probe/tiles/generated_sglang/references_nadir.json
+    reference_kind: generated
+matchers: [loftr, lightglue, sift]
+modes: [gray]
+runner:
+  max_dim: 768
+  base_radius: 150
+  max_radius: 1200
+  max_jump_m: 300
+  scale_tolerance: 1.0
+  max_candidates: 8
+  bootstrap_candidates: 15
+  confirmation: 1
+  rng_seed: 0

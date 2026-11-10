@@ -1,0 +1,105 @@
+version: 1
+updated: '2026-11-04T18:27:03.976Z'
+entries:
+  env_flight:
+    summary: >-
+      Python 3.11 uv environment for flight/raster/lab work. As of 2026-11-04 it has torch
+      2.10.0+cu128, OpenCV 4.12, rasterio 1.4.4, pandas 3.0.6, PyYAML 6.0.3, and now `kornia==0.8.3`
+      + `kornia_rs==0.2.0` installed from the uv archive cache (direct copy into site-packages after
+      network timeouts). LoFTR (`loftr_outdoor.ckpt`), DISK (`depth-save.pth` from Gitee mirror),
+      and LightGlue (`disk_lightglue...`) weights are in `~/.cache/torch/hub/checkpoints`.
+      matplotlib/scipy remain absent.
+    confidence: inferred
+    based_on:
+      - env_flight/pyvenv.cfg@183-1790179800935
+  NOTES.md:
+    summary: >-
+      Running technical log for the workspace. It records environment traps (16GB RAM, RTX 4060 8GB,
+      separate venvs), PX4 SITL and MAVSDK failure modes, FLUX 3 quantization results, sat2aerial
+      findings (seed variance, oblique-view limitation, coverage gate), and NavLab state (map-EV,
+      baro height, offboard gating). It is the highest-value place to check before modifying
+      `navlab/sim.py`, `navlab/imagery.py`, or generation code.
+    based_on:
+      - NOTES.md@35211-1793398071715
+relations:
+  - from: navlab/jobs.py
+    to: sat2aerial/backends
+    description: >-
+      `navlab.jobs._run_generation` calls `navlab.generation.generate_reference`, which calls
+      `sat2aerial.backends.make_backend` to dispatch dummy/ComfyUI/BFL/SGLang/flux3 generation.
+    confidence: verified
+    based_on:
+      - navlab/jobs.py@15933-1793640245089
+      - navlab/generation.py@2842-1793639776984
+      - sat2aerial/backends/__init__.py@897-1793639770674
+  - from: scripts/eval_localizer.py
+    to: navlab/localizer.py
+    description: >-
+      `scripts.eval_localizer.main` builds `MapLocalizer(args.eval_dir)` and calls
+      `MapLocalizer.locate(frame, prior_e, prior_n, radius, last_kf)` for each held-out frame, then
+      computes error against the frame's `x`/`y` truth.
+    confidence: verified
+    based_on:
+      - scripts/eval_localizer.py@3235-1793374620459
+      - navlab/localizer.py@4841-1793369480609
+  - from: scripts/uav_visloc_pairs.py
+    to: data/raw/uav_visloc/UAV_VisLoc_dataset
+    description: >-
+      `scripts.uav_visloc_pairs.main` opens `03/03.csv` with `csv.DictReader`, reads
+      `lat/lon/height/Phi1`, and passes them to `crop_satellite`, which uses `latlon_to_pixel` and
+      `pixel_size_m` against `satellite03.tif` to write pair crops.
+    confidence: verified
+    based_on:
+      - scripts/uav_visloc_pairs.py@5843-1792585763849
+      - data/raw/uav_visloc/UAV_VisLoc_dataset/03/03.csv@83054-1792586020651
+      - data/raw/uav_visloc/UAV_VisLoc_dataset/03/satellite03.tif@2577636150-1792586019313
+  - from: navlab/lab/generate.py
+    to: sat2aerial/backends
+    description: >-
+      Through `navlab.generation.get_backend`, lab generation reaches
+      `sat2aerial.backends.make_backend`, which dispatches SGLang/ComfyUI/BFL/dummy/flux3.
+    confidence: verified
+    based_on:
+      - navlab/lab/generate.py@3588-1793813162556
+      - navlab/generation.py@2842-1793639776984
+      - sat2aerial/backends/__init__.py@897-1793639770674
+  - from: navlab/lab/matchers.py
+    to: sat2aerial/matching.py
+    description: >-
+      `ClassicalMatcher.match` calls `sat2aerial.matching.match_images` with the selected
+      detector/mode/max_dim/RANSAC options and maps its `MatchResult` into `MatchOutcome`.
+    confidence: verified
+    based_on:
+      - navlab/lab/matchers.py@3666-1793814493259
+      - sat2aerial/matching.py@7787-1793811114222
+  - from: flux3-deploy/sglang_start.sh
+    to: sat2aerial/backends/sglang.py
+    description: >-
+      The deployment script starts the SGLang FLUX.3 Klein service on port 30010; `SGLangBackend`
+      posts to `/v1/images/edits` on that server, and `NAVLAB_SGLANG_URL` in navlab/config.py
+      defaults to the same endpoint.
+    confidence: verified
+    based_on:
+      - flux3-deploy/sglang_start.sh@1671-1793638023685
+      - sat2aerial/backends/sglang.py@3341-1793639770657
+      - navlab/config.py@1017-1793639776984
+  - from: experiments/lab
+    to: navlab/lab/bench.py
+    description: >-
+      The YAML files in `experiments/lab` are loaded by `navlab.lab.bench.run_bench` to define
+      store/queries/reference_sets/matchers/modes and RunnerConfig options for each benchmark
+      matrix.
+    confidence: verified
+    based_on:
+      - experiments/lab
+      - navlab/lab/bench.py@4515-1793814128294
+  - from: navlab/lab/synthetic.py
+    to: sat2aerial/synthetic.py
+    description: >-
+      `make_scene` uses `sat2aerial.synthetic.make_satellite` to create the georeferenced base
+      image, and `make_queries` uses `make_aerial` to apply perspective/photometric augmentation to
+      ground-truth crops.
+    confidence: verified
+    based_on:
+      - navlab/lab/synthetic.py@4210-1793811444584
+      - sat2aerial/synthetic.py@6330-1792566247603

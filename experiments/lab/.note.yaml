@@ -1,0 +1,14 @@
+version: 1
+updated: '2026-11-04T18:27:03.976Z'
+summary: >-
+  YAML benchmark configs consumed by `navlab.lab.bench.run_bench`. `uav03_bench.yaml` compares
+  satellite vs dummy-generated references across sift/orb/akaze and gray/edges; `synth_bench.yaml`,
+  `synth_sglang_bench.yaml`, and `synth_deep_bench.yaml` compare raw satellite, SGLang-generated,
+  and ensemble references across classical and deep matchers on the synthetic JP2-crop scene.
+  Configs carry store/queries/reference_sets/matchers/modes and a `runner` block for RunnerConfig
+  fields.
+based_on:
+  - experiments/lab/uav03_bench.yaml@480-1793814358531
+  - experiments/lab/synth_bench.yaml@510-1793814768562
+  - experiments/lab/synth_sglang_bench.yaml@618-1793815392283
+  - experiments/lab/synth_deep_bench.yaml@527-1793816407190

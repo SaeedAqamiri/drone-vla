@@ -155,6 +155,81 @@ env_flight/bin/python -m unittest discover -s tests -v
 `flux3` (diffusers؛ روی 8GB عملاً محدود). برای نتیجهٔ معتبر `--seeds 3` بده: مدل به seed حساس است و یک seed
 هندسه را حفظ می‌کند و seed دیگر شهر را جابه‌جا می‌سازد. جزئیات: `sat2aerial/README.md` و بخش ۱۲ در `NOTES.md`.
 
+### ۷.۱) چطور بدون GPS تست کنیم — تصویر تست از کجا می‌آید؟
+
+مشکل شبیه‌سازی این است که از دنیای دلخواه (AirSim/Gazebo) orthophoto وجود ندارد، پس هر عدد matching
+فقط «فاصلهٔ sim2real» را می‌سنجد. دو دستور این را حل می‌کنند:
+
+```bash
+# L1: رندر 2.5D روی همان نقشه‌ای که localizer با آن تطبیق می‌دهد (ground truth دقیق)
+env_flight/bin/python -m sat2aerial flythrough --ortho site.tif --out outputs/orthofly/site \
+  --frames 120 --alt 80 --path snake --length 400 --ref-jitter 40 \
+  --pairs-dir outputs/orthofly/site/pairs
+
+# خطای متری + نرخ رد شدن
+env_flight/bin/python -m sat2aerial localize --run outputs/orthofly/site --match-mode gray
+
+# L0: پرواز واقعی دوربین‌دار (UAV-VisLoc v1/v2) → همان فرمت، پس همان ارزیاب
+env_flight/bin/python scripts/import_uav_visloc.py --src data/uav_visloc/raw --sites 07 \
+  --out data/uav_visloc/processed/07
+env_flight/bin/python -m sat2aerial localize --run data/uav_visloc/processed/07 --matcher ncc
+```
+
+نتیجهٔ دموی مصنوعی (۳۰ فریم، ۳۰۰ متر): `success 0.77`، میانهٔ خطا در فریم‌های پذیرفته‌شده **۰.۲۵ m**،
+هیچ فریم «قبول اما اشتباه» بالای ۵ متر. نکتهٔ مهم: `--match-mode gray` برای فریم nadir الزامی است
+(`edges` روی نقشه، inlierهای هم‌خط روی جاده می‌دهد و homography را در راستای جاده آزاد می‌گذارد).
+جدول کامل و محدودیت‌ها: `sat2aerial/README.md`.
+
+روی تصویر **واقعی** پهپاد همین منطق برعکس می‌شود. دو نسخهٔ دیتاست دو رفتار متفاوت دارند:
+
+| نسخه | تصویر | matcher | نرخ fix | میانهٔ خطا |
+|---|---|---|---|---|
+| v2 (چیپ‌های ۱۳۵ px) | ۱۴۱۴ px، شمال-بالا | `ncc` | ۰.۸۷ | ۱۱.۸ m (بدون بایاس **۲.۷۶ m**) |
+| v1 (همان zip ۱۷ گیگی) | ۳۰۰۰×۲۰۰۰، چرخیده ~۹۰° | `ncc --rotate-search 360` | ۰.۸۳ | **۱.۷۰ m** |
+| v1 | همان | `features/edges` (SIFT) | ۰.۰۳ | — |
+
+⚠ این عدد فقط برای فلایت **۰۷** است و فقط **طول‌محور** است: کریدور ۰۷ دور خودِ خط پرواز بریده
+شده (۴۹ m ارتفاع کریدور در برابر ۱۸۹ m ارتفاع فریم)، پس محور عرضی by construction صفر است و
+آن ۱ متر، دقت ۱-بعدیِ واقعی ولی محدود است. سوییپ کامل ۱۱ فلایت: ۰۷ → ۱.۰۲ m؛ بقیه ۲۸ تا ۸۵ m.
+
+**علت واقعی (۲۰۲۶-۱۱-۰۸):** تست «رتبهٔ حقیقت» نشان داد NCC در جای درست، در صدک ۴۲–۷۴ بین هزاران
+آفست است — یعنی **مکان درست از یک مکان تصادفی قابل تفکیک نیست**. پس خطای ۲۸–۸۵ متری باگ matcher
+نیست: تصویر مرجع و مسیر پهپاد co-registration ندارند (موزاییک Google Earth در برابر GPS خام
+WGS84). فاصلهٔ زمانی هم توضیح‌دهنده نیست (۰۶ با ۱ ماه → ۲۸ m، ۰۷ با ۴.۹ سال → ۱ m). جزئیات و
+اعداد FLUX در `STATUS_2026-11-06.md` §۹.۷.
+
+در v1 دوربین ~۹۰ درجه نسبت به شمالِ نقشه چرخیده و کریدور ماهواره فقط ۴۳٪ ارتفاع فریم است؛ به همین
+دلیل SIFT می‌شکند و همبستگی متراکم بدون جست‌وجوی چرخش هم. اسکریپت `scripts/plan_capture.py` هم
+تعداد فریم یک پرواز ۱۰ کیلومتری را می‌دهد: ۱۰۰–۳۰۰ متر، ۲۰۰ m/s، هم‌پوشانی ۷۰–۸۰٪ →
+**۱۳۲ تا ۵۹۰ فریم**. برای اجرای کل دیتاست با یک دستور:
+
+```bash
+env_flight/bin/python scripts/run_uav_visloc.py --src data/uav_visloc/raw_v1 \
+  --out data/uav_visloc/processed_v1 --frame-stride 5 --rotate-search auto
+```
+
+### ۷.۲) L2 — دنیای Gazebo از همان نقشه (حلقهٔ بسته)
+
+```bash
+# زمین = خود orthophoto، مختصات ENU گره‌خورده به lat/lon، ساختمان‌های OSM
+env_flight/bin/python scripts/make_geo_world.py --ortho site.tif --name site1 \
+  --out outputs/geo --extent-m 800 --tile-m 200 --tile-px 1024 \
+  --center-lat 47.397 --center-lon 8.546 --buildings b.geojson
+
+source outputs/geo/site1/env.sh
+gz sim -r outputs/geo/site1/worlds/site1.sdf
+
+# تأیید اینکه دوربین رو به پایینِ شبیه‌ساز با همان نقشه تطبیق می‌دهد
+env_flight/bin/python scripts/check_geo_world.py --run outputs/geo/site1 --alt 260
+```
+
+`world = ENU` (`x=East, y=North, z=Up`) و `(0,0)` همان `--center-lat/lon` است، پس خروجی
+`localize`/`poses.csv` مستقیماً به `VISION_POSITION_ESTIMATE` وصل می‌شود.
+
+**تأییدشده روی Gazebo Harmonic 8.15 (headless, llvmpipe):** ۵۰۲ inlier، coverage ۰.۹۰،
+scale `0.99971`، rotation `-0.004°`، جابه‌جایی `0.41 m`. یعنی بافت زمین نه flip می‌خواهد و نه
+محورها جابه‌جا شده‌اند؛ با `heading=0` تصویر دوربین شمال‌بالا است.
+
 ---
 
 ## ۸) NavLab — رابط وب فارسی برای تست ناوبری

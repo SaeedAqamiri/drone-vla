@@ -58,6 +58,8 @@ def inspect_image(path: Path) -> dict[str, Any]:
         "bounds": None,
         "crs": None,
         "gsd_m": None,
+        "gsd_xy_m": None,
+        "rotated": False,
     }
     try:
         with rasterio.open(path) as dataset:
@@ -78,16 +80,10 @@ def inspect_image(path: Path) -> dict[str, Any]:
                     "max_lon": max(left, right),
                     "max_lat": max(bottom, top),
                 }
-                res_x, res_y = dataset.res
-                if dataset.crs.is_geographic:
-                    center_lat = (info["bounds"]["min_lat"] + info["bounds"]["max_lat"]) / 2.0
-                    m_per_deg_lat = 111_320.0
-                    m_per_deg_lon = 111_320.0 * math.cos(math.radians(center_lat))
-                    info["gsd_m"] = float(
-                        (abs(res_x) * m_per_deg_lon + abs(res_y) * m_per_deg_lat) / 2.0
-                    )
-                else:
-                    info["gsd_m"] = float((abs(res_x) + abs(res_y)) / 2.0)
+                rotated, gsd_x, gsd_y = _native_gsd(dataset)
+                info["rotated"] = bool(rotated)
+                info["gsd_xy_m"] = [float(gsd_x), float(gsd_y)]
+                info["gsd_m"] = float((gsd_x + gsd_y) / 2.0)
                 return info
     except Exception:
         pass
@@ -97,6 +93,33 @@ def inspect_image(path: Path) -> dict[str, Any]:
     except Exception:
         pass
     return info
+
+
+def _native_gsd(dataset) -> tuple[bool, float, float]:
+    """``(rotated, gsd_x_m, gsd_y_m)`` for an open rasterio dataset.
+
+    Uses the affine transform rather than ``dataset.res`` so rotated rasters
+    (non-zero ``b``/``d``) report a real pixel footprint instead of ``0, 0``.
+    Geographic CRSs are converted to metres at the dataset's centre latitude.
+    """
+    a, b, _, d, e, _ = dataset.transform[:6]
+    rotated = abs(b) > 1e-12 or abs(d) > 1e-12
+    size_x = math.hypot(a, d)
+    size_y = math.hypot(b, e)
+    crs = dataset.crs
+    if crs is not None and crs.is_geographic:
+        bounds = dataset.bounds
+        center_lat = (bounds.bottom + bounds.top) / 2.0
+        m_per_deg_lat = 111_320.0
+        m_per_deg_lon = 111_320.0 * math.cos(math.radians(center_lat))
+        return rotated, size_x * m_per_deg_lon, size_y * m_per_deg_lat
+    return rotated, size_x, size_y
+
+
+def _ground_resolution(dataset) -> tuple[float, float]:
+    """Per-axis ground resolution (metres/pixel) of an open rasterio dataset."""
+    _, gsd_x, gsd_y = _native_gsd(dataset)
+    return gsd_x, gsd_y
 
 
 def make_preview(path: Path, dest: Path) -> Path | None:

@@ -1,0 +1,16 @@
+# These files are authored on Windows but executed by bash / python inside WSL.
+# With core.autocrlf=true a checkout would rewrite them with CRLF endings and
+# every shebang and shell script would fail with "bad interpreter: /bin/bash^M".
+# Pin the working tree to LF for everything textual.
+* text=auto eol=lf
+
+# Real binaries must never be normalised.
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.bin   binary
+*.apj   binary
+*.exe   binary
+*.dll   binary
+*.a     binary
+*.zip   binary

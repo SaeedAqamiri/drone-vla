@@ -5,15 +5,17 @@ __pycache__/
 *.py[cod]
 .pytest_cache/
 
-# Large external trees (separate repos / downloads)
-ComfyUI/
-models/
-PX4-Autopilot/
-IsaacLab-2.1/
-flux-action/
-data/
-outputs/
-logs/
+# Large external trees (separate repos / downloads).
+# Anchored to the repo root on purpose: an unanchored "models/" also swallowed
+# sim/ardupilot/models/, i.e. the airframe SDFs that belong in the repo.
+/ComfyUI/
+/models/
+/PX4-Autopilot/
+/IsaacLab-2.1/
+/flux-action/
+/data/
+/outputs/
+/logs/
 
 # Model / log artifacts
 *.safetensors
@@ -34,3 +36,17 @@ logs/
 # Large satellite test data
 *.jp2
 navlab/final_Request points/
+
+# Large datasets kept outside the repo (multi-GB)
+UAV_VisLoc_dataset.zip
+*.zip
+
+# Secrets and local-only access notes -- never commit these
+*.local.md
+credentials*
+api.txt
+secrets*
+
+# PX4 tree is checked out next to the repo and linked in as a junction;
+# the pattern above (PX4-Autopilot/) does not match a symlink of that name.
+/PX4-Autopilot

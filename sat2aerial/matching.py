@@ -10,10 +10,7 @@ from .types import MatchResult
 FLANN_INDEX_KDTREE = 1
 
 
-def _read(path: str | Path, max_dim: int) -> np.ndarray | None:
-    image = cv2.imread(str(path), cv2.IMREAD_COLOR)
-    if image is None:
-        return None
+def _resize(image: np.ndarray, max_dim: int) -> np.ndarray:
     height, width = image.shape[:2]
     scale = max_dim / float(max(height, width))
     if scale < 1.0:
@@ -23,6 +20,13 @@ def _read(path: str | Path, max_dim: int) -> np.ndarray | None:
             interpolation=cv2.INTER_AREA,
         )
     return image
+
+
+def _read(path: str | Path, max_dim: int) -> np.ndarray | None:
+    image = cv2.imread(str(path), cv2.IMREAD_COLOR)
+    if image is None:
+        return None
+    return _resize(image, max_dim)
 
 
 def _prepare(image: np.ndarray, mode: str) -> np.ndarray:
@@ -39,13 +43,32 @@ def _prepare(image: np.ndarray, mode: str) -> np.ndarray:
     return gray
 
 
-def _detector():
+def _detector(name: str = "sift"):
+    key = (name or "sift").lower().strip()
+    if key == "akaze":
+        factory = getattr(cv2, "AKAZE_create", None)
+        if factory is None and hasattr(cv2, "AKAZE"):
+            factory = getattr(cv2.AKAZE, "create", None)
+        if factory is None:
+            raise RuntimeError(
+                "this OpenCV build has no AKAZE "
+                f"(cv2 {cv2.__version__}); use 'sift' or 'orb' instead"
+            )
+        return factory(threshold=0.0005)
+    if key == "orb":
+        return cv2.ORB_create(nfeatures=5000)
+    if key == "sift" and hasattr(cv2, "SIFT_create"):
+        return cv2.SIFT_create(nfeatures=5000, contrastThreshold=0.005, edgeThreshold=15)
     if hasattr(cv2, "SIFT_create"):
         return cv2.SIFT_create(nfeatures=5000, contrastThreshold=0.005, edgeThreshold=15)
     return cv2.ORB_create(nfeatures=5000)
 
 
-def _matcher():
+def _matcher(name: str = "sift"):
+    key = (name or "sift").lower().strip()
+    if key == "orb":
+        # binary descriptors -> brute-force Hamming
+        return cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=False)
     index_params = dict(algorithm=FLANN_INDEX_KDTREE, trees=5)
     search_params = dict(checks=64)
     return cv2.FlannBasedMatcher(index_params, search_params)
@@ -69,12 +92,52 @@ def match_images(
     min_inliers: int = 15,
     min_ratio: float = 0.15,
     min_coverage: float = 0.03,
+    detector: str = "sift",
 ) -> tuple[MatchResult, np.ndarray | None]:
-    ref_image = _read(ref_path, max_dim)
-    target_image = _read(target_path, max_dim)
+    """Load two images from disk and match them (see :func:`match_arrays`)."""
+    return match_arrays(
+        _read(ref_path, max_dim),
+        _read(target_path, max_dim),
+        mode=mode,
+        max_dim=max_dim,
+        ratio=ratio,
+        ransac_px=ransac_px,
+        min_inliers=min_inliers,
+        min_ratio=min_ratio,
+        min_coverage=min_coverage,
+        detector=detector,
+        ref_name=str(ref_path),
+        target_name=str(target_path),
+    )
+
+
+def match_arrays(
+    ref_image: np.ndarray | None,
+    target_image: np.ndarray | None,
+    *,
+    mode: str = "edges",
+    max_dim: int = 1024,
+    ratio: float = 0.75,
+    ransac_px: float = 5.0,
+    min_inliers: int = 15,
+    min_ratio: float = 0.15,
+    min_coverage: float = 0.03,
+    detector: str = "sift",
+    ref_name: str = "<array>",
+    target_name: str = "<array>",
+) -> tuple[MatchResult, np.ndarray | None]:
+    """Match two in-memory BGR images.
+
+    Same geometry and gate as :func:`match_images`, but without touching the
+    filesystem — the navigation loop calls this a few times per second.
+    """
+    if ref_image is not None:
+        ref_image = _resize(ref_image, max_dim)
+    if target_image is not None:
+        target_image = _resize(target_image, max_dim)
     empty = MatchResult(
-        ref=str(ref_path),
-        target=str(target_path),
+        ref=ref_name,
+        target=target_name,
         mode=mode,
         keypoints_ref=0,
         keypoints_target=0,
@@ -92,15 +155,15 @@ def match_images(
 
     ref_gray = _prepare(ref_image, mode)
     target_gray = _prepare(target_image, mode)
-    detector = _detector()
-    kp_ref, des_ref = detector.detectAndCompute(ref_gray, None)
-    kp_target, des_target = detector.detectAndCompute(target_gray, None)
+    detector_impl = _detector(detector)
+    kp_ref, des_ref = detector_impl.detectAndCompute(ref_gray, None)
+    kp_target, des_target = detector_impl.detectAndCompute(target_gray, None)
     if des_ref is None or des_target is None or len(kp_ref) < 4 or len(kp_target) < 4:
         empty.keypoints_ref = len(kp_ref)
         empty.keypoints_target = len(kp_target)
         return empty, None
 
-    knn = _matcher().knnMatch(des_ref, des_target, k=2)
+    knn = _matcher(detector).knnMatch(des_ref, des_target, k=2)
     good = [pair[0] for pair in knn if len(pair) == 2 and pair[0].distance < ratio * pair[1].distance]
     if len(good) < 4:
         empty.keypoints_ref = len(kp_ref)
@@ -142,8 +205,8 @@ def match_images(
 
     coverage = _coverage(inlier_dst, target_gray.shape[:2])
     result = MatchResult(
-        ref=str(ref_path),
-        target=str(target_path),
+        ref=ref_name,
+        target=target_name,
         mode=mode,
         keypoints_ref=len(kp_ref),
         keypoints_target=len(kp_target),

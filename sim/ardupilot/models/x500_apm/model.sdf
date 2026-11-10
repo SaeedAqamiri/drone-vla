@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sdf version='1.9'>
+  <model name="x500_apm">
+    <include merge='true'>
+      <uri>model://x500_base</uri>
+    </include>
+    <plugin filename="gz-sim-multicopter-motor-model-system"
+      name="gz::sim::systems::MulticopterMotorModel">
+      <jointName>rotor_0_joint</jointName>
+      <linkName>rotor_0</linkName>
+      <turningDirection>ccw</turningDirection>
+      <timeConstantUp>0.0125</timeConstantUp>
+      <timeConstantDown>0.025</timeConstantDown>
+      <maxRotVelocity>1000.0</maxRotVelocity>
+      <motorConstant>8.54858e-06</motorConstant>
+      <momentConstant>0.016</momentConstant>
+      <commandSubTopic>command/motor_speed</commandSubTopic>
+      <motorNumber>0</motorNumber>
+      <rotorDragCoefficient>8.06428e-05</rotorDragCoefficient>
+      <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
+      <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
+      <motorType>velocity</motorType>
+    </plugin>
+    <plugin filename="gz-sim-multicopter-motor-model-system"
+      name="gz::sim::systems::MulticopterMotorModel">
+      <jointName>rotor_1_joint</jointName>
+      <linkName>rotor_1</linkName>
+      <turningDirection>ccw</turningDirection>
+      <timeConstantUp>0.0125</timeConstantUp>
+      <timeConstantDown>0.025</timeConstantDown>
+      <maxRotVelocity>1000.0</maxRotVelocity>
+      <motorConstant>8.54858e-06</motorConstant>
+      <momentConstant>0.016</momentConstant>
+      <commandSubTopic>command/motor_speed</commandSubTopic>
+      <motorNumber>1</motorNumber>
+      <rotorDragCoefficient>8.06428e-05</rotorDragCoefficient>
+      <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
+      <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
+      <motorType>velocity</motorType>
+    </plugin>
+    <plugin filename="gz-sim-multicopter-motor-model-system"
+      name="gz::sim::systems::MulticopterMotorModel">
+      <jointName>rotor_2_joint</jointName>
+      <linkName>rotor_2</linkName>
+      <turningDirection>cw</turningDirection>
+      <timeConstantUp>0.0125</timeConstantUp>
+      <timeConstantDown>0.025</timeConstantDown>
+      <maxRotVelocity>1000.0</maxRotVelocity>
+      <motorConstant>8.54858e-06</motorConstant>
+      <momentConstant>0.016</momentConstant>
+      <commandSubTopic>command/motor_speed</commandSubTopic>
+      <motorNumber>2</motorNumber>
+      <rotorDragCoefficient>8.06428e-05</rotorDragCoefficient>
+      <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
+      <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
+      <motorType>velocity</motorType>
+    </plugin>
+    <plugin filename="gz-sim-multicopter-motor-model-system"
+      name="gz::sim::systems::MulticopterMotorModel">
+      <jointName>rotor_3_joint</jointName>
+      <linkName>rotor_3</linkName>
+      <turningDirection>cw</turningDirection>
+      <timeConstantUp>0.0125</timeConstantUp>
+      <timeConstantDown>0.025</timeConstantDown>
+      <maxRotVelocity>1000.0</maxRotVelocity>
+      <motorConstant>8.54858e-06</motorConstant>
+      <momentConstant>0.016</momentConstant>
+      <commandSubTopic>command/motor_speed</commandSubTopic>
+      <motorNumber>3</motorNumber>
+      <rotorDragCoefficient>8.06428e-05</rotorDragCoefficient>
+      <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
+      <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
+      <motorType>velocity</motorType>
+    </plugin>
+    <plugin filename="MotorFailurePlugin"
+      name="gz::sim::systems::MotorFailureSystem">
+    </plugin>
+      <!-- Sensors + JSON FDM only. Motor commands are injected by
+         scripts/apm_motor_bridge.py, so there are deliberately no <control>
+         blocks here: the x500 MotorModel owns thrust. -->
+    <plugin name="ArduPilotPlugin"
+      filename="ArduPilotPlugin">
+      <fdm_addr>127.0.0.1</fdm_addr>
+      <fdm_port_in>9002</fdm_port_in>
+      <connectionTimeoutMaxCount>5</connectionTimeoutMaxCount>
+      <!-- Lock step: the world advances once per ArduPilot servo packet, which
+           keeps sensor/actuator timing deterministic. Free-running (0) makes
+           the rate loop unstable on this airframe. -->
+      <lock_step>1</lock_step>
+      <no_time_sync>1</no_time_sync>
+      <have_32_channels>0</have_32_channels>
+      <modelXYZToAirplaneXForwardZDown degrees="true">0 0 0 180 0 0</modelXYZToAirplaneXForwardZDown>
+      <gazeboXYZToNED degrees="true">0 0 0 180 0 90</gazeboXYZToNED>
+      <imuName>ap_imu_link::ap_imu_sensor</imuName>
+    </plugin>
+
+    <!-- ArduPilot-facing IMU: 180 deg roll converts FLU (Gazebo) to FRD
+         (ArduPilot). Without this the vehicle flips on take-off. -->
+    <link name='ap_imu_link'>
+      <inertial>
+        <pose>0 0 0 0 0 0</pose>
+        <mass>0.01</mass>
+        <inertia>
+          <ixx>1e-6</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>1e-6</iyy>
+          <iyz>0</iyz>
+          <izz>1e-6</izz>
+        </inertia>
+      </inertial>
+      <sensor name="ap_imu_sensor" type="imu">
+        <gz_frame_id>ap_imu_link</gz_frame_id>
+        <pose degrees="true">0 0 0 180 0 0</pose>
+        <always_on>1</always_on>
+        <update_rate>250</update_rate>
+      </sensor>
+    </link>
+    <joint name='ap_imu_joint' type='fixed'>
+      <parent>base_link</parent>
+      <child>ap_imu_link</child>
+    </joint>
+
+    <!-- camera: nose-mounted, 30 deg below the horizon.
+         Two things matter here:
+         * a nadir camera sees only ground texture, which is useless for a
+           navigation/VLA dataset, so it is pitched 30 deg down to keep the
+           horizon and the terrain ahead in view like a real FPV cam;
+         * it sits at x=0.350 m, i.e. beyond the front propeller disc (rotor
+           tips reach x ~ 0.32 m). Mounted at x=0 the 99.7 deg horizontal FOV
+           puts the drone's own propeller in the top of every frame. -->
+    <include merge='true'>
+      <uri>model://mono_cam</uri>
+      <pose>0.350 0 0 0 0.436332 0</pose>
+      <name>mono_cam</name>
+    </include>
+    <joint name="CameraJoint" type="fixed">
+      <parent>base_link</parent>
+      <child>camera_link</child>
+      <pose relative_to="base_link">0.350 0 0 0 0.436332 0</pose>
+    </joint>
+  </model>
+</sdf>

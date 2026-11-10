@@ -308,6 +308,36 @@ def build_parser() -> argparse.ArgumentParser:
     selfcheck.add_argument("--seed", type=int, default=0)
     selfcheck.set_defaults(func=cmd_selfcheck)
 
+    from .orthofly import _add_arguments as add_flythrough_args
+    from .orthofly import run_from_args as cmd_flythrough
+
+    fly = sub.add_parser(
+        "flythrough",
+        help="render a 2.5D camera flythrough over a georeferenced orthophoto (exact ground truth)",
+    )
+    add_flythrough_args(fly)
+    fly.set_defaults(func=cmd_flythrough)
+
+    from .localize import add_arguments as add_localize_args
+    from .localize import run_from_args as cmd_localize
+
+    localize = sub.add_parser(
+        "localize",
+        help="score a flythrough: match every frame to its reference crop and report metric error",
+    )
+    add_localize_args(localize)
+    localize.set_defaults(func=cmd_localize)
+
+    from .closure import add_arguments as add_closure_args
+    from .closure import run_from_args as cmd_closure
+
+    closure = sub.add_parser(
+        "closure",
+        help="closed-loop vision-only navigation (the only position source is map matching)",
+    )
+    add_closure_args(closure)
+    closure.set_defaults(func=cmd_closure)
+
     return parser
 
 

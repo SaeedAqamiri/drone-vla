@@ -23,11 +23,22 @@ def route_points(
     return coords, distance, azimuth, count
 
 
-def _aeqd(lat: float, lon: float) -> str:
+def local_crs(lat: float, lon: float) -> str:
+    """Local metric frame (azimuthal equidistant) centred on ``lat``/``lon``.
+
+    Returns a PROJ string, so it can be handed straight to rasterio
+    (``WarpedVRT``, ``calculate_default_transform``) as well as pyproj
+    ``Transformer.from_crs``. Shared by ``imagery.crop_bounds`` and
+    ``navlab.lab.tiles``.
+    """
     return (
         f"+proj=aeqd +lat_0={lat} +lon_0={lon} +datum=WGS84 "
         "+units=m +no_defs +type=crs"
     )
+
+
+def _aeqd(lat: float, lon: float) -> str:
+    return local_crs(lat, lon)
 
 
 def corridor_geometry(

@@ -1,0 +1,27 @@
+# ArduPilot SITL parameters for drone-vla episodes.
+#
+# This VM renders Gazebo with llvmpipe (software OpenGL), so SITL sustains only
+# ~166 Hz instead of the default 400 Hz and refuses to arm with
+#   "Arm: Main loop slow (166Hz < 200Hz)"
+#   "Arm: Gyro 0 rate 333Hz < loop rate*1.8"
+# Both checks compare against SCHED_LOOP_RATE, so declaring the rate the machine
+# can actually hold (150 Hz < 166 Hz measured, gyro needs >=270 Hz) satisfies
+# them without disabling the checks. This says nothing about a real airframe.
+SCHED_LOOP_RATE 150
+
+# --- plant matching for the Gazebo x500_apm airframe -----------------------
+# Thrust is motorConstant * omega^2 with omega = throttle * 1500 rad/s, which
+# puts hover at PWM ~1500 (throttle 0.5) instead of ArduPilot's default 0.35.
+MOT_THST_HOVER 0.5
+MOT_THST_EXPO 0.75
+
+# Gazebo's MulticopterMotorModel applies thrust only: there is no reaction
+# torque on the body, so yaw is not actuated on this airframe. ArduPilot's yaw
+# controller then saturates permanently (the model starts at yaw 90 deg in an
+# ENU world, so the error is never zeroed) and eats the roll/pitch authority
+# that keeps the vehicle upright. Keep the yaw controller from fighting.
+ATC_ANG_YAW_P 1.0
+ATC_RAT_YAW_P 0.001
+ATC_RAT_YAW_I 0.001
+ATC_RAT_YAW_D 0
+ATC_RAT_YAW_FF 0

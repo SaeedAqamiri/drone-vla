@@ -1,0 +1,218 @@
+version: 1
+updated: '2026-11-04T18:27:03.976Z'
+summary: >-
+  Reproducible visual-localization lab. Core pieces: tiles.py
+  (build_tiles_along_route/build_tiles_in_bbox/TileStore/ReferenceStore, local-CRS north-up warping
+  with calculate_default_transform), sequences.py (uav_visloc_queries, frame_folder_queries,
+  video_queries with telemetry/has_truth), matchers.py (ClassicalMatcher + get_matcher for
+  sift/orb/akaze/loftr/lightglue), deep.py (DeepMatcher using kornia LoFTR or DISK+LightGlue),
+  candidates.py (Prior + CandidateSelector with global thumbnail bootstrap and spatial radius),
+  runner.py (LabRunner/RunnerConfig with scale/jump/coverage/confirmation gates and position
+  refinement from homography), metrics.py/report.py (fix rate, precision, false-fix, p95 error,
+  latency, recovery; summary/results/frames/report), and
+  generate.py/references.py/bench.py/synthetic.py/cli.py. Synthetic benchmark with SGLang-generated
+  references: SIFT/LoFTR/LightGlue all 10/10 fixes, precision 1.0, p95 ~9.7m, LightGlue ~210ms;
+  UAV-VisLoc real video still fails due to dataset georeference/oblique limitations.
+based_on:
+  - navlab/lab/tiles.py@14385-1793814721164
+  - navlab/lab/sequences.py@8592-1793814510612
+  - navlab/lab/matchers.py@3666-1793814493259
+  - navlab/lab/deep.py@9849-1793816235751
+  - navlab/lab/candidates.py@5674-1793811179480
+  - navlab/lab/runner.py@14677-1793814385675
+  - navlab/lab/metrics.py@5051-1793811260874
+  - navlab/lab/report.py@4473-1793814277529
+  - navlab/lab/generate.py@3588-1793813162556
+  - navlab/lab/references.py@1212-1793814858003
+  - navlab/lab/bench.py@4515-1793814128294
+  - navlab/lab/synthetic.py@4210-1793811444584
+  - navlab/lab/cli.py@11731-1793814874236
+entries:
+  tiles.py:
+    summary: >-
+      Metric north-up tile store. `build_tiles_along_route` and `build_tiles_in_bbox` compute
+      centers, `_build_from_centers` warps the source into `local_crs` and writes tile PNGs plus
+      manifest; `TileStore` exposes `to_local`/`to_wgs`/`candidates`/`all_tiles`/`path_for`, and
+      `ReferenceStore` overlays a generated/combined manifest. Critical rasterio details:
+      `WarpedVRT` does not accept a `resolution` kwarg and silently kept the source resolution, so
+      the code first calls `calculate_default_transform(..., resolution=(gsd,gsd))` and passes
+      `transform/width/height` to the VRT; `_read_tile` clips the request to the VRT extent because
+      `WarpedVRT` forbids boundless reads. Supports east/north offsets and manifest metadata.
+    confidence: verified
+    based_on:
+      - navlab/lab/tiles.py@14385-1793814721164
+  sequences.py:
+    summary: >-
+      Query-sequence adapters. `uav_visloc_queries` reads `XX.csv`, filters
+      `abs(Omega)`/`abs(Kappa)` by `near_nadir_deg`, sorts by `num`, and builds `QueryFrame`s with
+      lat/lon/height/Phi1. `frame_folder_queries` reads a generic image+CSV folder. `video_queries`
+      uses `cv2.VideoCapture`, samples at `sample_fps`, saves frames, and aligns an optional
+      telemetry CSV by nearest timestamp; without telemetry it sets `has_truth=False`.
+      `write_queries`/`load_queries` persist the manifest.
+    confidence: verified
+    based_on:
+      - navlab/lab/sequences.py@8592-1793814510612
+      - navlab/lab/types.py@3733-1793814371656
+  matchers.py:
+    summary: >-
+      Matcher registry. `ClassicalMatcher` wraps `sat2aerial.matching.match_images` with
+      detector/mode/max_dim/threshold/RANSAC options and seeds `cv2.setRNGSeed` for reproducible
+      RANSAC; `get_matcher(name)` dispatches sift/orb/akaze to ClassicalMatcher and
+      loftr/lightglue/superpoint_lightglue to `navlab.lab.deep.DeepMatcher`. `CLASSICAL` and `DEEP`
+      define the available names.
+    confidence: verified
+    based_on:
+      - navlab/lab/matchers.py@3666-1793814493259
+      - sat2aerial/matching.py@7787-1793811114222
+      - navlab/lab/deep.py@9849-1793816235751
+  deep.py:
+    summary: >-
+      Optional deep matchers. `DeepMatcher` lazily loads kornia `LoFTR(pretrained='outdoor')` for
+      `loftr`, or `DISK.from_pretrained('depth')` + `LightGlue('disk')` for lightglue. LoFTR is fed
+      grayscale tensors and filters by `output['confidence']`; DISK is run per image (not batched
+      across different image sizes) and LightGlue matches are filtered to rows with both indices >=
+      0 before indexing keypoints. Both produce a RANSAC homography and `MatchOutcome` with
+      inliers/ratio/coverage/scale/rotation/reproj. If kornia is missing, construction raises a
+      clear install error. Tested: LoFTR 2597 inliers and LightGlue 789 inliers on a synthetic pair,
+      scale ~1.34.
+    confidence: verified
+    based_on:
+      - navlab/lab/deep.py@9849-1793816235751
+      - navlab/lab/matchers.py@3666-1793814493259
+  runner.py:
+    summary: >-
+      Online localization loop. `RunnerConfig` holds matcher/mode/max_dim, candidate limits, radii,
+      thresholds, scale/jump tolerances, camera FOV, fix sigma, dropout range, confirmation
+      count/radius, and RNG seed. `LabRunner.run` bootstraps with global thumbnail candidates when
+      no prior exists, otherwise uses `CandidateSelector` with the `Prior`; matches each candidate,
+      picks the best by `(success,inliers,coverage,-reproj)`, refines the query center through the
+      inverse homography into tile pixel/local coordinates (`_refine_position`), applies scale and
+      jump gates, optional two-fix confirmation, and updates/decays the prior. It records per-frame
+      candidates/matched/accepted/error/prior_error/latency/reason/match metrics.
+    confidence: verified
+    based_on:
+      - navlab/lab/runner.py@14677-1793814385675
+      - navlab/lab/candidates.py@5674-1793811179480
+      - navlab/lab/matchers.py@3666-1793814493259
+      - navlab/lab/tiles.py@14385-1793814721164
+  candidates.py:
+    summary: >-
+      Prior and candidate selection. `Prior` stores east/north/velocity/timestamp/sigma, predicts
+      with constant velocity, updates velocity from accepted fixes (speed-capped), and decays sigma
+      when no fix arrives. `CandidateSelector` precomputes 32x32 normalized tile thumbnails for
+      global bootstrap, then returns spatially nearest tiles within `base_radius +
+      sigma_scale*sigma` (capped by `max_radius`), with optional global fallback and a max candidate
+      count. This implements the motion-prior search window that avoids matching the whole database.
+    confidence: verified
+    based_on:
+      - navlab/lab/candidates.py@5674-1793811179480
+      - navlab/lab/tiles.py@14385-1793814721164
+      - navlab/lab/runner.py@14677-1793814385675
+  generate.py:
+    summary: >-
+      Reference generation for tiles. `generate_references(store, out_dir, backend, view, size,
+      seeds, seed, limit, style_refs, altitude_m)` calls `navlab.generation.generate_reference` for
+      every tile/seed, requires a square output size, resizes the backend output to that size,
+      computes per-reference `gsd = store.tile_ground_m / width`, and writes
+      `references_<view>.json` with tile bounds/center/kind=generated/variant/seed/source_tile.
+      SGLang, ComfyUI, BFL, and dummy backends all flow through the same path.
+    confidence: verified
+    based_on:
+      - navlab/lab/generate.py@3588-1793813162556
+      - navlab/generation.py@2842-1793639776984
+      - sat2aerial/backends
+  references.py:
+    summary: >-
+      `combine_references(store, generated_manifest, out_path, name)` builds an ensemble manifest:
+      all satellite tiles from the base TileStore are tagged `kind='satellite'`, generated tiles
+      from the manifest are tagged `kind='generated'`, and both lists are written under one
+      manifest. `ReferenceStore` then lets the runner search satellite+generated candidates
+      together; on the synthetic scene the ensemble was 10/10 with precision 1.0 and p95 ~14.9m.
+    confidence: verified
+    based_on:
+      - navlab/lab/references.py@1212-1793814858003
+      - navlab/lab/tiles.py@14385-1793814721164
+      - navlab/lab/runner.py@14677-1793814385675
+  bench.py:
+    summary: >-
+      Benchmark matrix runner. `run_bench(config_path, out_dir)` loads YAML/JSON with
+      store/queries/reference_sets/matchers/modes/runner, builds RunnerConfig per combination, runs
+      LabRunner (optionally with a references manifest), writes per-run dirs via `write_run`, and
+      aggregates `results.csv` plus a Markdown table `report.md`. It is the entry point behind
+      `python -m navlab.lab bench`.
+    confidence: verified
+    based_on:
+      - navlab/lab/bench.py@4515-1793814128294
+      - navlab/lab/runner.py@14677-1793814385675
+      - navlab/lab/report.py@4473-1793814277529
+      - experiments/lab
+  synthetic.py:
+    summary: >-
+      Harness-validation data. `make_scene` writes a procedural `make_satellite` image as a
+      georeferenced GeoTIFF at a chosen GSD/origin; `make_queries` crops real ground footprints
+      along a route, applies `make_aerial` perspective/photometric augmentation, resizes to query
+      size, computes center lat/lon from the scene transform, and writes queries.json. It gives
+      known-truth sequences for testing the tile store/runner without real-flight data; the
+      synthetic benchmark reaches 10/10 fixes, precision 1.0, p95 ~9.7m.
+    confidence: verified
+    based_on:
+      - navlab/lab/synthetic.py@4210-1793811444584
+      - sat2aerial/synthetic.py@6330-1792566247603
+relations:
+  - from: matchers.py
+    to: deep.py
+    description: >-
+      `get_matcher` dispatches `loftr`/`lightglue`/`superpoint_lightglue` to
+      `navlab.lab.deep.DeepMatcher`, while sift/orb/akaze go to `ClassicalMatcher`.
+    confidence: verified
+    based_on:
+      - navlab/lab/matchers.py@3666-1793814493259
+      - navlab/lab/deep.py@9849-1793816235751
+  - from: runner.py
+    to: candidates.py
+    description: >-
+      `LabRunner.run` instantiates `CandidateSelector` and `Prior`; it calls `selector.select` or
+      `selector.global_candidates` for each query and updates the prior from accepted refined
+      positions.
+    confidence: verified
+    based_on:
+      - navlab/lab/runner.py@14677-1793814385675
+      - navlab/lab/candidates.py@5674-1793811179480
+  - from: runner.py
+    to: matchers.py
+    description: >-
+      `LabRunner.run` calls `get_matcher(config.matcher, ...)` once per run and
+      `matcher.match(tile_path, query_path)` for each candidate; deep and classical matchers share
+      this interface.
+    confidence: verified
+    based_on:
+      - navlab/lab/runner.py@14677-1793814385675
+      - navlab/lab/matchers.py@3666-1793814493259
+  - from: bench.py
+    to: runner.py
+    description: >-
+      `run_bench` constructs `RunnerConfig` for each reference/matcher/mode combination and runs
+      `LabRunner(...).run()`; it optionally passes a generated/ensemble references manifest.
+    confidence: verified
+    based_on:
+      - navlab/lab/bench.py@4515-1793814128294
+      - navlab/lab/runner.py@14677-1793814385675
+  - from: bench.py
+    to: report.py
+    description: >-
+      `run_bench` calls `write_run` for each combination and aggregates the returned summaries into
+      `results.csv` and `report.md`.
+    confidence: verified
+    based_on:
+      - navlab/lab/bench.py@4515-1793814128294
+      - navlab/lab/report.py@4473-1793814277529
+  - from: references.py
+    to: tiles.py
+    description: >-
+      `combine_references` reads satellite tiles via `TileStore.all_tiles`, merges them with a
+      generated manifest, and writes a combined manifest that `ReferenceStore` loads over the base
+      store.
+    confidence: verified
+    based_on:
+      - navlab/lab/references.py@1212-1793814858003
+      - navlab/lab/tiles.py@14385-1793814721164

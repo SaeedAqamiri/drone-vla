@@ -1,0 +1,30 @@
+version: 1
+updated: '2026-11-04T18:27:03.976Z'
+summary: >-
+  Deployment scripts for FLUX.3 Klein on the remote H100. `sglang_start.sh` starts `sglang serve
+  --model-path /home/ava/flux3-klein/sglang-weights --model-variant fp8r --port 30010
+  --batching-max-size 2` with the offline HF cache and the required CUDA/JIT fallback env;
+  `sglang_stop.sh`/`status.sh` manage it. `comfy_start.sh` and `comfy_gateway.py` provide the local
+  ComfyUI alternative. Live service measured ~3.5s per 768px image on the H100.
+based_on:
+  - flux3-deploy/sglang_start.sh@1671-1793638023685
+  - flux3-deploy/sglang_stop.sh@475-1793627500814
+  - flux3-deploy/status.sh@651-1793630575500
+  - flux3-deploy/comfy_start.sh@2275-1793630575494
+  - flux3-deploy/comfy_gateway.py@20307-1793627340999
+entries:
+  sglang_start.sh:
+    summary: >-
+      Starts the remote FLUX.3 Klein SGLang service used by `sat2aerial.backends.sglang` and
+      `navlab.generation` (`NAVLAB_SGLANG_URL` defaults to http://172.16.20.117:30010). It runs
+      `/home/ava/flux3-klein/venv-sglang/bin/sglang serve --model-path
+      /home/ava/flux3-klein/sglang-weights --model-variant fp8r --host 0.0.0.0 --port 30010
+      --batching-max-size 2 --batching-delay-ms 5`, with HF offline caches and JIT-fallback env. The
+      service was started on the H100 and `/v1/models` reports Flux3ImagePipeline; measured ~3.5s
+      for one 768px reference and ~13s for four (batch=2).
+    confidence: verified
+    based_on:
+      - flux3-deploy/sglang_start.sh@1671-1793638023685
+      - flux3-deploy/status.sh@651-1793630575500
+      - sat2aerial/backends/sglang.py@3341-1793639770657
+      - navlab/config.py@1017-1793639776984

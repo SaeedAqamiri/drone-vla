@@ -1,0 +1,79 @@
+<sdf version='1.9'>
+  <!-- Baylands terrain (Fuel) + iris with a downward camera, for ArduPilot SITL
+       episodes. Matches the PX4 `baylands + x500_mono_cam_down` viewpoint. -->
+  <world name='baylands'>
+    <!-- ArduPilot locks the simulator to SITL's clock, so physics is "ignore"
+         and the systems below are declared here (ArduPilot does not use PX4's
+         server.config). Without gz-sim-sensors-system there is no camera. -->
+    <physics name="1ms" type="ignore">
+      <max_step_size>0.001</max_step_size>
+      <real_time_factor>1.0</real_time_factor>
+    </physics>
+
+    <plugin filename="gz-sim-physics-system" name="gz::sim::systems::Physics"/>
+    <plugin filename="gz-sim-sensors-system" name="gz::sim::systems::Sensors">
+      <render_engine>ogre2</render_engine>
+    </plugin>
+    <plugin filename="gz-sim-user-commands-system" name="gz::sim::systems::UserCommands"/>
+    <plugin filename="gz-sim-scene-broadcaster-system" name="gz::sim::systems::SceneBroadcaster"/>
+    <plugin filename="gz-sim-imu-system" name="gz::sim::systems::Imu"/>
+    <plugin filename="gz-sim-navsat-system" name="gz::sim::systems::NavSat"/>
+
+    <gravity>0 0 -9.8</gravity>
+    <magnetic_field>6e-06 2.3e-05 -4.2e-05</magnetic_field>
+    <atmosphere type='adiabatic'/>
+    <scene>
+      <ambient>0.8 0.5 1</ambient>
+      <grid>false</grid>
+      <sky>
+        <clouds>true</clouds>
+      </sky>
+      <shadows>1</shadows>
+    </scene>
+    <light name='sunUTC' type='directional'>
+      <pose>0 0 500 0 -0 0</pose>
+      <cast_shadows>false</cast_shadows>
+      <intensity>1</intensity>
+      <direction>0.001 0.625 -0.78</direction>
+      <diffuse>0.904 0.904 0.904 1</diffuse>
+      <specular>0.271 0.271 0.271 1</specular>
+      <attenuation>
+        <range>2000</range>
+        <linear>0</linear>
+        <constant>1</constant>
+        <quadratic>0</quadratic>
+      </attenuation>
+    </light>
+    <include>
+      <uri>
+        https://fuel.gazebosim.org/1.0/OpenRobotics/models/baylands
+      </uri>
+      <name>park</name>
+      <pose>205 155 -1 0 0 0</pose>
+    </include>
+    <include>
+      <uri>
+        https://fuel.gazebosim.org/1.0/OpenRobotics/models/Coast Water
+      </uri>
+      <pose>0 0 -2 0 0 0
+        <relative_to>park</relative_to>
+      </pose>
+    </include>
+
+    <include>
+      <uri>model://iris_down_cam</uri>
+      <name>iris</name>
+      <!-- baylands terrain sits above z=0, so spawn clear of it and let the
+           vehicle settle; spawning at 0.2 buries it and it never lifts. -->
+      <pose>0 0 3.0 0 0 0</pose>
+    </include>
+
+    <spherical_coordinates>
+      <surface_model>EARTH_WGS84</surface_model>
+      <world_frame_orientation>ENU</world_frame_orientation>
+      <latitude_deg>37.412173071650805</latitude_deg>
+      <longitude_deg>-121.998878727967</longitude_deg>
+      <elevation>38</elevation>
+    </spherical_coordinates>
+  </world>
+</sdf>
