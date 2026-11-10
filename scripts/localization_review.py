@@ -150,6 +150,27 @@ def replay_candidates(rows, summary, store, query_map, details):
 class Catalog:
     def __init__(self):
         self.runs = {}
+        self.flux = {}
+        # Only associate an output with its explicitly recorded source tile in
+        # the same store. Validated copies and dummy generators are not FLUX.
+        for manifest in OUTPUT.rglob('references_nadir.json'):
+            try:
+                data = json.loads(manifest.read_text())
+                store = (ROOT / data['store']).resolve()
+                if not store.is_relative_to(ROOT) or data.get('backend') != 'sglang':
+                    continue
+                for tile in data.get('tiles', []):
+                    model = tile.get('meta', {}).get('model', '')
+                    if 'flux' not in model.lower() or not tile.get('source_tile'):
+                        continue
+                    source = safe_path(tile.get('source', ''))
+                    image = safe_path(store / tile['image'])
+                    if source and image:
+                        key = (str(store), str(tile['source_tile']))
+                        self.flux.setdefault(key, []).append({'id':str(tile['id']), 'source':source,
+                                                               'image':image, 'model':model})
+            except (OSError, ValueError, TypeError, KeyError, AttributeError):
+                continue
         qindex = query_index()
         for frames_path in OUTPUT.rglob('frames.csv'):
             try:
@@ -214,6 +235,9 @@ class Catalog:
         candidates=run['candidates'].get(row['query_id'],[])
         if not candidates and best and best in run['tiles']:
             candidates=[{'id':best,'bounds':run['tiles'][best]['bounds'],'dynamic':False}]
+        candidates=[{**candidate, 'flux_available':bool(self.flux_for(run, candidate)),
+                     'kind':run['tiles'].get(candidate['id'], {}).get('kind', 'satellite')}
+                    for candidate in candidates]
         candidate_text='بازسازی‌شده از حالت ذخیره‌شده' if row['query_id'] in run['candidates'] else 'فقط قطعهٔ برتر ثبت شده است'
         q=run['queries'].get(row['query_id'])
         return {'query_id':row['query_id'],'accepted':accepted,'matched':flag(row.get('matched')),
@@ -233,8 +257,28 @@ class Catalog:
                 'crop_diagnostic':run['details'].get(row['query_id'],{}).get('crop_diagnostic'),
                 'ortholoc':False}
 
+    def flux_for(self, run, candidate):
+        if not candidate or candidate.get('dynamic'):
+            return None
+        tile = run['tiles'].get(candidate['id'])
+        if not tile:
+            return None
+        source_id = tile.get('source_tile', tile['id'])
+        variants = self.flux.get((str(run['store'].root.resolve()), str(source_id)), [])
+        # If the recorded reference is itself a FLUX result, prefer that exact
+        # output; otherwise use the first output explicitly tied to this tile.
+        return next((v for v in variants if v['id'] == tile['id']), variants[0] if variants else None)
+
     def image(self, run_id, index, kind, tile_id=None, angle=0):
         run=self.runs[run_id]; row=run['rows'][index]
+        if kind in ('flux', 'flux_source'):
+            if run['type'] != 'uav': raise FileNotFoundError('FLUX comparison unavailable')
+            cand=next((x for x in self.frame(run_id,index)['candidates'] if x['id']==tile_id),None)
+            pair=self.flux_for(run,cand)
+            if not pair: raise FileNotFoundError('FLUX comparison unavailable')
+            image=cv2.imread(str(pair['image' if kind=='flux' else 'source']),cv2.IMREAD_COLOR)
+            if image is None: raise ValueError('image unreadable')
+            return image
         if run['type']=='ortholoc':
             with np.load(row['sample'],allow_pickle=False) as data:
                 image=cv2.cvtColor(data['image_query' if kind=='query' else 'image_dop'],cv2.COLOR_RGB2BGR)

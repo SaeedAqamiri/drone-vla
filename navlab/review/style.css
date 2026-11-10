@@ -4,3 +4,4 @@
 .frame-row .id{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.frame-row .frame-status{flex-shrink:0;margin-right:6px}#title{direction:ltr;text-align:right;overflow-wrap:anywhere}
 
 .guide{margin-top:13px;border-top:1px solid #263843;padding-top:12px;color:#a9bdc8;font-size:12px;line-height:2}.guide summary{color:#7cdebd;cursor:pointer}.guide p{margin-top:8px}.guide b{color:#e0edf1}
+.flux-card{margin-top:16px}.flux-note{color:#a8bbc5;font-size:12px;line-height:2;margin:-3px 0 14px}.flux-visuals{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px;align-items:start}@media(max-width:900px){.flux-visuals{grid-template-columns:1fr}}

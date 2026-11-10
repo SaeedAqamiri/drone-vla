@@ -1,9 +1,13 @@
 import tempfile
 import unittest
+import json
 from pathlib import Path
+from unittest.mock import patch
 
+import cv2
 import numpy as np
 
+import scripts.localization_review as review
 from scripts.localization_review import Catalog, replay_candidates, safe_path
 
 
@@ -43,5 +47,32 @@ class ReviewTest(unittest.TestCase):
             self.assertEqual(frame['map_size_m'],[10.,8.])
             self.assertEqual(cat.image('sample',0,'query').shape,(20,25,3))
             self.assertEqual(cat.image('sample',0,'map').shape,(40,50,3))
+
+    def test_flux_requires_explicit_source_and_real_flux_model(self):
+        with tempfile.TemporaryDirectory(dir=review.ROOT) as tmp:
+            root=Path(tmp); store=root/'store'; store.mkdir()
+            source=store/'source.png'; generated=store/'out.png'
+            cv2.imwrite(str(source),np.full((4,4,3),40,np.uint8))
+            cv2.imwrite(str(generated),np.full((4,4,3),120,np.uint8))
+            manifest={'store':str(store),'backend':'sglang','tiles':[
+                {'id':'generated1','source_tile':'source1','source':str(source),
+                 'image':'out.png','meta':{'model':'flux-3-image-klein'}},
+                {'id':'fake','source_tile':'source2','source':str(source),
+                 'image':'out.png','meta':{'model':'procedural dummy'}},
+            ]}
+            (root/'references_nadir.json').write_text(json.dumps(manifest))
+            with patch.object(review,'OUTPUT',root):
+                cat=Catalog()
+            run={'type':'uav','store':type('Store',(),{'root':store})(),
+                 'tiles':{'source1':{'id':'source1'},
+                          'generated1':{'id':'generated1','source_tile':'source1'},
+                          'source2':{'id':'source2'}}}
+            self.assertIsNotNone(cat.flux_for(run,{'id':'source1','dynamic':False}))
+            self.assertIsNotNone(cat.flux_for(run,{'id':'generated1','dynamic':False}))
+            self.assertIsNone(cat.flux_for(run,{'id':'source2','dynamic':False}))
+            self.assertIsNone(cat.flux_for(run,{'id':'source1','dynamic':True}))
+            pair=cat.flux_for(run,{'id':'source1','dynamic':False})
+            self.assertEqual(int(cv2.imread(str(pair['source']))[0,0,0]),40)
+            self.assertEqual(int(cv2.imread(str(pair['image']))[0,0,0]),120)
 
 if __name__=='__main__': unittest.main()
